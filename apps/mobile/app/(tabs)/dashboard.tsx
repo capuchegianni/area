@@ -6,6 +6,8 @@ import { Text } from "~/components/ui/text";
 import api from "@common/api/api";
 import type { AboutJson } from "@common/types/about/interfaces/about.interface";
 import ServiceOauth from "~/components/serviceOauth";
+import { Button } from "~/components/ui/button";
+import { useRouter } from "expo-router";
 
 type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number];
 
@@ -27,7 +29,7 @@ const servicesComponents: { [key: string]: (service: Service) => React.JSX.Eleme
     />,
     "twitch": (service: Service) => <ServiceOauth
         name="twitch"
-        scope=""
+        scope="channel:read:subscriptions"
         color="#6441a5"
         service={service}
     />
@@ -36,6 +38,7 @@ const servicesComponents: { [key: string]: (service: Service) => React.JSX.Eleme
 export default function HomePage() {
     const { t } = useTranslation();
 
+    const router = useRouter();
     const [services, setServices] = useState<Services>([]);
 
     useMount(async () => {
@@ -52,19 +55,27 @@ export default function HomePage() {
     });
 
     return (
-        <>
-            <View className="flex-1 p-4">
-                <View className="flex-row justify-between items-center mb-4">
-                    <Text className="text-xl font-bold">{t("home")}</Text>
-                </View>
-                <View>
-                    {services.map((service: Services[number], index: number) => (
-                        <View key={index}>
-                            {servicesComponents[service.name](service)}
-                        </View>
-                    ))}
-                </View>
+        <View className="flex-1 p-4">
+            <View className="flex-row justify-between items-center mb-4">
+                <Text className="text-xl font-bold">{t("home")}</Text>
             </View>
-        </>
+            <Button onPress={() => router.navigate("./area")}>
+                <Text className="text-lg">
+                    {t("createArea")}
+                </Text>
+            </Button>
+            <View className="mt-10">
+                <View className="items-center">
+                    <Text className="text-sm font-bold text-gray-400">
+                        {t("servicesConnect")}
+                    </Text>
+                </View>
+                {services.map((service: Services[number], index: number) => (
+                    <View key={index}>
+                        {servicesComponents[service.name](service)}
+                    </View>
+                ))}
+            </View>
+        </View>
     );
 }

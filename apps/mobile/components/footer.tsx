@@ -26,11 +26,14 @@ export default function FooterMenu() {
             <Menubar value={value} onValueChange={onValChange} className="m-2">
                 <MenubarMenu value="menu">
                     <MenubarTrigger>
-                        <Menu className="text-primary" />
+                        <Menu className="text-primary"/>
                     </MenubarTrigger>
                     <MenubarContent>
                         <MenubarItem onPress={() => router.navigate("/(tabs)/dashboard")}>
-                            <Text>{t("home")}</Text>
+                            <Text className="text-lg">{t("home")}</Text>
+                        </MenubarItem>
+                        <MenubarItem onPress={() => router.navigate("/(tabs)/area")}>
+                            <Text className="text-lg">{t("Area")}</Text>
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>

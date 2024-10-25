@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { type Theme, ThemeProvider } from "@react-navigation/native";
 import { SplashScreen, Stack, useRouter, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import useMount from "react-use/lib/useMount";
 import { Platform, View } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -54,7 +54,9 @@ export default function RootLayout() {
     useMount(() => {
         (async () => {
             const theme = await AsyncStorage.getItem("theme");
+            const language = await AsyncStorage.getItem("@language") || undefined;
 
+            i18n.changeLanguage(language);
             if (Platform.OS === "web") {
                 // Adds the background color to the html element to prevent white background on overscroll.
                 document.documentElement.classList.add("bg-background");
@@ -96,7 +98,7 @@ export default function RootLayout() {
                 router.navigate("/(auth)/login");
                 break;
             case 500:
-                console.log("An internal error happened.");
+                console.error("An internal error happened.");
                 break;
             }
             return;
@@ -104,27 +106,6 @@ export default function RootLayout() {
         AsyncStorage.removeItem("@access_token");
         router.navigate("/(auth)/login");
     };
-
-    useEffect(() => {
-        const updateAuth = async () => {
-            const token = await getToken();
-
-            if (isColorSchemeLoaded) {
-                if (token && (pathName === "/login" || pathName === "/signup")) {
-                    const res = await api.users.me(process.env.EXPO_PUBLIC_API_URL, token);
-
-                    if (res.status === 401)
-                        router.replace("/(auth)/login");
-                    else
-                        router.replace("/dashboard");
-                } else if (!token && pathName !== "/login" && pathName !== "/signup") {
-                    router.replace("/(auth)/login");
-                }
-            }
-        };
-
-        updateAuth();
-    }, [pathName, router, isColorSchemeLoaded]);
 
     if (!isColorSchemeLoaded) return null;
 
@@ -175,6 +156,12 @@ export default function RootLayout() {
                 />
                 <Stack.Screen
                     name="(tabs)/dashboard"
+                    options={{
+                        title: ""
+                    }}
+                />
+                <Stack.Screen
+                    name="(tabs)/area"
                     options={{
                         title: ""
                     }}
