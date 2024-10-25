@@ -21,7 +21,9 @@ const englishTranslations = {
         "500": "An internal error happened."
     },
     "home": "Home",
-    "createArea": "Create a new AREA"
+    "createArea": "Create a new AREA",
+    "servicesConnect": "Connect your account to multiple services!",
+    "areaDescription": "Link an Action and a REAction to create an AREA"
 };
 
 type Translation = {
@@ -56,7 +58,9 @@ const translations: Record<string, Translation> = {
                 "500": "Une erreur interne est survenue."
             },
             "home": "Accueil",
-            "createArea": "Créer une nouvelle AREA"
+            "createArea": "Créer une nouvelle AREA",
+            "servicesConnect": "Connectez votre compte avec plusieurs services !",
+            "areaDescription": "Liez une Action avec une REAction afin de créer une AREA"
         }
     }
 };
