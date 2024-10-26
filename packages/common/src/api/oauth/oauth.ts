@@ -1,4 +1,5 @@
 import type { RequestResponse } from "../api";
+import type { Service } from "../types/Service";
 
 type OAuthPayload = {
     redirect_uri: string;
@@ -6,7 +7,7 @@ type OAuthPayload = {
 };
 
 // TODO: common response type
-export default async function oauth(apiUrl: string, service: string, payload: OAuthPayload, accessToken: string): Promise<RequestResponse<{ redirect_uri: string; }, 200 | 401>> {
+export default async function oauth(apiUrl: string, service: Service, payload: OAuthPayload, accessToken: string): Promise<RequestResponse<{ redirect_uri: string; }, 200 | 401>> {
     try {
         const response = await fetch(`${apiUrl}/oauth/${service}?redirect_uri=${payload.redirect_uri}&scope=${payload.scope}`, {
             method: "GET",

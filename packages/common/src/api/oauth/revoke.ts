@@ -1,6 +1,7 @@
-import { RequestResponse } from "../api";
+import type { RequestResponse } from "../api";
+import type { Service } from "../types/Service";
 
-export default async function revoke(apiUrl: string, service: string, payload: { oauthCredentialId: number }, accessToken: string): Promise<RequestResponse<string, 204 | 401 | 404 | 422>> {
+export default async function revoke(apiUrl: string, service: Service, payload: { oauthCredentialId: number }, accessToken: string): Promise<RequestResponse<string, 204 | 401 | 404 | 422>> {
     try {
         const response = await fetch(`${apiUrl}/oauth/${service}/revoke/${payload.oauthCredentialId}`, {
             method: "GET",

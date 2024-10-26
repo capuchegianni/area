@@ -5,7 +5,8 @@ import api from "@common/api/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform, Pressable } from "react-native";
 import { Text } from "./ui/text";
-import { AboutJson } from "area-common/src/types/about/interfaces/about.interface";
+import type { AboutJson } from "@common/types/about/interfaces/about.interface";
+import type { Service as ServiceName } from "@common/api/types/Service";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -21,7 +22,7 @@ function getRedirectUri() {
 }
 
 type ServiceOauthProps = {
-    name: string
+    name: ServiceName
     scope: string
     color: `#${string}`
     service: Service

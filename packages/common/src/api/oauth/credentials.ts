@@ -1,4 +1,5 @@
-import { RequestResponse } from "../api";
+import type { RequestResponse } from "../api";
+import type { Service } from "../types/Service";
 
 type OAuthCredentialsResponse = {
     id: number
@@ -8,7 +9,7 @@ type OAuthCredentialsResponse = {
     scope: string
 }
 
-export default async function credentials(apiUrl: string, service: string, accessToken: string): Promise<RequestResponse<OAuthCredentialsResponse, 200 | 401>> {
+export default async function credentials(apiUrl: string, service: Service, accessToken: string): Promise<RequestResponse<OAuthCredentialsResponse, 200 | 401>> {
     try {
         const response = await fetch(`${apiUrl}/oauth/${service}/credentials`, {
             method: "GET",

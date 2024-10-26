@@ -1,5 +1,5 @@
-import { RequestResponse } from "../api";
-import { Area } from "../../types/area/interfaces/area.interface";
+import type { RequestResponse } from "../api";
+import type { Area } from "../../types/area/interfaces/area.interface";
 
 export default async function getWebhook(apiUrl: string, accessToken: string, webhookId: string): Promise<RequestResponse<Area, 200 | 404>> {
     try {

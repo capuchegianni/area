@@ -1,11 +1,12 @@
-import { Empty, RequestResponse } from "../api";
+import type { Empty, RequestResponse } from "../api";
+import type { Service } from "../types/Service";
 
 type OAuthCallbackPayload = {
     code: string;
     state: string;
 };
 
-export default async function callback(apiUrl: string, service: string, payload: OAuthCallbackPayload, accessToken: string): Promise<RequestResponse<Empty, 303 | 403>> {
+export default async function callback(apiUrl: string, service: Service, payload: OAuthCallbackPayload, accessToken: string): Promise<RequestResponse<Empty, 303 | 403>> {
     try {
         const response = await fetch(`${apiUrl}/oauth/${service}/callback?code=${payload.code}&state=${payload.state}`, {
             method: "GET",
