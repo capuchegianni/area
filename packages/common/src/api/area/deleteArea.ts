@@ -1,4 +1,4 @@
-import { RequestResponse, Empty } from "../api";
+import type { RequestResponse, Empty } from "../api";
 
 export default async function deleteArea(apiUrl: string, accessToken: string, areaId: string): Promise<RequestResponse<Empty, 204 | 401>> {
     try {

@@ -1,4 +1,4 @@
-import { Empty, RequestResponse } from "../api";
+import type { Empty, RequestResponse } from "../api";
 
 type OAuthCallbackPayload = {
     code: string;

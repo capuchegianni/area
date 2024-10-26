@@ -1,4 +1,4 @@
-import { RequestResponse } from "../api";
+import type { RequestResponse } from "../api";
 
 type OAuthCredentialsResponse = {
     id: number

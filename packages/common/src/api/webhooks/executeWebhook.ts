@@ -1,4 +1,4 @@
-import { RequestResponse, Empty } from "../api";
+import type { RequestResponse, Empty } from "../api";
 
 export default async function executeWebhook(apiUrl: string, accessToken: string, webhookId: string): Promise<RequestResponse<Empty, 200 | 404>> {
     try {

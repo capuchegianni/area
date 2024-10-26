@@ -1,6 +1,6 @@
-import { RequestResponse } from "../api";
-import { CreateAreaDto } from "../../types/area/dto/createArea.dto";
-import { Area } from "../../types/area/interfaces/area.interface";
+import type { RequestResponse } from "../api";
+import type { CreateAreaDto } from "../../types/area/dto/createArea.dto";
+import type { Area } from "../../types/area/interfaces/area.interface";
 
 export default async function createArea(apiUrl: string, accessToken: string, body: CreateAreaDto): Promise<RequestResponse<Area, 201 | 401>> {
     try {

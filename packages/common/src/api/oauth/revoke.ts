@@ -1,4 +1,4 @@
-import { RequestResponse } from "../api";
+import type { RequestResponse } from "../api";
 
 export default async function revoke(apiUrl: string, service: string, payload: { oauthCredentialId: number }, accessToken: string): Promise<RequestResponse<string, 204 | 401 | 404 | 422>> {
     try {
