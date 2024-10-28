@@ -46,13 +46,19 @@ services:
     networks:
       - area_network
 
-#  client_mobile: # TODO
-#    build:
-#      context: ./
-#      dockerfile: ./apps/mobile/Dockerfile
-#    image: area-mobile:latest
-#    volumes:
-#      - area-client:/usr/app/mobile
+  client_mobile:
+    build:
+      context: ./
+      dockerfile: ./apps/mobile/Dockerfile
+    image: area-mobile:latest
+    environment:
+      - EXPO_PUBLIC_API_URL=${MOBILE_API_URL}
+      - EXPO_USE_METRO_WORKSPACE_ROOT=1
+      - EXPO_PUBLIC_NODE_ENV=production
+    env_file:
+      - .env
+    volumes:
+      - area-client:/app/apps/frontend
 
   client_web:
     build:
@@ -60,7 +66,7 @@ services:
       dockerfile: ./apps/frontend/Dockerfile
     depends_on:
       - server
-#      - client_mobile
+      - client_mobile
     image: area-frontend:latest
     environment:
       - PORT=8081
@@ -70,8 +76,8 @@ services:
       - .env
     ports:
       - "8081:8081"
-#    volumes:
-#      - area-client:/usr/app/frontend
+    volumes:
+      - area-client:/app/apps/frontend
     networks:
       - area_network
 
