@@ -1,7 +1,15 @@
-export default async function hashString(string: string/*, algorithm: string = "SHA-512"*/) {
-    // const hashBuffer = await crypto.subtle.digest(algorithm, (new TextEncoder()).encode(string));
-    // const hashArray = Array.from(new Uint8Array(hashBuffer));
-    //
-    // return hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
-    return string;
+import CryptoJS from "crypto-js";
+
+export default function hashString(string: string, algorithm: keyof typeof CryptoJS = "SHA512") {
+    let hash;
+    switch (algorithm) {
+    case "SHA256":
+    case "SHA512":
+        hash = CryptoJS[algorithm](string);
+        break;
+    default:
+        throw new Error(`Unsupported algorithm: ${algorithm}`);
+    }
+
+    return hash.toString(CryptoJS.enc.Hex);
 }

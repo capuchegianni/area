@@ -9,7 +9,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import React, { useState } from "react";
 import api from "@common/api/api";
 import type { RegisterDto } from "@common/types/auth/dto/register.dto";
-import hashPassword from "~/lib/auth/hashPassword";
+import hashPassword from "@common/hash/hashPassword";
 
 export default function SignupPage() {
     const { t } = useTranslation();

@@ -77,7 +77,6 @@
         "@rn-primitives/types": "~1.0.3",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.0",
-        "crypto-js": "^4.2.0",
         "expo": "~51.0.38",
         "expo-auth-session": "~5.5.2",
         "expo-linking": "~6.3.1",

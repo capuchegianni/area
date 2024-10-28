@@ -22,7 +22,7 @@
         <form
             method="POST"
             use:enhance={async ({ formData }) => {
-                formData.set("password", await hashPassword(formData.get("password")));
+                formData.set("password", hashPassword(formData.get("password")));
                 return async ({ result }) => {await applyAction(result);};
             }}
             class="grid gap-4"
