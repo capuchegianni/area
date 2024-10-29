@@ -31,7 +31,7 @@ export class TwitchOAuthController implements OAuthController {
         private readonly oauthManager: TwitchOAuthService
     ) {}
 
-    @OAuthController_getOAuthUrl()
+    @OAuthController_getOAuthUrl("channel:read:polls channel:read:vips")
     async getOAuthUrl(
         @Req() req: Request,
         @Query("scope") scope: string,

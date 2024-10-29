@@ -31,7 +31,7 @@ export class DiscordOAuthController implements OAuthController {
         private readonly oauthManager: DiscordOAuthService
     ) {}
 
-    @OAuthController_getOAuthUrl()
+    @OAuthController_getOAuthUrl("identify email connections")
     async getOAuthUrl(
         @Req() req: Request,
         @Query("scope") scope: string,

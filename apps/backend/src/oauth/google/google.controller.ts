@@ -31,7 +31,9 @@ export class GoogleOAuthController implements OAuthController {
         private readonly oauthManager: GoogleOAuthService
     ) {}
 
-    @OAuthController_getOAuthUrl()
+    @OAuthController_getOAuthUrl(
+        "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtubepartner https://www.googleapis.com/auth/youtube.force-ssl"
+    )
     async getOAuthUrl(
         @Req() req: Request,
         @Query("scope") scope: string,

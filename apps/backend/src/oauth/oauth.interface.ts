@@ -30,11 +30,11 @@ import { Cache } from "cache-manager";
 import { OAuthCallbackResponseDto } from "./dto/OAuthCallbackResponse.dto";
 
 export class OAuthCredential {
-    @ApiProperty({ description: "The ID of the Google OAuth authorization." })
+    @ApiProperty({ description: "The ID of the OAuth2.0 credential." })
     readonly id?: number;
 
     @ApiProperty({
-        description: "The access token used to interact with the Google API."
+        description: "The access token used to interact with the OAuth provider's API."
     })
     readonly access_token: string;
 
@@ -71,7 +71,7 @@ export abstract class OAuthManager extends OAuthDBService {
     abstract revokeCredential(oauthCredential: OAuthCredential): Promise<void>;
 }
 
-export function OAuthController_getOAuthUrl(): MethodDecorator &
+export function OAuthController_getOAuthUrl(scopesExample: string): MethodDecorator &
     ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
@@ -90,8 +90,7 @@ export function OAuthController_getOAuthUrl(): MethodDecorator &
             name: "scope",
             description:
                 "The scopes required for the OAuth2.0 credential. It's a whitespace-joined string list.",
-            example:
-                "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtubepartner https://www.googleapis.com/auth/youtube.force-ssl"
+            example: scopesExample
         }),
         ApiQuery({
             name: "redirect_uri",
@@ -163,6 +162,7 @@ export function OAuthController_revoke(): MethodDecorator & ClassDecorator {
             description: "The ID of the credential to revoke.",
             type: Number
         }),
+        HttpCode(HttpStatus.NO_CONTENT),
         ApiBearerAuth("bearer"),
         ApiNoContentResponse({
             description: "Revokes an oauth credential."

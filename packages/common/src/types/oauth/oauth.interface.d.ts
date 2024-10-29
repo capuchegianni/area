@@ -1,8 +1,8 @@
 import { User } from "../users/interfaces/user.interface";
-import { HttpRedirectResponse } from "@nestjs/common";
 import { Request } from "express";
 import { OAuthDBService } from "./oauthDb.service";
 import { Cache } from "cache-manager";
+import { OAuthCallbackResponseDto } from "./dto/OAuthCallbackResponse.dto";
 export declare class OAuthCredential {
     readonly id?: number;
     readonly access_token: string;
@@ -35,7 +35,7 @@ export declare abstract class OAuthController {
     abstract getOAuthUrl(req: Request, scope: string, redirectUri: string): Promise<{
         redirect_uri: string;
     }>;
-    abstract callback(req: Request, code: string, state: string): Promise<HttpRedirectResponse>;
+    abstract callback(req: Request, code: string, state: string): Promise<OAuthCallbackResponseDto>;
     abstract credentials(req: Request): Promise<OAuthCredential[]>;
     abstract revoke(req: Request, oauthCredentialId: OAuthCredential["id"]): Promise<void>;
 }

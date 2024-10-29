@@ -31,8 +31,9 @@ export class DiscordOAuthService
         super(prismaService);
         const restAPIUrl = this.configService.getOrThrow("REST_API_URL");
 
-        this.clientId = this.configService.get<string>("DISCORD_CLIENT_ID");
-        this.clientSecret = this.configService.get<string>(
+        this.clientId =
+            this.configService.getOrThrow<string>("DISCORD_CLIENT_ID");
+        this.clientSecret = this.configService.getOrThrow<string>(
             "DISCORD_CLIENT_SECRET"
         );
         this.redirectUri = encodeURIComponent(
@@ -57,6 +58,7 @@ export class DiscordOAuthService
     async getCredentials(code: string): Promise<OAuthCredential> {
         if (undefined === code)
             throw new ForbiddenException("The scope were invalid.");
+
         const response = (
             await axios.post<{
                 access_token: string;
@@ -135,6 +137,10 @@ export class DiscordOAuthService
                 {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    auth: {
+                        username: this.clientId,
+                        password: this.clientSecret
                     }
                 }
             );
@@ -157,6 +163,10 @@ export class DiscordOAuthService
                 {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    auth: {
+                        username: this.clientId,
+                        password: this.clientSecret
                     }
                 }
             );
