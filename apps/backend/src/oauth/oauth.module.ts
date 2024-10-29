@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { OAuthService } from "./oauth.service";
-import { OAuthDBService } from "./oauthDb.service";
+import { OAuthDBService } from "./oauth-db.service";
 import { PrismaModule } from "src/prisma/prisma.module";
 import { OAuthController } from "./oauth.controller";
 import { OAuthProvidersService } from "./oauth-providers.service";

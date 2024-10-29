@@ -3,7 +3,7 @@ import { SchedulerService } from "./scheduler.service";
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { AreaService } from "src/area/area.service";
 import { OAuthService } from "src/oauth/oauth.service";
-import { OAuthDBService } from "src/oauth/oauthDb.service";
+import { OAuthDBService } from "src/oauth/oauth-db.service";
 import { OAuthProvidersService } from "src/oauth/oauth-providers.service";
 
 describe("SchedulerService", () => {

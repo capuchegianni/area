@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { OAuthDBService } from "./oauthDb.service";
+import { OAuthDBService } from "./oauth-db.service";
 import { DeepMockProxy, mockDeep } from "jest-mock-extended";
 import { PrismaClient } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";

@@ -22,7 +22,7 @@ import {
     HttpStatus,
     UseGuards
 } from "@nestjs/common";
-import { OAuthDBService } from "./oauthDb.service";
+import { OAuthDBService } from "./oauth-db.service";
 
 export class OAuthCredential {
     @ApiProperty({ description: "The ID of the OAuth2.0 credential." })

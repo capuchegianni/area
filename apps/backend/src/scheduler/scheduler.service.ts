@@ -23,7 +23,7 @@ import {
     AreaServiceAuth
 } from "../area/services/interfaces/service.interface";
 import { User } from "src/users/interfaces/user.interface";
-import { OAuthDBService } from "src/oauth/oauthDb.service";
+import { OAuthDBService } from "src/oauth/oauth-db.service";
 import {
     OAuthProvider,
     OAuthProvidersService

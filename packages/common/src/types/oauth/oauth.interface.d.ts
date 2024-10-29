@@ -1,4 +1,4 @@
-import { OAuthDBService } from "./oauthDb.service";
+import { OAuthDBService } from "./oauth-db.service";
 export declare class OAuthCredential {
     readonly id?: number;
     readonly access_token: string;

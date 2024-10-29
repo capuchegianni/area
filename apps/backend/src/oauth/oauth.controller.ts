@@ -18,7 +18,7 @@ import {
     OAuthCredential
 } from "./oauth.interface";
 import { User } from "src/users/interfaces/user.interface";
-import { OAuthDBService } from "./oauthDb.service";
+import { OAuthDBService } from "./oauth-db.service";
 import { OAuthProvidersService } from "./oauth-providers.service";
 
 @ApiTags("OAuth")
