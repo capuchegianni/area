@@ -42,22 +42,28 @@ export class DiscordOAuthService
     }
 
     getOAuthUrl(state: string, scope: string): string {
-        const queries = {
-            client_id: this.clientId,
-            redirect_uri: this.redirectUri,
-            scope: scope,
-            state,
-            response_type: "code"
-        };
+        const url = new URL("https://discord.com/oauth2/authorize");
 
-        return `https://discord.com/oauth2/authorize?${Object.entries(queries)
-            .map(([k, v]) => `${k}=${v}`)
-            .join("&")}`;
+        url.searchParams.append("client_id", this.clientId);
+        url.searchParams.append("redirect_uri", this.redirectUri);
+        url.searchParams.append("scope", scope);
+        url.searchParams.append("state", state);
+        url.searchParams.append("response_type", "code");
+
+        return url.toString();
     }
 
     async getCredentials(code: string): Promise<OAuthCredential> {
         if (undefined === code)
             throw new ForbiddenException("The scope were invalid.");
+
+        const data = new URLSearchParams({
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
+            code,
+            grant_type: "authorization_code",
+            redirect_uri: this.redirectUri
+        });
 
         const response = (
             await axios.post<{
@@ -66,23 +72,11 @@ export class DiscordOAuthService
                 scope: string;
                 expires_in: number;
                 token_type: "Bearer";
-            }>(
-                this.OAUTH_TOKEN_URL,
-                {
-                    code,
-                    grant_type: "authorization_code",
-                    redirect_uri: decodeURIComponent(this.redirectUri)
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    auth: {
-                        username: this.clientId,
-                        password: this.clientSecret
-                    }
+            }>(this.OAUTH_TOKEN_URL, data, {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
                 }
-            )
+            })
         ).data;
 
         return {

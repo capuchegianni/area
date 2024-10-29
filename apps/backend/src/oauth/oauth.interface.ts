@@ -12,21 +12,16 @@ import {
     ApiUnprocessableEntityResponse,
     getSchemaPath
 } from "@nestjs/swagger";
-import { User } from "../users/interfaces/user.interface";
 import { JwtGuard } from "src/auth/guards/jwt.guard";
 import {
     applyDecorators,
     Delete,
-    ForbiddenException,
     Get,
     HttpCode,
     HttpStatus,
     UseGuards
 } from "@nestjs/common";
-import { Request } from "express";
 import { OAuthDBService } from "./oauthDb.service";
-import { hash } from "node:crypto";
-import { Cache } from "cache-manager";
 import { OAuthCallbackResponseDto } from "./dto/OAuthCallbackResponse.dto";
 
 export class OAuthCredential {
@@ -34,7 +29,8 @@ export class OAuthCredential {
     readonly id?: number;
 
     @ApiProperty({
-        description: "The access token used to interact with the OAuth provider's API."
+        description:
+            "The access token used to interact with the OAuth provider's API."
     })
     readonly access_token: string;
 
@@ -71,8 +67,9 @@ export abstract class OAuthManager extends OAuthDBService {
     abstract revokeCredential(oauthCredential: OAuthCredential): Promise<void>;
 }
 
-export function OAuthController_getOAuthUrl(scopesExample: string): MethodDecorator &
-    ClassDecorator {
+export function OAuthController_getOAuthUrl(
+    scopesExample: string
+): MethodDecorator & ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
         Get("/"),
@@ -188,72 +185,4 @@ export interface OAuthMetadata {
     state: string;
     requestedAt: number;
     redirectUri: string;
-}
-
-export abstract class OAuthController {
-    static readonly OAUTH_METADATA_TTL: number = 600000; // 10 minutes
-
-    static createState(userId: User["id"], requestedAt: number) {
-        return hash("SHA-512", `${userId}:${requestedAt}`, "hex");
-    }
-
-    static async prepareOAuthSession(
-        cacheManager: Cache,
-        userId: User["id"],
-        redirectUri: string
-    ): Promise<string> {
-        const requestedAt = Date.now();
-        const state = OAuthController.createState(userId, requestedAt);
-
-        const oauthMetadata: OAuthMetadata = {
-            state,
-            requestedAt,
-            redirectUri
-        };
-
-        await cacheManager.set(
-            `oauth-${userId}`,
-            oauthMetadata,
-            OAuthController.OAUTH_METADATA_TTL
-        );
-
-        return state;
-    }
-
-    static async verifyState(
-        cacheManager: Cache,
-        userId: User["id"],
-        state: string
-    ): Promise<string> {
-        const oauthMetadata: OAuthMetadata = await cacheManager.get(
-            `oauth-${userId}`
-        );
-        if (undefined === oauthMetadata)
-            throw new ForbiddenException("Session expired.");
-        await cacheManager.del(`oauth-${userId}`);
-        if (state !== oauthMetadata.state)
-            throw new ForbiddenException(
-                "Invalid state. Possibly due to a CSRF attack attempt."
-            );
-        return oauthMetadata.redirectUri;
-    }
-
-    abstract getOAuthUrl(
-        req: Request,
-        scope: string,
-        redirectUri: string
-    ): Promise<{ redirect_uri: string }>;
-
-    abstract callback(
-        req: Request,
-        code: string,
-        state: string
-    ): Promise<OAuthCallbackResponseDto>;
-
-    abstract credentials(req: Request): Promise<OAuthCredential[]>;
-
-    abstract revoke(
-        req: Request,
-        oauthCredentialId: OAuthCredential["id"]
-    ): Promise<void>;
 }
