@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - area_network
+      - area-network
 
   redis:
     image: redis:alpine3.20
@@ -24,7 +24,7 @@ services:
     volumes:
       - area-redis-volume:/data:rw
     networks:
-      - area_network
+      - area-network
     command: redis-server --save 60 1 --loglevel warning
 
   server:
@@ -44,7 +44,7 @@ services:
       - ./crypto/jwe_public_key.pem:${JWE_PUBLIC_KEY}:ro
       - ./crypto/jwe_private_key.pem:${JWE_PRIVATE_KEY}:ro
     networks:
-      - area_network
+      - area-network
 
   client_mobile:
     build:
@@ -69,17 +69,17 @@ services:
       - client_mobile
     image: area-frontend:latest
     environment:
-      - PORT=8081
+      - PORT=${FRONTEND_PORT}
       - SERVER_API_URL=http://server:${REST_API_PORT}
       - CLIENT_API_URL=${REST_API_URL}
     env_file:
       - .env
     ports:
-      - "8081:8081"
+      - "8081:${FRONTEND_PORT}"
     volumes:
       - area-client:/app/apps/frontend
     networks:
-      - area_network
+      - area-network
 
 volumes:
   area-postgres-volume:
@@ -87,4 +87,4 @@ volumes:
   area-client:
 
 networks:
-  area_network:
+  area-network:
