@@ -27,10 +27,7 @@ export default function validateCredentials({ email, password }: Credentials, LL
 
     if (!password)
         return { error: true, passwordError: LL.auth.errors.missingPassword() };
-    if (typeof password !== "string")
-        return { error: true, passwordError: LL.auth.errors.incorrectPassword() };
-    password = password.trim();
-    if (password.length < 8)
+    if (typeof password !== "string" || password.length < 8)
         return { error: true, passwordError: LL.auth.errors.incorrectPassword() };
 
     return { error: false, email, password };
