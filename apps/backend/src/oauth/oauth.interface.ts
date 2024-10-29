@@ -100,7 +100,7 @@ export function OAuthController_getAuthorizationUrl(): MethodDecorator &
             name: "redirect_uri",
             description:
                 "The URI to which the user will be redirected once the authentication flow is successful.",
-            example: "http://localhost:5173/dashboard"
+            example: "http://localhost:8081/oauth/discord/callback"
         })
     );
 }
