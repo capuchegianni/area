@@ -9,7 +9,7 @@ import {
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { transformer } from "../area/generic.transformers";
-import { OAuthManager, OAuthCredential } from "../oauth/oauth.interface";
+import { OAuthCredential } from "../oauth/oauth.interface";
 import { AreaServiceAuthentication, AreaStatus } from "@prisma/client";
 import {
     AreaAction,
@@ -23,6 +23,11 @@ import {
     AreaServiceAuth
 } from "../area/services/interfaces/service.interface";
 import { User } from "src/users/interfaces/user.interface";
+import { OAuthDBService } from "src/oauth/oauthDb.service";
+import {
+    OAuthProvider,
+    OAuthProvidersService
+} from "src/oauth/oauth-providers.service";
 
 @Injectable()
 export class SchedulerService implements OnModuleInit, OnModuleDestroy {
@@ -32,7 +37,9 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         @Inject(forwardRef(() => AreaService))
         private readonly areaService: AreaService,
-        private readonly oauthService: OAuthService
+        private readonly oauthService: OAuthService,
+        private readonly oauthDbService: OAuthDBService,
+        private readonly oauthProvidersService: OAuthProvidersService
     ) {}
 
     async onModuleInit() {
@@ -47,21 +54,33 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
 
     private async getOAuthCredential(
         userId: User["id"],
-        scopes: string[],
-        credentialsManager: OAuthManager
+        providerName: string,
+        scopes: string[]
     ): Promise<OAuthCredential | null> {
+        const provider: OAuthProvider =
+            this.oauthProvidersService[providerName];
+
         const credentials: OAuthCredential[] =
-            await credentialsManager.loadCredentialsByScopes(
+            await this.oauthDbService.loadCredentialsByScopes(
                 userId,
                 scopes,
-                credentialsManager.OAUTH_TOKEN_URL,
-                credentialsManager.OAUTH_REVOKE_URL
+                provider.OAUTH_TOKEN_URL,
+                provider.OAUTH_REVOKE_URL
             );
+
         if (0 === credentials.length) return null;
 
         const credential = credentials[0];
+
         if (credential.expires_at > new Date()) return credential;
-        return await credentialsManager.refreshCredential(credential);
+
+        const refreshedCredentials = await this.oauthService.refresh(
+            provider,
+            credential
+        );
+        await this.oauthDbService.updateCredential(refreshedCredentials);
+
+        return refreshedCredentials;
     }
 
     private async getServiceAuth(
@@ -70,12 +89,10 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         auth: Omit<AreaServiceAuthentication, "id">
     ): Promise<AreaServiceAuth> {
         if (0 < kind.config.oauthScopes?.length) {
-            const credentialsManager =
-                this.oauthService.getOAuthCredentialsManager(kind.service);
             const credential = await this.getOAuthCredential(
                 userId,
-                kind.config.oauthScopes,
-                credentialsManager
+                kind.service,
+                kind.config.oauthScopes
             );
             if (null === credential)
                 throw new ForbiddenException("Token was revoked.");

@@ -1,4 +1,5 @@
 import {
+    ApiBadRequestResponse,
     ApiBearerAuth,
     ApiExtraModels,
     ApiForbiddenResponse,
@@ -22,7 +23,6 @@ import {
     UseGuards
 } from "@nestjs/common";
 import { OAuthDBService } from "./oauthDb.service";
-import { OAuthCallbackResponseDto } from "./dto/OAuthCallbackResponse.dto";
 
 export class OAuthCredential {
     @ApiProperty({ description: "The ID of the OAuth2.0 credential." })
@@ -67,17 +67,24 @@ export abstract class OAuthManager extends OAuthDBService {
     abstract revokeCredential(oauthCredential: OAuthCredential): Promise<void>;
 }
 
-export function OAuthController_getOAuthUrl(
-    scopesExample: string
-): MethodDecorator & ClassDecorator {
+export function OAuthController_getAuthorizationUrl(): MethodDecorator &
+    ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
-        Get("/"),
+        Get("/:provider"),
         HttpCode(HttpStatus.OK),
+        ApiParam({
+            name: "provider",
+            description: "The OAuth2.0 provider",
+            example: "discord"
+        }),
         ApiBearerAuth("bearer"),
         ApiOkResponse({
             description:
                 "Returns the OAuth2.0 URL to which the user will have to log in to the service."
+        }),
+        ApiNotFoundResponse({
+            description: "The specified provider is not supported."
         }),
         ApiUnauthorizedResponse({
             description:
@@ -87,7 +94,7 @@ export function OAuthController_getOAuthUrl(
             name: "scope",
             description:
                 "The scopes required for the OAuth2.0 credential. It's a whitespace-joined string list.",
-            example: scopesExample
+            example: "identify connections email"
         }),
         ApiQuery({
             name: "redirect_uri",
@@ -101,20 +108,26 @@ export function OAuthController_getOAuthUrl(
 export function OAuthController_callback(): MethodDecorator & ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
-        Get("/callback"),
+        Get("/:provider/callback"),
         HttpCode(HttpStatus.OK),
+        ApiParam({
+            name: "provider",
+            description: "The OAuth2.0 provider",
+            example: "discord"
+        }),
+        ApiNotFoundResponse({
+            description: "The specified provider is not supported."
+        }),
         ApiBearerAuth("bearer"),
-        ApiExtraModels(OAuthCallbackResponseDto),
         ApiOkResponse({
-            description:
-                "The auth flow has been completed successfully. Returns the URL to which the user must be redirected to.",
-            schema: {
-                $ref: getSchemaPath(OAuthCallbackResponseDto)
-            }
+            description: "The auth flow has been completed successfully."
         }),
         ApiForbiddenResponse({
             description:
                 "The 'state' attribute stored in the user' session is either invalid or does not match the one returned by the OAuth provider. This may happen during a CSRF attack."
+        }),
+        ApiBadRequestResponse({
+            description: "The 'code' is invalid."
         }),
         ApiQuery({
             name: "code",
@@ -133,9 +146,17 @@ export function OAuthController_credentials(): MethodDecorator &
     ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
-        Get("/credentials"),
+        Get("/:provider/credentials"),
         ApiExtraModels(OAuthCredential),
         ApiBearerAuth("bearer"),
+        ApiParam({
+            name: "provider",
+            description: "The OAuth2.0 provider",
+            example: "discord"
+        }),
+        ApiNotFoundResponse({
+            description: "The specified provider is not supported."
+        }),
         ApiOkResponse({
             description:
                 "Returns all the OAuth2.0 credentials related to the user.",
@@ -153,9 +174,14 @@ export function OAuthController_credentials(): MethodDecorator &
 export function OAuthController_revoke(): MethodDecorator & ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
-        Delete("/revoke/:oauthCredentialId"),
+        Delete("/:provider/revoke/:id"),
         ApiParam({
-            name: "oauthCredentialId",
+            name: "provider",
+            description: "The OAuth2.0 provider",
+            example: "discord"
+        }),
+        ApiParam({
+            name: "id",
             description: "The ID of the credential to revoke.",
             type: Number
         }),
@@ -166,7 +192,7 @@ export function OAuthController_revoke(): MethodDecorator & ClassDecorator {
         }),
         ApiNotFoundResponse({
             description:
-                "The given credential ID was either not found or does not belong to the current user."
+                "Either the provider name or the credential ID was invalid."
         }),
         ApiUnprocessableEntityResponse({
             description:

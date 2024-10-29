@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Inject,
     Injectable,
     InternalServerErrorException,
@@ -11,6 +12,7 @@ import { ForbiddenException } from "@nestjs/common";
 import axios from "axios";
 import { OAuthCredential, OAuthMetadata } from "./oauth.interface";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { OAuthProvider } from "./oauth-providers.service";
 
 type OAuthCredentialResponse = {
     access_token: string;
@@ -26,12 +28,7 @@ export class OAuthService {
 
     constructor(
         @Inject(CACHE_MANAGER)
-        private readonly cacheManager: Cache,
-        private readonly clientId: string,
-        private readonly clientSecret: string,
-        private readonly oauthAuthorizationUrl: string,
-        private readonly oauthTokenUrl: string,
-        private readonly oauthRevokeUrl: string
+        private readonly cacheManager: Cache
     ) {}
 
     private static createState(userId: User["id"], requestedAt: number) {
@@ -90,15 +87,16 @@ export class OAuthService {
     }
 
     async getAuthorizationUrl(
+        provider: OAuthProvider,
         userId: User["id"],
         redirectUri: string,
         scope: string
     ): Promise<string> {
         const state = await this.prepareOAuthSession(userId, redirectUri);
 
-        const url = new URL(this.oauthAuthorizationUrl);
+        const url = new URL(provider.OAUTH_AUTHORIZATION_URL);
 
-        url.searchParams.append("client_id", this.clientId);
+        url.searchParams.append("client_id", provider.CLIENT_ID);
         url.searchParams.append("redirect_uri", redirectUri);
         url.searchParams.append("scope", scope);
         url.searchParams.append("state", state);
@@ -108,6 +106,7 @@ export class OAuthService {
     }
 
     async callback(
+        provider: OAuthProvider,
         userId: User["id"],
         code: string,
         state: string
@@ -118,44 +117,54 @@ export class OAuthService {
             throw new ForbiddenException("The scope were invalid.");
 
         const data = new URLSearchParams({
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
+            client_id: provider.CLIENT_ID,
+            client_secret: provider.CLIENT_SECRET,
             code,
             grant_type: "authorization_code",
             redirect_uri: redirectUri
-        });
+        }).toString();
 
-        const response = (
-            await axios.post<OAuthCredentialResponse>(
-                this.oauthTokenUrl,
-                data,
-                {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
+        try {
+            const response = (
+                await axios.post<OAuthCredentialResponse>(
+                    provider.OAUTH_TOKEN_URL,
+                    data,
+                    {
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        }
                     }
-                }
-            )
-        ).data;
+                )
+            ).data;
 
-        return {
-            access_token: response.access_token,
-            refresh_token: response.refresh_token,
-            scope: response.scope,
-            expires_at: new Date(Date.now() + response.expires_in * 1000)
-        };
+            return {
+                access_token: response.access_token,
+                refresh_token: response.refresh_token,
+                scope: response.scope,
+                expires_at: new Date(Date.now() + response.expires_in * 1000)
+            };
+        } catch (e) {
+            if (400 === e.response.status)
+                throw new BadRequestException("Invalid 'code' provided.");
+            console.error(e.response.data, e.response.status);
+            throw new InternalServerErrorException();
+        }
     }
 
-    async refresh(oauthCredential: OAuthCredential): Promise<OAuthCredential> {
+    async refresh(
+        provider: OAuthProvider,
+        oauthCredential: OAuthCredential
+    ): Promise<OAuthCredential> {
         const data = new URLSearchParams({
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
+            client_id: provider.CLIENT_ID,
+            client_secret: provider.CLIENT_SECRET,
             grant_type: "refresh_token",
             refresh_token: oauthCredential.refresh_token
-        });
+        }).toString();
 
         const response = (
             await axios.post<OAuthCredentialResponse>(
-                this.oauthTokenUrl,
+                provider.OAUTH_TOKEN_URL,
                 data,
                 {
                     headers: {
@@ -175,19 +184,20 @@ export class OAuthService {
         };
     }
 
-    private async revoke(
+    private async internalRevoke(
+        provider: OAuthProvider,
         token: string,
         tokenTypeHint: "access_token" | "refresh_token"
     ): Promise<void> {
         const data = new URLSearchParams({
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
+            client_id: provider.CLIENT_ID,
+            client_secret: provider.CLIENT_SECRET,
             token,
             token_type_hint: tokenTypeHint
         });
 
         try {
-            await axios.post(this.oauthRevokeUrl, data, {
+            await axios.post(provider.OAUTH_REVOKE_URL, data, {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 }
@@ -208,9 +218,20 @@ export class OAuthService {
         }
     }
 
-    async revokeCredential(oauthCredential: OAuthCredential): Promise<void> {
-        await this.revoke(oauthCredential.access_token, "access_token");
+    async revoke(
+        provider: OAuthProvider,
+        oauthCredential: OAuthCredential
+    ): Promise<void> {
+        await this.internalRevoke(
+            provider,
+            oauthCredential.access_token,
+            "access_token"
+        );
 
-        await this.revoke(oauthCredential.refresh_token, "refresh_token");
+        await this.internalRevoke(
+            provider,
+            oauthCredential.refresh_token,
+            "refresh_token"
+        );
     }
 }
