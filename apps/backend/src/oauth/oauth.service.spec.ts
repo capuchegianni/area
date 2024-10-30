@@ -1,8 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { OAuthService } from "./oauth.service";
-import { GoogleOAuthService } from "./google/google.service";
-import { DiscordOAuthService } from "./discord/discord.service";
-import { TwitchOAuthService } from "./twitch/twitch.service";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 
 describe("OauthService", () => {
     let service: OAuthService;
@@ -11,9 +9,10 @@ describe("OauthService", () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 OAuthService,
-                { provide: GoogleOAuthService, useValue: {} },
-                { provide: DiscordOAuthService, useValue: {} },
-                { provide: TwitchOAuthService, useValue: {} }
+                {
+                    provide: CACHE_MANAGER,
+                    useValue: () => ({ get: jest.fn(), set: jest.fn() })
+                }
             ]
         }).compile();
 

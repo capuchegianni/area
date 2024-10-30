@@ -19,7 +19,7 @@ import { AboutModule } from "./about/about.module";
 import { PrismaService } from "./prisma/prisma.service";
 import { AreaService } from "./area/area.service";
 import { WebhookModule } from "./webhook/webhook.module";
-import { OAuthDBService } from "./oauth/oauthDb.service";
+import { OAuthDBService } from "./oauth/oauth-db.service";
 
 @Module({
     imports: [
