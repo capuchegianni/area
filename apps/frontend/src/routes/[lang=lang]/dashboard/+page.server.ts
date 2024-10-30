@@ -15,5 +15,5 @@ export const load: PageServerLoad = async ({ parent }) => {
     if (!areas.success)
         return error(500, "Internal Server Error");
 
-    return { locale, services, areas: areas.body };
+    return { locale, services, areas: areas.body, client, apiUrl: env.CLIENT_API_URL };
 };
