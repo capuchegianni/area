@@ -1,31 +1,23 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { TwitchOAuthService } from "./twitch.service";
-import { PrismaClient } from "@prisma/client";
+import { OAuthDBService } from "./oauth-db.service";
 import { DeepMockProxy, mockDeep } from "jest-mock-extended";
+import { PrismaClient } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { ConfigService } from "@nestjs/config";
 
-describe("TwitchService", () => {
-    let service: TwitchOAuthService;
-
+describe("OAuthDBService", () => {
+    let service: OAuthDBService;
     let prismaService: DeepMockProxy<PrismaClient>;
+
     beforeEach(async () => {
         prismaService = mockDeep<PrismaClient>();
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                TwitchOAuthService,
-                {
-                    provide: ConfigService,
-                    useValue: {
-                        get: jest.fn(),
-                        getOrThrow: jest.fn()
-                    }
-                },
+                OAuthDBService,
                 { provide: PrismaService, useValue: prismaService }
             ]
         }).compile();
 
-        service = module.get<TwitchOAuthService>(TwitchOAuthService);
+        service = module.get<OAuthDBService>(OAuthDBService);
     });
 
     it("should be defined", () => {
