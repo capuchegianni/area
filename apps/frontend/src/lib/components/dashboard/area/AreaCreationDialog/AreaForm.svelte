@@ -95,6 +95,7 @@
     };
 
     export let action: Action;
+    // eslint-disable-next-line svelte/valid-compile
     export let actionId: string;
     export let reaction: Reaction;
     export let reactionId: string;
