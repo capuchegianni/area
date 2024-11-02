@@ -29,14 +29,15 @@ import { AreaServiceAuthDto } from "./dto/areaServiceAuth.dto";
 
 @Injectable()
 export class AreaService {
-    private readonly actions = {
-        youtube: YOUTUBE_ACTIONS,
-        discord: DISCORD_ACTIONS
-    };
-
-    private readonly reactions = {
-        youtube: YOUTUBE_REACTIONS,
-        discord: DISCORD_REACTIONS
+    private readonly configs = {
+        actions: {
+            youtube: YOUTUBE_ACTIONS,
+            discord: DISCORD_ACTIONS
+        },
+        reactions: {
+            youtube: YOUTUBE_REACTIONS,
+            discord: DISCORD_REACTIONS
+        }
     };
 
     constructor(
@@ -45,44 +46,28 @@ export class AreaService {
         private readonly schedulerService: SchedulerService
     ) {}
 
-    getAction(actionId: string): AreaAction {
-        const [actionService, actionMethod] = actionId.split(/\./);
+    getAreaConfig(
+        id: string,
+        kind: "action" | "reaction"
+    ): AreaAction | AreaReaction {
+        const [service, method] = id.split(/\./);
+        const referer = this.configs[kind];
 
-        if (!Object.keys(this.actions).includes(actionService))
+        if (!Object.keys(referer).includes(service))
             throw new NotFoundException(
-                `Invalid action service ID : ${actionService}.`
+                `Invalid action service ID : ${service}.`
             );
 
-        const action: ActionDescription =
-            this.actions[actionService][actionMethod];
-        if (undefined !== action)
+        const config: ActionDescription & ReactionDescription =
+            referer[service][method];
+        if (undefined !== config)
             return {
-                service: actionService,
-                method: actionMethod,
-                config: action
+                service,
+                method,
+                config
             };
-        throw new NotFoundException(`Invalid action method : ${actionMethod}.`);
-    }
 
-    getReaction(reactionId: string): AreaReaction {
-        const [reactionService, reactionMethod] = reactionId.split(/\./);
-
-        if (!Object.keys(this.reactions).includes(reactionService))
-            throw new NotFoundException(
-                `Invalid reaction service ID : ${reactionService}.`
-            );
-
-        const reaction: ReactionDescription =
-            this.reactions[reactionService][reactionMethod];
-        if (undefined !== reaction)
-            return {
-                service: reactionService,
-                method: reactionMethod,
-                config: reaction
-            };
-        throw new NotFoundException(
-            `Invalid reaction method : ${reactionMethod}.`
-        );
+        throw new NotFoundException(`Invalid ${kind} method : ${method}.`);
     }
 
     private prismaAreaToArea({
@@ -168,8 +153,14 @@ export class AreaService {
     }
 
     async getAreaTask(area: PrismaArea): Promise<AreaTask> {
-        const action = this.getAction(area.actionId);
-        const reaction = this.getReaction(area.reactionId);
+        const action = this.getAreaConfig(
+            area.actionId,
+            "action"
+        ) as AreaAction;
+        const reaction = this.getAreaConfig(
+            area.reactionId,
+            "reaction"
+        ) as AreaReaction;
         const taskName = `${area.id}|${action.service}.${action.method}|${reaction.service}.${reaction.method}`;
 
         const actionAuth =
@@ -240,8 +231,14 @@ export class AreaService {
         userId: User["id"],
         createAreaDto: CreateAreaDto
     ): Promise<Area> {
-        const action = this.getAction(createAreaDto.actionId);
-        const reaction = this.getReaction(createAreaDto.reactionId);
+        const action = this.getAreaConfig(
+            createAreaDto.actionId,
+            "action"
+        ) as AreaAction;
+        const reaction = this.getAreaConfig(
+            createAreaDto.reactionId,
+            "reaction"
+        ) as AreaReaction;
 
         if (
             !this.checkServiceAuthRequirements(
@@ -305,8 +302,14 @@ export class AreaService {
                 reactionAuth: true
             }
         });
-        const action = this.getAction(area.actionId);
-        const reaction = this.getReaction(area.reactionId);
+        const action = this.getAreaConfig(
+            area.actionId,
+            "action"
+        ) as AreaAction;
+        const reaction = this.getAreaConfig(
+            area.reactionId,
+            "reaction"
+        ) as AreaReaction;
 
         if (
             !this.checkServiceAuthRequirements(

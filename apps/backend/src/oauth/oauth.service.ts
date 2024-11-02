@@ -121,6 +121,7 @@ export class OAuthService {
             client_secret: provider.CLIENT_SECRET,
             code,
             grant_type: "authorization_code",
+            access_type: "offline",
             redirect_uri: redirectUri
         }).toString();
 

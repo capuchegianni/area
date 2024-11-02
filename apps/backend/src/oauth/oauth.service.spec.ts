@@ -230,7 +230,7 @@ describe("OauthService", () => {
 
             expect(axiosPost).toHaveBeenCalledWith(
                 "https://oauth2.googleapis.com/token",
-                "client_id=GOOGLE_CLIENT_ID&client_secret=GOOGLE_CLIENT_SECRET&code=code&grant_type=authorization_code&redirect_uri=REDIRECT_URI",
+                "client_id=GOOGLE_CLIENT_ID&client_secret=GOOGLE_CLIENT_SECRET&code=code&grant_type=authorization_code&access_type=offline&redirect_uri=REDIRECT_URI",
                 {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
@@ -288,7 +288,7 @@ describe("OauthService", () => {
 
             expect(axiosPost).toHaveBeenCalledWith(
                 "https://oauth2.googleapis.com/token",
-                "client_id=GOOGLE_CLIENT_ID&client_secret=GOOGLE_CLIENT_SECRET&code=code&grant_type=authorization_code&redirect_uri=REDIRECT_URI",
+                "client_id=GOOGLE_CLIENT_ID&client_secret=GOOGLE_CLIENT_SECRET&code=code&grant_type=authorization_code&access_type=offline&redirect_uri=REDIRECT_URI",
                 {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
@@ -345,7 +345,7 @@ describe("OauthService", () => {
 
             expect(axiosPost).toHaveBeenCalledWith(
                 "https://oauth2.googleapis.com/token",
-                "client_id=GOOGLE_CLIENT_ID&client_secret=GOOGLE_CLIENT_SECRET&code=code&grant_type=authorization_code&redirect_uri=REDIRECT_URI",
+                "client_id=GOOGLE_CLIENT_ID&client_secret=GOOGLE_CLIENT_SECRET&code=code&grant_type=authorization_code&access_type=offline&redirect_uri=REDIRECT_URI",
                 {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
