@@ -162,11 +162,12 @@ describe("AuthService", () => {
                 has_accepted_terms_and_conditions: true
             };
 
-            prismaService.user.create.mockRejectedValueOnce(new PrismaClientKnownRequestError("Conflict", {
-                clientVersion: "CLIENT_VERSION",
-                code: "P2002",
-
-            }));
+            prismaService.user.create.mockRejectedValueOnce(
+                new PrismaClientKnownRequestError("Conflict", {
+                    clientVersion: "CLIENT_VERSION",
+                    code: "P2002"
+                })
+            );
 
             try {
                 await authService.register(registerDto);
@@ -198,11 +199,12 @@ describe("AuthService", () => {
                 has_accepted_terms_and_conditions: true
             };
 
-            prismaService.user.create.mockRejectedValueOnce(new PrismaClientKnownRequestError("Conflict", {
-                clientVersion: "CLIENT_VERSION",
-                code: "UNKNOWNED_CODE",
-
-            }));
+            prismaService.user.create.mockRejectedValueOnce(
+                new PrismaClientKnownRequestError("Conflict", {
+                    clientVersion: "CLIENT_VERSION",
+                    code: "UNKNOWNED_CODE"
+                })
+            );
 
             try {
                 await authService.register(registerDto);

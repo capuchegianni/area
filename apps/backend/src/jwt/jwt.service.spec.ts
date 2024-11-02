@@ -38,7 +38,7 @@ function b64decode(s: string): string {
 
 describe("CryptoService", () => {
     let jwtService: JwtService;
-    let jweDataExample: jose.JWTPayload = { id: "blabla" };
+    const jweDataExample: jose.JWTPayload = { id: "blabla" };
     let jweExample: string;
 
     beforeAll(async () => {
@@ -220,7 +220,7 @@ describe("CryptoService", () => {
             };
 
             try {
-                const module: TestingModule = await Test.createTestingModule({
+                await Test.createTestingModule({
                     providers: [
                         JwtService,
                         { provide: ConfigService, useValue: configService }

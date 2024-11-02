@@ -5,7 +5,6 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { randomUUID } from "node:crypto";
 import { OAuthCredential } from "./oauth.interface";
-import { User, OAuthCredential as PrismaOAuthCredential } from "@prisma/client";
 import { NotFoundException } from "@nestjs/common";
 
 describe("OAuthDBService", () => {
