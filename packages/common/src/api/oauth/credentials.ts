@@ -9,7 +9,7 @@ type OAuthCredentialsResponse = {
     scope: string
 }
 
-export default async function credentials(apiUrl: string, service: OAuthService, accessToken: string): Promise<RequestResponse<OAuthCredentialsResponse, 200 | 401 | 404>> {
+export default async function credentials(apiUrl: string, service: OAuthService, accessToken: string): Promise<RequestResponse<OAuthCredentialsResponse[], 200 | 401 | 404>> {
     try {
         const response = await fetch(`${apiUrl}/oauth/${service}/credentials`, {
             method: "GET",
