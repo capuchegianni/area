@@ -169,9 +169,8 @@ export function OAuthController_credentials(): MethodDecorator &
         ApiOkResponse({
             description:
                 "Returns all the OAuth2.0 credentials related to the user.",
-            schema: {
-                $ref: getSchemaPath(OAuthCredential)
-            }
+            isArray: true,
+            type: OAuthCredential
         }),
         ApiUnauthorizedResponse({
             description:

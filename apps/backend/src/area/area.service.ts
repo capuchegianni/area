@@ -30,11 +30,11 @@ import { AreaServiceAuthDto } from "./dto/areaServiceAuth.dto";
 @Injectable()
 export class AreaService {
     private readonly configs = {
-        actions: {
+        action: {
             youtube: YOUTUBE_ACTIONS,
             discord: DISCORD_ACTIONS
         },
-        reactions: {
+        reaction: {
             youtube: YOUTUBE_REACTIONS,
             discord: DISCORD_REACTIONS
         }
