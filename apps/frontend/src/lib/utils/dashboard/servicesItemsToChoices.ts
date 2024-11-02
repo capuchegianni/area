@@ -22,7 +22,10 @@ export default function servicesItemsToChoices(services: Services, item: "action
                 ...service[item].map(serviceItem => {
                     const id = `${service.name}.${serviceItem.name}`;
 
-                    dest[id] = serviceItem;
+                    dest[id] = {
+                        ...serviceItem,
+                        serviceName: service.name
+                    };
                     return { label: serviceItem.name, value: id, group: name };
                 })
             ]);
