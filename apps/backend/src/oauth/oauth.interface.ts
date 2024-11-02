@@ -124,7 +124,7 @@ export function OAuthController_callback(): MethodDecorator & ClassDecorator {
         }),
         ApiForbiddenResponse({
             description:
-                "The 'state' attribute stored in the user' session is either invalid or does not match the one returned by the OAuth provider. This may happen during a CSRF attack."
+                "The 'state' attribute stored in the user's session is either invalid or does not match the one returned by the OAuth provider. This may happen during a CSRF attack."
         }),
         ApiBadRequestResponse({
             description: "The 'code' is invalid."
