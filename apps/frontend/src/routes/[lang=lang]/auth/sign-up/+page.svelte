@@ -1,6 +1,6 @@
 <script lang="ts">
     import { enhance, applyAction } from "$app/forms";
-    import hashPassword from "@common/hash/hashPassword";
+    import hashPassword from "@common/utils/hash/hashPassword";
     import { Button } from "$lib/components/ui/button";
     import { Input } from "$lib/components/ui/input";
     import { Checkbox } from "$lib/components/ui/checkbox";
