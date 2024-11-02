@@ -496,7 +496,6 @@ describe("AreaService", () => {
             expect(area).toStrictEqual(expectedArea);
         });
         it("should throw an UnprocessableEntityException when the auth fields do not match the service's authentication method", async () => {
-            const userId = "user-id";
             const createDto: CreateAreaDto = {
                 actionAuth: { oauth: 1 },
                 reactionAuth: { oauth: 1 },
