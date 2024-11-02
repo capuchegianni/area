@@ -4,7 +4,7 @@
     import type { HTMLInputTypeAttribute } from "svelte/elements";
     import type { ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
     import { applyAction, enhance } from "$app/forms";
-    import type { Action, Reaction } from "@common/customTypes/about.interface";
+    import type { Action, Reaction } from "@common/area/types/area";
     import { Label } from "$lib/components/ui/label";
     import { Input } from "$lib/components/ui/input";
     import { Separator } from "$lib/components/ui/separator";

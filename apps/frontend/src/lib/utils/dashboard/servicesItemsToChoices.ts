@@ -1,5 +1,5 @@
 import type { Choice } from "$lib/components/dashboard/area/Combobox/Combobox";
-import type { Services, Action, Reaction } from "@common/customTypes/about.interface";
+import type { Services, Action, Reaction } from "@common/area/types/area";
 import { serviceName } from "@common/area/services";
 
 /**

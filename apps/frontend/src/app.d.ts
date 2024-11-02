@@ -1,5 +1,5 @@
 import type { UserInfo } from "@common/types/users/interfaces/user.interface";
-import { Services } from "@common/customTypes/about.interface";
+import { Services } from "@common/area/types/area";
 import type { Locales, TranslationFunctions } from "$i18n/i18n-types";
 
 // See https://kit.svelte.dev/docs/types#app

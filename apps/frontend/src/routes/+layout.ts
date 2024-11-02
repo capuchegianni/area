@@ -1,5 +1,5 @@
 import type { LayoutLoad } from "./$types";
-import type { Services } from "@common/customTypes/about.interface";
+import type { Services } from "@common/area/types/area";
 import type { Locales } from "$i18n/i18n-types";
 import { loadLocaleAsync } from "$i18n/i18n-util.async";
 import type { Client } from "~/app";

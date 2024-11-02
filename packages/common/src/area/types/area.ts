@@ -1,4 +1,4 @@
-import { AboutJson } from "../types/about/interfaces/about.interface";
+import { AboutJson } from "../../types/about/interfaces/about.interface";
 
 // TODO: use them everywhere
 

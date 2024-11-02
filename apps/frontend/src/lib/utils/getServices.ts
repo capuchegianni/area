@@ -1,6 +1,6 @@
 import { env } from "$env/dynamic/private";
 import api from "@common/api/api";
-import type { Services } from "@common/customTypes/about.interface";
+import type { Services } from "@common/area/types/area";
 
 export default async function getServices(): Promise<Services | null> {
     const response = await api.about(env.API_URL);
