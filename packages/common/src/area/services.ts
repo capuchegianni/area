@@ -1,22 +1,22 @@
-export const serviceNames: Record<string, string> = {
+const SERVICE_NAMES: Record<string, string> = {
     google: "Google",
     youtube: "YouTube",
     discord: "Discord"
 };
 
 export function serviceName(service: string): string {
-    if (serviceNames[service])
-        return serviceNames[service];
+    if (SERVICE_NAMES[service])
+        return SERVICE_NAMES[service];
     return service;
 }
 
-export const oauthServiceNames: Record<string, string> = {
+const OAUTH_SERVICE_NAMES: Record<string, string> = {
     youtube: "google",
     twitch: "twitch"
 };
 
 export function oauthServiceName(service: string): string {
-    if (oauthServiceNames[service])
-        return oauthServiceNames[service];
+    if (OAUTH_SERVICE_NAMES[service])
+        return OAUTH_SERVICE_NAMES[service];
     return service;
 }
