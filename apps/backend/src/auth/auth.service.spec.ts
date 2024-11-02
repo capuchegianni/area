@@ -1,5 +1,6 @@
 import { DeepMockProxy, mockDeep } from "jest-mock-extended";
 import {
+    ConflictException,
     ForbiddenException,
     UnprocessableEntityException
 } from "@nestjs/common";
@@ -12,6 +13,7 @@ import { PrismaClient } from "@prisma/client";
 import { JwtService } from "src/jwt/jwt.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { randomUUID } from "node:crypto";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const users = [
     {
@@ -160,15 +162,54 @@ describe("AuthService", () => {
                 has_accepted_terms_and_conditions: true
             };
 
-            prismaService.user.create.mockResolvedValueOnce({
-                id: user.id
-            } as any);
+            prismaService.user.create.mockRejectedValueOnce(
+                new PrismaClientKnownRequestError("Conflict", {
+                    clientVersion: "CLIENT_VERSION",
+                    code: "P2002"
+                })
+            );
 
             try {
                 await authService.register(registerDto);
             } catch (e) {
-                console.error(e);
-                expect(e).toBeInstanceOf(UnprocessableEntityException);
+                expect(e).toBeInstanceOf(ConflictException);
+            }
+
+            expect(argon2Service.hashPassword).toHaveBeenCalledWith(
+                registerDto.password
+            );
+            expect(prismaService.user.create).toHaveBeenCalledWith({
+                data: {
+                    email: registerDto.email,
+                    hashedPassword: `${registerDto.password}-hashed`,
+                    firstname: registerDto.firstname,
+                    lastname: registerDto.lastname
+                },
+                select: { id: true }
+            });
+        });
+
+        it("should catch unknown error", async () => {
+            const user = users[0];
+            const registerDto: RegisterDto = {
+                email: user.email,
+                password: user.hashedPassword.replace(/\-hashed$/, ""),
+                firstname: user.firstname,
+                lastname: user.lastname,
+                has_accepted_terms_and_conditions: true
+            };
+
+            prismaService.user.create.mockRejectedValueOnce(
+                new PrismaClientKnownRequestError("Conflict", {
+                    clientVersion: "CLIENT_VERSION",
+                    code: "UNKNOWNED_CODE"
+                })
+            );
+
+            try {
+                await authService.register(registerDto);
+            } catch (e) {
+                expect(e).toBeInstanceOf(PrismaClientKnownRequestError);
             }
 
             expect(argon2Service.hashPassword).toHaveBeenCalledWith(

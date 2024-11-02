@@ -12,6 +12,14 @@ const fakeEnv = {
     JWT_EXPIRES_IN: "1s"
 };
 
+const reasonableEnv = {
+    JWT_ISSUER: fakeEnv.JWT_ISSUER,
+    JWT_SECRET: fakeEnv.JWT_SECRET,
+    JWE_PUBLIC_KEY: fakeEnv.JWE_PUBLIC_KEY,
+    JWE_PRIVATE_KEY: fakeEnv.JWE_PRIVATE_KEY,
+    JWT_EXPIRES_IN: "10s"
+};
+
 const configService: Partial<ConfigService> = {
     get: jest
         .fn()
@@ -30,6 +38,21 @@ function b64decode(s: string): string {
 
 describe("CryptoService", () => {
     let jwtService: JwtService;
+    const jweDataExample: jose.JWTPayload = { id: "blabla" };
+    let jweExample: string;
+
+    beforeAll(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [
+                JwtService,
+                { provide: ConfigService, useValue: configService }
+            ]
+        }).compile();
+
+        const _jwtService = module.get<JwtService>(JwtService);
+        expect(_jwtService.areKeysLoaded()).toBe(false);
+        jweExample = await _jwtService.forgeJwe(jweDataExample);
+    });
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -96,6 +119,22 @@ describe("CryptoService", () => {
         });
     });
 
+    describe("JWE decrypt", () => {
+        it("should decrypt the jwe", async () => {
+            expect(jwtService.areKeysLoaded()).toBe(false);
+
+            const data = await jwtService.decryptJwe(jweExample);
+
+            expect(jwtService.areKeysLoaded()).toBe(true);
+
+            const parsedData = JSON.parse(
+                Buffer.from(data.split(/\./)[1], "base64").toString("utf-8")
+            );
+
+            expect(parsedData.id).toBe(jweDataExample.id);
+        });
+    });
+
     describe("JWE verify", () => {
         it("should return an error as the jwe is expired", async () => {
             const jwe = await jwtService.forgeJwe({ id: randomUUID() });
@@ -108,6 +147,89 @@ describe("CryptoService", () => {
                 }
                 clearTimeout(timeout);
             }, 1250);
+        });
+
+        it("should return an the data", async () => {
+            const configService: Partial<ConfigService> = {
+                get: jest
+                    .fn()
+                    .mockImplementation(
+                        (property: string): string => reasonableEnv[property]
+                    ),
+                getOrThrow: jest
+                    .fn()
+                    .mockImplementation((property: string): string => {
+                        const value = reasonableEnv[property];
+                        if (undefined === value)
+                            throw new Error(
+                                `Env variable not found: ${property}`
+                            );
+                        return value;
+                    })
+            };
+
+            const module: TestingModule = await Test.createTestingModule({
+                providers: [
+                    JwtService,
+                    { provide: ConfigService, useValue: configService }
+                ]
+            }).compile();
+
+            const jwtService = module.get<JwtService>(JwtService);
+
+            expect(jwtService.areKeysLoaded()).toBe(false);
+
+            const id = randomUUID();
+
+            const jwe = await jwtService.forgeJwe({ id });
+
+            const decrypted = jwtService.decryptJwe(jwe);
+
+            jest.spyOn(jwtService, "decryptJwe").mockResolvedValueOnce(
+                decrypted
+            );
+
+            const data = await jwtService.verifyJwe(jwe);
+
+            expect(jwtService.decryptJwe).toHaveBeenCalledWith(jwe);
+
+            expect(data["id"]).toMatch(id);
+        });
+    });
+
+    describe("Check for 32 bytes secret key", () => {
+        it("Should throw an error for secret keys which don't ahve exactly 32 bytes", async () => {
+            const configService: Partial<ConfigService> = {
+                get: jest
+                    .fn()
+                    .mockImplementation(
+                        (property: string): string => reasonableEnv[property]
+                    ),
+                getOrThrow: jest
+                    .fn()
+                    .mockImplementation((property: string): string => {
+                        if (property === "JWT_SECRET") return "invalid";
+
+                        const value = reasonableEnv[property];
+                        if (undefined === value)
+                            throw new Error(
+                                `Env variable not found: ${property}`
+                            );
+                        return value;
+                    })
+            };
+
+            try {
+                await Test.createTestingModule({
+                    providers: [
+                        JwtService,
+                        { provide: ConfigService, useValue: configService }
+                    ]
+                }).compile();
+                fail();
+            } catch (e) {
+                expect(e).toBeInstanceOf(Error);
+            }
         });
     });
 });
