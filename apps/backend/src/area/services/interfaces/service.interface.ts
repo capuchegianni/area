@@ -16,6 +16,7 @@ export interface ActionDescription {
     description: string;
     oauthScopes?: string[];
     auth?: keyof AreaServiceAuth;
+    authProvider?: string;
     trigger: (auth: AreaServiceAuth) => Promise<ActionResource>;
 }
 
@@ -23,5 +24,6 @@ export interface ReactionDescription {
     description: string;
     oauthScopes?: string[];
     auth?: keyof AreaServiceAuth;
+    authProvider?: string;
     produce: (auth: AreaServiceAuth, data: AreaDiscordEmbed) => Promise<void>;
 }
