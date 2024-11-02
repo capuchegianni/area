@@ -101,6 +101,7 @@ export class OAuthService {
         url.searchParams.append("scope", scope);
         url.searchParams.append("state", state);
         url.searchParams.append("response_type", "code");
+        url.searchParams.append("access_type", "offline");
 
         return url.toString();
     }
@@ -121,7 +122,6 @@ export class OAuthService {
             client_secret: provider.CLIENT_SECRET,
             code,
             grant_type: "authorization_code",
-            access_type: "offline",
             redirect_uri: redirectUri
         }).toString();
 

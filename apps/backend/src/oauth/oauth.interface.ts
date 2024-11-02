@@ -105,11 +105,17 @@ export function OAuthController_getAuthorizationUrl(): MethodDecorator &
     );
 }
 
+class OAuthCallbackResponse {
+    @ApiProperty({ description: "The ID of the OAuth Credential" })
+    readonly id: number;
+}
+
 export function OAuthController_callback(): MethodDecorator & ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
         Get("/:provider/callback"),
         HttpCode(HttpStatus.OK),
+        ApiExtraModels(OAuthCallbackResponse),
         ApiParam({
             name: "provider",
             description: "The OAuth2.0 provider",
@@ -120,7 +126,10 @@ export function OAuthController_callback(): MethodDecorator & ClassDecorator {
         }),
         ApiBearerAuth("bearer"),
         ApiOkResponse({
-            description: "The auth flow has been completed successfully."
+            description: "The auth flow has been completed successfully.",
+            schema: {
+                $ref: getSchemaPath(OAuthCallbackResponse)
+            }
         }),
         ApiForbiddenResponse({
             description:
