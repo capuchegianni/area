@@ -2,6 +2,7 @@
 
 <script lang="ts">
     import type { HTMLInputTypeAttribute } from "svelte/elements";
+    import type { ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
     import { applyAction, enhance } from "$app/forms";
     import type { Action, Reaction } from "@common/customTypes/about.interface";
     import { Label } from "$lib/components/ui/label";
@@ -105,7 +106,7 @@
     export let reactionId: string;
     export let oauthResult;
 
-    export let form;
+    export let form: ActionData;
 </script>
 
 <ScrollArea class="max-h-96">

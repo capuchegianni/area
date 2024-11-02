@@ -2,7 +2,7 @@
 
 <script lang="ts">
     import { onMount, afterUpdate } from "svelte";
-    import type { Services, Action, Reaction } from "@common/customTypes/about.interface";
+    import type { ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
     import {  buttonVariants } from "$lib/components/ui/button";
     import * as Dialog from "$lib/components/ui/dialog";
     import Combobox from "$lib/components/dashboard/area/Combobox/Combobox.svelte";
@@ -14,7 +14,7 @@
     export let services: Services;
     export let oauthResult;
 
-    export let form;
+    export let form: ActionData;
 
     const actions: Record<string, Action> = {};
     const reactions: Record<string, Reaction> = {};
