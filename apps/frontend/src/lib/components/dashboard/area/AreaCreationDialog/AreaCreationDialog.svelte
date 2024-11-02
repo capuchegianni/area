@@ -1,21 +1,20 @@
 <!-- TODO: i18n -->
 
 <script lang="ts">
-    import type { Client } from "~/app";
+    import { onMount, afterUpdate } from "svelte";
     import type { Services, Action, Reaction } from "@common/customTypes/about.interface";
     import {  buttonVariants } from "$lib/components/ui/button";
     import * as Dialog from "$lib/components/ui/dialog";
     import Combobox from "$lib/components/dashboard/area/Combobox/Combobox.svelte";
     import LL from "$i18n/i18n-svelte";
-    import { error } from "@sveltejs/kit";
-    import api from "@common/api/api";
     import AreaForm from "./AreaForm.svelte";
     import servicesItemsToChoices from "$lib/utils/dashboard/servicesItemsToChoices";
     import { Separator } from "$lib/components/ui/separator";
 
     export let services: Services;
-    export let client: Client;
-    export let apiUrl: string;
+    export let oauthResult;
+
+    export let form;
 
     const actions: Record<string, Action> = {};
     const reactions: Record<string, Reaction> = {};
@@ -23,23 +22,18 @@
     const actionsChoices = servicesItemsToChoices(services, "actions", actions);
     const reactionsChoices = servicesItemsToChoices(services, "reactions", reactions);
 
-    let action: string = "";
-    let reaction: string = "";
+    let actionId: string = "";
+    let reactionId: string = "";
 
-    // TODO: adapt to other services
-    const handleSubmit = async () => {
-        if (!client)
-            return error(401, "Unauthorized");
+    onMount(() => {
+        actionId = sessionStorage.getItem("actionId") || "";
+        reactionId = sessionStorage.getItem("reactionId") || "";
+    });
 
-        const response = await api.oauth.oauth(apiUrl, "google", {
-            redirect_uri: window.location.href,
-            scope: actions[action]?.oauthScopes?.join(" ") || ""
-        }, client.accessToken);
-
-        if (!response.success)
-            return error(401, "Unauthorized");
-        window.location.href = response.body.redirect_uri;
-    };
+    afterUpdate(() => {
+        sessionStorage.setItem("actionId", actionId);
+        sessionStorage.setItem("reactionId", reactionId);
+    });
 </script>
 
 <Dialog.Root>
@@ -54,16 +48,17 @@
             </Dialog.Description>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
-            <Combobox title="Action" choices={actionsChoices} value={action} setValue={(value) => action = value} />
-            <Combobox title="REAction" choices={reactionsChoices} value={reaction} setValue={(value) => reaction = value} />
-            {#if action && reaction}
+            <Combobox title="Action" choices={actionsChoices} value={actionId} setValue={(value) => actionId = value} />
+            <Combobox title="REAction" choices={reactionsChoices} value={reactionId} setValue={(value) => reactionId = value} />
+            {#if actionId && reactionId}
                 <Separator />
                 <AreaForm
-                    action={actions[action]}
-                    actionId={action}
-                    reaction={reactions[reaction]}
-                    reactionId={reaction}
-                    handleSubmitActionOAuth={handleSubmit}
+                    action={actions[actionId]}
+                    actionId={actionId}
+                    reaction={reactions[reactionId]}
+                    reactionId={reactionId}
+                    oauthResult={oauthResult}
+                    form={form}
                 />
             {/if}
         </div>

@@ -1,5 +1,6 @@
 import { redirect } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
 
-export async function GET({ locals: { locale } }) {
+export const GET: RequestHandler = async ({ locals: { locale } }) => {
     redirect(303, `/${locale}/dashboard`);
-}
+};
