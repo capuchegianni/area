@@ -13,9 +13,10 @@ import { AreaTask } from "src/area/interfaces/area.interface";
 import { YOUTUBE_ACTIONS } from "src/area/services/youtube/youtube.actions";
 import { DISCORD_REACTIONS } from "src/area/services/discord/discord.reactions";
 import { OAuthCredential } from "src/oauth/oauth.interface";
+import axios from "axios";
 
 describe("SchedulerService", () => {
-    const oauthProvidersService: OAuthProvidersService = {
+    const oauthProvidersService: Partial<OAuthProvidersService> = {
         google: {
             OAUTH_AUTHORIZATION_URL:
                 "https://accounts.google.com/o/oauth2/v2/auth",
@@ -32,9 +33,9 @@ describe("SchedulerService", () => {
             CLIENT_SECRET: "DISCORD_CLIENT_SECRET"
         },
         twitch: {
-            OAUTH_AUTHORIZATION_URL: "https://discord.com/oauth2/authorize",
-            OAUTH_TOKEN_URL: "https://discord.com/api/oauth2/token",
-            OAUTH_REVOKE_URL: "https://discord.com/api/oauth2/token/revoke",
+            OAUTH_AUTHORIZATION_URL: "https://id.twitch.tv/oauth2/authorize",
+            OAUTH_TOKEN_URL: "https://id.twitch.tv/oauth2/token",
+            OAUTH_REVOKE_URL: "https://id.twitch.tv/oauth2/revoke",
             CLIENT_ID: "DISCORD_CLIENT_ID",
             CLIENT_SECRET: "DISCORD_CLIENT_SECRET"
         }
@@ -44,14 +45,12 @@ describe("SchedulerService", () => {
     let areaService: DeepMockProxy<AreaService>;
     let oauthService: DeepMockProxy<OAuthService>;
     let oauthDbService: DeepMockProxy<OAuthDBService>;
-    let oauthProvidersService: OAuthProvidersService;
 
     beforeEach(async () => {
         cache = mockDeep<Cache>();
         areaService = mockDeep<AreaService>();
         oauthService = mockDeep<OAuthService>();
         oauthDbService = mockDeep<OAuthDBService>();
-        oauthProvidersService = mockDeep<OAuthProvidersService>();
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 SchedulerService,
@@ -318,10 +317,6 @@ describe("SchedulerService", () => {
 
             // areaService.getAreaTask.mockResolvedValueOnce(task);
 
-            const googleProvider = jest.spyOn(oauthProvidersService, "google");
-
-            googleProvider.mockReturnValueOnce(provider);
-
             const credential: OAuthCredential = {
                 access_token: "access_token_here",
                 refresh_token: "refresh_token_here",
@@ -334,24 +329,30 @@ describe("SchedulerService", () => {
                 credential
             ]);
 
+            const axiosPost = jest.spyOn(axios, "post");
+
+            axiosPost.mockResolvedValueOnce(null);
+
             const executed = await service.executeTask(task);
 
             expect(consoleLog).toHaveBeenCalled();
 
-            expect(oauthDbService.loadCredentialsByScopes).toHaveBeenCalledWith(
-                userId,
-                "https://www.googleapis.com/auth/youtube.readonly",
-                provider.OAUTH_TOKEN_URL,
-                provider.OAUTH_REVOKE_URL
-            );
-
             consoleLog.mockClear();
 
+            expect(oauthDbService.loadCredentialsByScopes).toHaveBeenCalledWith(
+                userId,
+                ["https://www.googleapis.com/auth/youtube.readonly"],
+                oauthProvidersService.google.OAUTH_TOKEN_URL,
+                oauthProvidersService.google.OAUTH_REVOKE_URL
+            );
+
             expect(getResourceTrigger).toHaveBeenCalledWith({
-                oauth: credential.id
+                oauth: credential.access_token
             });
 
             expect(executed).toBe(true);
+
+            expect(axiosPost).toHaveBeenCalledTimes(1);
         });
     });
 });

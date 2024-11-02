@@ -42,9 +42,9 @@ export class OAuthProvidersService {
 
     get twitch(): OAuthProvider {
         return {
-            OAUTH_AUTHORIZATION_URL: "https://discord.com/oauth2/authorize",
-            OAUTH_TOKEN_URL: "https://discord.com/api/oauth2/token",
-            OAUTH_REVOKE_URL: "https://discord.com/api/oauth2/token/revoke",
+            OAUTH_AUTHORIZATION_URL: "https://id.twitch.tv/oauth2/authorize",
+            OAUTH_TOKEN_URL: "https://id.twitch.tv/oauth2/token",
+            OAUTH_REVOKE_URL: "https://id.twitch.tv/oauth2/revoke",
             CLIENT_ID:
                 this.configService.getOrThrow<string>("TWITCH_CLIENT_ID"),
             CLIENT_SECRET: this.configService.getOrThrow<string>(

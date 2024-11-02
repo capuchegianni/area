@@ -4,6 +4,7 @@ import {
     forwardRef,
     Inject,
     Injectable,
+    NotFoundException,
     OnModuleDestroy,
     OnModuleInit
 } from "@nestjs/common";
@@ -28,6 +29,7 @@ import {
     OAuthProvider,
     OAuthProvidersService
 } from "src/oauth/oauth-providers.service";
+import { copyFileSync } from "fs";
 
 @Injectable()
 export class SchedulerService implements OnModuleInit, OnModuleDestroy {
@@ -60,6 +62,11 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         const provider: OAuthProvider =
             this.oauthProvidersService[providerName];
 
+        if (undefined === provider)
+            throw new NotFoundException(
+                `The provider ${providerName} was not found.`
+            );
+
         const credentials: OAuthCredential[] =
             await this.oauthDbService.loadCredentialsByScopes(
                 userId,
@@ -91,7 +98,7 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         if (0 < kind.config.oauthScopes?.length) {
             const credential = await this.getOAuthCredential(
                 userId,
-                kind.service,
+                kind.config.authProvider!,
                 kind.config.oauthScopes
             );
             if (null === credential)
@@ -128,7 +135,7 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
 
         try {
             await task.reaction.config.produce(auth, transformedData);
-        } catch {
+        } catch(e) {
             return false;
         }
         return true;
