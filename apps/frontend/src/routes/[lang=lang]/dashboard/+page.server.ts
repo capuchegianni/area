@@ -17,9 +17,11 @@ export const load: PageServerLoad = async ({ parent, url: { searchParams } }) =>
     if (!areas.success)
         return error(500, "Internal Server Error");
 
+    const id = Number(searchParams.get("id"));
     const oauthResult = {
         success: searchParams.get("oauth_success"),
-        service: searchParams.get("service")
+        service: searchParams.get("service"),
+        id: isNaN(id) ? undefined : id
     };
 
     return { locale, services, areas: areas.body, oauthResult };

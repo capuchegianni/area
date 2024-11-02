@@ -16,5 +16,7 @@ export const GET: RequestHandler = async ({ url: { searchParams }, params: { ser
         state: searchParams.get("state") || ""
     }, client.accessToken);
 
-    return redirect(303, `/dashboard?oauth_success=${response.success}&service=${service}`);
+    if (response.success)
+        return redirect(303, `/dashboard?oauth_success=true&service=${service}&id=${response.body.id}`);
+    return redirect(303, `/dashboard?oauth_success=false&service=${service}`);
 };
