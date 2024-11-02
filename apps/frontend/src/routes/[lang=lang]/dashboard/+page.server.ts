@@ -2,7 +2,7 @@ import type { PageServerLoad, Actions } from "./$types";
 import api from "@common/api/api";
 import { env } from "$env/dynamic/private";
 import { error, fail, redirect } from "@sveltejs/kit";
-import { isOauthService } from "area-common/src/api/types/OAuthService";
+import { isOauthService, OAUTH_SERVICES } from "area-common/src/api/types/OAuthService";
 import type { TranslationFunctions } from "$i18n/i18n-types";
 
 export const load: PageServerLoad = async ({ parent, url: { searchParams } }) => {
@@ -17,14 +17,20 @@ export const load: PageServerLoad = async ({ parent, url: { searchParams } }) =>
     if (!areas.success)
         return error(500, "Internal Server Error");
 
-    const id = Number(searchParams.get("id"));
+    const oauthCredentials: Record<string, string[]> = {};
+    for (const service of OAUTH_SERVICES) {
+        const credentials = await api.oauth.credentials(env.API_URL, service, client.accessToken);
+        if (credentials.success)
+            oauthCredentials[service] = credentials.body.filter(credential => credential.id !== undefined).map(credential => credential.id.toString());
+    }
+
     const oauthResult = {
         success: searchParams.get("oauth_success"),
         service: searchParams.get("service"),
-        id: isNaN(id) ? undefined : id
+        id: searchParams.get("id")
     };
 
-    return { locale, services, areas: areas.body, oauthResult };
+    return { locale, services, areas: areas.body, oauthCredentials, oauthResult };
 };
 
 function badRequestFail(status: number, LL: TranslationFunctions) {

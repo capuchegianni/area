@@ -2,7 +2,7 @@
 
 <script lang="ts">
     import { onMount, afterUpdate } from "svelte";
-    import type { ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
+    import type { PageServerData, ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
     import type { Services, Action, Reaction } from "@common/area/types/area";
     import {  buttonVariants } from "$lib/components/ui/button";
     import * as Dialog from "$lib/components/ui/dialog";
@@ -13,7 +13,8 @@
     import { Separator } from "$lib/components/ui/separator";
 
     export let services: Services;
-    export let oauthResult;
+    export let oauthCredentials: PageServerData["oauthCredentials"];
+    export let oauthResult: PageServerData["oauthResult"];
 
     export let form: ActionData;
 
@@ -58,6 +59,7 @@
                     actionId={actionId}
                     reaction={reactions[reactionId]}
                     reactionId={reactionId}
+                    oauthCredentials={oauthCredentials}
                     oauthResult={oauthResult}
                     form={form}
                 />

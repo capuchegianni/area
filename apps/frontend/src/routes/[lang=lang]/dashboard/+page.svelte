@@ -10,6 +10,7 @@
     {#if data.services}
         <AreaCreationDialog
             services={data.services}
+            oauthCredentials={data.oauthCredentials}
             oauthResult={data.oauthResult}
             form={form}
         />
