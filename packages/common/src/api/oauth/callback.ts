@@ -1,4 +1,4 @@
-import type { Empty, RequestResponse } from "../api";
+import type { RequestResponse } from "../api";
 import type { OAuthService } from "../types/OAuthService";
 
 type OAuthCallbackPayload = {
@@ -6,7 +6,7 @@ type OAuthCallbackPayload = {
     state: string;
 };
 
-export default async function callback(apiUrl: string, service: OAuthService, payload: OAuthCallbackPayload, accessToken: string): Promise<RequestResponse<Empty, 200 | 400 | 403 | 404>> {
+export default async function callback(apiUrl: string, service: OAuthService, payload: OAuthCallbackPayload, accessToken: string): Promise<RequestResponse<{ id: number; }, 200 | 400 | 403 | 404>> {
     try {
         const response = await fetch(`${apiUrl}/oauth/${service}/callback?code=${payload.code}&state=${payload.state}`, {
             method: "GET",
@@ -16,7 +16,7 @@ export default async function callback(apiUrl: string, service: OAuthService, pa
 
         switch (response.status) {
         case 200:
-            return { status: 200, success: true, body: {} };
+            return { status: 200, success: true, body: await response.json() };
         case 400:
             return { status: 400, success: false }; // The 'code' is invalid.
         case 403:
