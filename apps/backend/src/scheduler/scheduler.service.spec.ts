@@ -4,10 +4,7 @@ import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { AreaService } from "src/area/area.service";
 import { OAuthService } from "src/oauth/oauth.service";
 import { OAuthDBService } from "src/oauth/oauth-db.service";
-import {
-    OAuthProvider,
-    OAuthProvidersService
-} from "src/oauth/oauth-providers.service";
+import { OAuthProvidersService } from "src/oauth/oauth-providers.service";
 import { DeepMockProxy, mockDeep } from "jest-mock-extended";
 import { AreaTask } from "src/area/interfaces/area.interface";
 import { YOUTUBE_ACTIONS } from "src/area/services/youtube/youtube.actions";

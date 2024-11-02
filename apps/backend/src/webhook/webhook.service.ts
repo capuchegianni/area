@@ -60,8 +60,7 @@ export class WebhookService {
             }
         });
 
-        if (null === area)
-            throw new NotFoundException();
+        if (null === area) throw new NotFoundException();
 
         const task = await this.areaService.getAreaTask(area);
 

@@ -29,7 +29,6 @@ import {
     OAuthProvider,
     OAuthProvidersService
 } from "src/oauth/oauth-providers.service";
-import { copyFileSync } from "fs";
 
 @Injectable()
 export class SchedulerService implements OnModuleInit, OnModuleDestroy {
@@ -135,7 +134,7 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
 
         try {
             await task.reaction.config.produce(auth, transformedData);
-        } catch(e) {
+        } catch {
             return false;
         }
         return true;
