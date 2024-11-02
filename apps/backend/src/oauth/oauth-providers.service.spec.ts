@@ -81,8 +81,7 @@ describe("OauthService", () => {
             configService.getOrThrow.mockClear();
 
             expect(provider).toStrictEqual({
-                OAUTH_AUTHORIZATION_URL:
-                    "https://discord.com/oauth2/authorize",
+                OAUTH_AUTHORIZATION_URL: "https://discord.com/oauth2/authorize",
                 OAUTH_TOKEN_URL: "https://discord.com/api/oauth2/token",
                 OAUTH_REVOKE_URL: "https://discord.com/api/oauth2/token/revoke",
                 CLIENT_ID: "DISCORD_CLIENT_ID",

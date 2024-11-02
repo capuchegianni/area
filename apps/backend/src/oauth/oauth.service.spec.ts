@@ -1,10 +1,9 @@
-import { randomUUID } from "node:crypto";
 import * as crypto from "node:crypto";
 import { Test, TestingModule } from "@nestjs/testing";
 import { OAuthService } from "./oauth.service";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { DeepMockProxy, mockDeep } from "jest-mock-extended";
-import { Cache, Milliseconds } from "cache-manager";
+import { Cache } from "cache-manager";
 import { OAuthProvider } from "./oauth-providers.service";
 import {
     BadRequestException,
