@@ -4,11 +4,11 @@ declare interface YouTubeVideoThumbnail {
     height: number;
 }
 declare interface YouTubeVideoThumbnails {
-    default: YouTubeVideoThumbnail;
-    medium: YouTubeVideoThumbnail;
-    high: YouTubeVideoThumbnail;
-    standard: YouTubeVideoThumbnail;
-    maxres: YouTubeVideoThumbnail;
+    default?: YouTubeVideoThumbnail;
+    medium?: YouTubeVideoThumbnail;
+    high?: YouTubeVideoThumbnail;
+    standard?: YouTubeVideoThumbnail;
+    maxres?: YouTubeVideoThumbnail;
 }
 declare interface YouTubeVideoLocalized {
     title: string;
