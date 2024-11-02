@@ -64,7 +64,7 @@ export class OAuthController {
         @Param("provider") providerName: string,
         @Query("code") code: string,
         @Query("state") state: string
-    ): Promise<void> {
+    ): Promise<{ id: OAuthCredential["id"] }> {
         const { id } = req.user as Pick<User, "id">;
 
         const provider = this.oauthProviders[providerName];
@@ -81,12 +81,15 @@ export class OAuthController {
             state
         );
 
-        await this.oauthDbService.saveCredential(
-            id,
-            oauthCredential,
-            provider.OAUTH_TOKEN_URL,
-            provider.OAUTH_REVOKE_URL
-        );
+        const oauthCredentialId: OAuthCredential["id"] =
+            await this.oauthDbService.saveCredential(
+                id,
+                oauthCredential,
+                provider.OAUTH_TOKEN_URL,
+                provider.OAUTH_REVOKE_URL
+            );
+
+        return { id: oauthCredentialId };
     }
 
     @OAuthController_credentials()
