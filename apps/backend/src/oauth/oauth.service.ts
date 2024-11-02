@@ -5,7 +5,7 @@ import {
     InternalServerErrorException,
     UnprocessableEntityException
 } from "@nestjs/common";
-import { hash } from "node:crypto";
+import * as crypto from "node:crypto";
 import { Cache } from "cache-manager";
 import { User } from "../users/interfaces/user.interface";
 import { ForbiddenException } from "@nestjs/common";
@@ -32,7 +32,7 @@ export class OAuthService {
     ) {}
 
     private static createState(userId: User["id"], requestedAt: number) {
-        return hash("SHA-512", `${userId}:${requestedAt}`, "hex");
+        return crypto.hash("SHA-512", `${userId}:${requestedAt}`, "hex");
     }
 
     private async prepareOAuthSession(
@@ -121,6 +121,7 @@ export class OAuthService {
             client_secret: provider.CLIENT_SECRET,
             code,
             grant_type: "authorization_code",
+            access_type: "offline",
             redirect_uri: redirectUri
         }).toString();
 
@@ -194,7 +195,7 @@ export class OAuthService {
             client_secret: provider.CLIENT_SECRET,
             token,
             token_type_hint: tokenTypeHint
-        });
+        }).toString();
 
         try {
             await axios.post(provider.OAUTH_REVOKE_URL, data, {
@@ -205,7 +206,7 @@ export class OAuthService {
         } catch (e) {
             const { error } = e.response.data;
 
-            if ("invalid_client" === error) {
+            if (400 === e.response.status) {
                 throw new UnprocessableEntityException(
                     "Unable to revoke the token. It may be from the wrong provider."
                 );
