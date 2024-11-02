@@ -144,7 +144,7 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         console.log(`--- [AREA ${task.areaId} Log End] ---`);
     }
 
-    private async executeTask(task: AreaTask): Promise<boolean> {
+    async executeTask(task: AreaTask): Promise<boolean> {
         this.logTask(task);
         let data: ActionResource;
         try {
