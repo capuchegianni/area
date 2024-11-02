@@ -3,7 +3,7 @@ import api from "@common/api/api";
 import type { Services } from "@common/customTypes/about.interface";
 
 export default async function getServices(): Promise<Services | null> {
-    const response = await api.about(env.SERVER_API_URL);
+    const response = await api.about(env.API_URL);
 
     if (response.success)
         return response.body.server.services;
