@@ -13,7 +13,6 @@ import { AreaTask } from "src/area/interfaces/area.interface";
 import { YOUTUBE_ACTIONS } from "src/area/services/youtube/youtube.actions";
 import { DISCORD_REACTIONS } from "src/area/services/discord/discord.reactions";
 import { OAuthCredential } from "src/oauth/oauth.interface";
-import axios from "axios";
 
 describe("SchedulerService", () => {
     const oauthProvidersService: Partial<OAuthProvidersService> = {
@@ -329,9 +328,7 @@ describe("SchedulerService", () => {
                 credential
             ]);
 
-            const axiosPost = jest.spyOn(axios, "post");
-
-            axiosPost.mockResolvedValueOnce(null);
+            const produce = jest.spyOn(task.reaction.config, "produce");
 
             const executed = await service.executeTask(task);
 
@@ -352,7 +349,7 @@ describe("SchedulerService", () => {
 
             expect(executed).toBe(true);
 
-            expect(axiosPost).toHaveBeenCalledTimes(1);
+            expect(produce).toHaveBeenCalledWith({ webhook: "https://..." }, {});
         });
     });
 });
