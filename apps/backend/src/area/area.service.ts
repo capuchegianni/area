@@ -26,6 +26,8 @@ import { AreaStatus, Area as PrismaArea } from "@prisma/client";
 import { UpdateAreaDto } from "./dto/updateArea.dto";
 import { GMAIL_ACTIONS } from "./services/gmail/gmail.actions";
 import { GMAIL_REACTIONS } from "./services/gmail/gmail.reactions";
+import { TWITCH_ACTIONS } from "./services/twitch/twitch.actions";
+import { TWITCH_REACTIONS } from "./services/twitch/twitch.reactions";
 
 @Injectable()
 export class AreaService {
@@ -33,11 +35,13 @@ export class AreaService {
         action: {
             youtube: YOUTUBE_ACTIONS,
             discord: DISCORD_ACTIONS,
+            twitch: TWITCH_ACTIONS,
             gmail: GMAIL_ACTIONS
         },
         reaction: {
             youtube: YOUTUBE_REACTIONS,
             discord: DISCORD_REACTIONS,
+            twitch: TWITCH_REACTIONS,
             gmail: GMAIL_REACTIONS
         }
     };

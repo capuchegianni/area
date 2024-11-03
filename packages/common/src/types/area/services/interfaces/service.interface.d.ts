@@ -2,7 +2,6 @@ import { DiscordGuild } from "../discord/interface/discord-guilds.interface";
 import { AreaTwitchStream } from "../twitch/interfaces/twitch-stream.interface";
 import { AreaTwitchFollower } from "../twitch/interfaces/twitch-follower.interface";
 import { AreaYouTubeSubscriber, AreaYouTubeVideo } from "../youtube/interfaces/youtube-video.interface";
-import { Area } from "@prisma/client";
 export interface ActionResource {
     data: AreaYouTubeVideo | AreaYouTubeSubscriber | DiscordGuild | AreaTwitchStream | AreaTwitchFollower | string | null;
     cacheValue: string | null;
@@ -12,7 +11,7 @@ export interface ActionDescription {
     oauthScopes: string[];
     oauthProvider: string;
     metadata: object;
-    trigger: (accessToken: string, metadata: Area["actionMetadata"], previous?: object) => Promise<ActionResource>;
+    trigger: (accessToken: string, metadata: object, previous?: object) => Promise<ActionResource>;
 }
 export interface ReactionDescription {
     description: string;
