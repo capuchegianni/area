@@ -32,21 +32,17 @@ function new_post_in_sub(
 }
 
 function new_comment_on_post(
-    accessToken: string,
-    metadata: object
+    accessToken: string, // eslint-disable-line
+    metadata: object // eslint-disable-line
 ): Promise<ActionResource> {
-    return new Promise(async (resolve, reject) => {
-        
-    });
+    return new Promise(async (resolve, reject) => {}); // eslint-disable-line
 }
 
 function new_vote_on_comment(
-    accessToken: string,
-    metadata: object
+    accessToken: string, // eslint-disable-line
+    metadata: object // eslint-disable-line
 ): Promise<ActionResource> {
-    return new Promise(async (resolve, reject) => {
-        
-    });
+    return new Promise(async (resolve, reject) => {}); // eslint-disable-line
 }
 
 export const REDDIT_ACTIONS: { [name: string]: ActionDescription } = {
@@ -54,7 +50,7 @@ export const REDDIT_ACTIONS: { [name: string]: ActionDescription } = {
         description: "This event is triggered once the user starts a stream.",
         oauthScopes: [""],
         oauthProvider: "reddit",
-        metadata: { streamerName: "The streamer's username" },
+        metadata: { subredditName: "The subreddit's name" },
         trigger: new_post_in_sub
     },
     new_follower: {
