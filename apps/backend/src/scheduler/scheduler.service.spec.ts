@@ -295,7 +295,7 @@ describe("SchedulerService", () => {
             ]);
             const produce = jest.spyOn(task.reaction.config, "produce");
             produce.mockResolvedValueOnce();
-            cache.get.mockResolvedValueOnce("\"string\"");
+            cache.get.mockResolvedValueOnce('"string"');
             const executed = await service.executeTask(task);
             expect(cache.get).toHaveBeenCalledWith(task.name);
             expect(consoleLog).toHaveBeenCalled();
@@ -313,7 +313,8 @@ describe("SchedulerService", () => {
                 oauthProvidersService.google.OAUTH_REVOKE_URL
             );
             expect(getResourceTrigger).toHaveBeenCalledWith(
-                "access_token_here", "string"
+                "access_token_here",
+                "string"
             );
             expect(produce).toHaveBeenCalledWith("access_token_here", {});
             expect(executed).toBe(true);
@@ -370,7 +371,7 @@ describe("SchedulerService", () => {
             ]);
             const produce = jest.spyOn(task.reaction.config, "produce");
             produce.mockResolvedValueOnce();
-            cache.get.mockResolvedValueOnce("\"string\"");
+            cache.get.mockResolvedValueOnce('"string"');
             const executed = await service.executeTask(task);
             expect(cache.get).toHaveBeenCalledWith(task.name);
             expect(consoleLog).toHaveBeenCalled();
@@ -393,7 +394,8 @@ describe("SchedulerService", () => {
                 oauthProvidersService.google.OAUTH_REVOKE_URL
             );
             expect(getResourceTrigger).toHaveBeenCalledWith(
-                "access_token_here", "string"
+                "access_token_here",
+                "string"
             );
             expect(produce).toHaveBeenCalledWith("access_token_here", {});
             expect(executed).toBe(true);
@@ -432,7 +434,7 @@ describe("SchedulerService", () => {
                 cacheValue: "video-id"
             });
 
-            cache.get.mockResolvedValueOnce("\"string\"");
+            cache.get.mockResolvedValueOnce('"string"');
             oauthDbService.loadCredentialsByScopes.mockResolvedValueOnce([]);
             const produce = jest.spyOn(task.reaction.config, "produce");
             produce.mockResolvedValueOnce();
@@ -447,7 +449,8 @@ describe("SchedulerService", () => {
                 oauthProvidersService.google.OAUTH_REVOKE_URL
             );
             expect(getResourceTrigger).toHaveBeenCalledWith(
-                "access_token_here", "string"
+                "access_token_here",
+                "string"
             );
             expect(executed).toBe(false);
             expect(produce).toHaveBeenCalledWith("access_token_here", {});

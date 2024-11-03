@@ -101,9 +101,6 @@ export class AuthController {
         };
         const now = Date.now();
         const delta = exp * 1000 - now;
-        console.log(delta);
-        if (0 < delta) {
-            await this.cacheManager.set(jwe, id, delta);
-        }
+        if (0 < delta) await this.cacheManager.set(jwe, id, delta);
     }
 }

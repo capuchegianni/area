@@ -19,14 +19,13 @@ async function onGuildJoin(
             Authorization: `Bearer ${accessToken}`
         }
     };
-    console.log("FROM CACHE", previous);
     return new Promise((resolve, reject) => {
         axios
             .get<DiscordGuildsResponse>(url, config)
             .then(({ data }) => {
                 if (!previous) {
                     return resolve({
-                        data: data,
+                        data: data[0] ?? null,
                         cacheValue: JSON.stringify(
                             data.map((guild) => guild.id)
                         )
@@ -35,19 +34,33 @@ async function onGuildJoin(
                 const newlyJoinedGuilds = data.filter(
                     (guild) => !previous.includes(guild.id)
                 );
-                if (0 === newlyJoinedGuilds.length) return null;
+                if (1 !== newlyJoinedGuilds.length) return null;
                 return resolve({
-                    data: newlyJoinedGuilds,
+                    data: newlyJoinedGuilds[0],
                     cacheValue: JSON.stringify(data.map((guild) => guild.id))
                 });
             })
             .catch((e) => {
-                if (403 === e.status) {
+                if (403 === e.status)
                     return reject(
                         new ForbiddenException("Access token expired.")
                     );
-                }
-                return reject(e);
+                if (429 === e.status) {
+                    const retryAfter = Math.ceil(
+                        e.response.headers["X-RateLimit-Reset-After"]
+                    );
+                    const timeout = setTimeout(
+                        async () => {
+                            const data = await onGuildLeave(
+                                accessToken,
+                                previous
+                            );
+                            clearTimeout(timeout);
+                            return resolve(data);
+                        },
+                        (retryAfter + 1) * 1000
+                    );
+                } else return reject(e);
             });
     });
 }
@@ -69,18 +82,32 @@ async function onGuildLeave(
                 const currentGuildsIds = data.map((guild) => guild.id);
                 if (!previous) {
                     return resolve({
-                        data,
+                        data: null,
                         cacheValue: JSON.stringify(currentGuildsIds)
                     });
                 }
-                const newlyLeftGuilds = previous
-                    .filter((guild) => !currentGuildsIds.includes(guild))
-                    .map((guildId) =>
-                        data.find((guild) => guild.id === guildId)
-                    );
-                if (0 === newlyLeftGuilds.length) return null;
+
+                const newlyLeftGuilds = previous.filter(
+                    (guild) => !currentGuildsIds.includes(guild)
+                );
+
+                if (1 !== newlyLeftGuilds.length)
+                    return resolve({
+                        data: null,
+                        cacheValue: JSON.stringify(currentGuildsIds)
+                    });
                 return resolve({
-                    data: newlyLeftGuilds,
+                    data: {
+                        id: newlyLeftGuilds[0],
+                        approximate_member_count: 0,
+                        approximate_presence_count: 0,
+                        banner: "",
+                        features: [],
+                        icon: "",
+                        name: "UNKNOWN_GUILD",
+                        owner: false,
+                        permissions: ""
+                    } satisfies DiscordGuild,
                     cacheValue: JSON.stringify(currentGuildsIds)
                 });
             })
@@ -89,7 +116,22 @@ async function onGuildLeave(
                     return reject(
                         new ForbiddenException("Access token expired.")
                     );
-                return reject(e);
+                if (429 === e.status) {
+                    const retryAfter = Math.ceil(
+                        e.response.headers["X-RateLimit-Reset-After"]
+                    );
+                    const timeout = setTimeout(
+                        async () => {
+                            const data = await onGuildLeave(
+                                accessToken,
+                                previous
+                            );
+                            clearTimeout(timeout);
+                            return resolve(data);
+                        },
+                        (retryAfter + 1) * 1000
+                    );
+                } else return reject(e);
             });
     });
 }

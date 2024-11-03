@@ -1,7 +1,7 @@
-import { DiscordGuildsResponse } from "../discord/interface/discord-guilds.interface";
+import { DiscordGuild } from "../discord/interface/discord-guilds.interface";
 import { AreaYouTubeSubscriber, AreaYouTubeVideo } from "../youtube/interfaces/youtube-video.interface";
 export interface ActionResource {
-    data: AreaYouTubeVideo | AreaYouTubeSubscriber | DiscordGuildsResponse | null;
+    data: AreaYouTubeVideo | AreaYouTubeSubscriber | DiscordGuild | null;
     cacheValue: string | null;
 }
 export interface ActionDescription {

@@ -108,9 +108,6 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
             task.userId,
             task.action
         );
-        console.debug(
-            `FETCHING RESOURCE FOR ${task.action.service}.${task.action.method}`
-        );
         return await task.action.config.trigger(accessToken, oldCache);
     }
 
@@ -146,11 +143,12 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
     async executeTask(task: AreaTask): Promise<boolean> {
         this.logTask(task);
         const oldCache: string = await this.cacheManager.get(task.name);
+        const parsedOldCache = JSON.parse(oldCache);
 
         let data: ActionResource;
         try {
-            data = await this.getResource(task, JSON.parse(oldCache));
-        } catch (e) {
+            data = await this.getResource(task, parsedOldCache);
+        } catch {
             return false;
         }
 
@@ -163,13 +161,13 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
 
         await this.cacheManager.set(
             task.name,
-            JSON.stringify(data.cacheValue),
+            data.cacheValue,
             (task.delay + 60) * 1000
         );
 
         if (
             null === oldCache ||
-            data.cacheValue === oldCache ||
+            data.cacheValue === parsedOldCache ||
             null === transformedData
         )
             return true;
