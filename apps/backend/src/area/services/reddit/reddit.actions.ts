@@ -22,7 +22,7 @@ function new_post_in_sub(
             const newestPost = data.data.children[0].data;
             return resolve({
                 data: newestPost,
-                cacheValue: JSON.stringify(newestPost.id)
+                cacheValue: JSON.stringify({ id: newestPost.id })
             });
         } catch (e) {
             if (e.response && e.response.status === 403) {

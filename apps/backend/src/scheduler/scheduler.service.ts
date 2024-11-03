@@ -153,7 +153,7 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         try {
             data = await this.getResource(task, parsedOldCache);
         } catch (e) {
-            console.log(e);
+            console.error(e);
             return false;
         }
 
@@ -170,6 +170,8 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
             (task.delay + 60) * 1000
         );
 
+        console.log(oldCache, data.cacheValue);
+
         if (
             null === oldCache ||
             data.cacheValue === oldCache ||
@@ -177,7 +179,9 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         )
             return true;
 
-        return await this.postData(task, transformedData);
+        const isPosted = await this.postData(task, transformedData);
+        console.log(isPosted);
+        return isPosted;
     }
 
     scheduleTask(task: AreaTask) {
