@@ -85,7 +85,7 @@ describe("OauthService", () => {
             );
 
             expect(authorizationUrl).toBe(
-                `https://accounts.google.com/o/oauth2/v2/auth?client_id=GOOGLE_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=hashed-state&response_type=code&access_type=offline`
+                `https://accounts.google.com/o/oauth2/v2/auth?client_id=GOOGLE_CLIENT_ID&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=hashed-state&response_type=code&access_type=offline&prompt=consent`
             );
         });
     });

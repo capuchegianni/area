@@ -102,6 +102,7 @@ export class OAuthService {
         url.searchParams.append("state", state);
         url.searchParams.append("response_type", "code");
         url.searchParams.append("access_type", "offline");
+        url.searchParams.append("prompt", "consent");
 
         return url.toString();
     }
