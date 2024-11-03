@@ -34,7 +34,7 @@ function onLikedVideo(
                 const youtubeVideo = data.items[0];
                 return resolve({
                     data: transformYouTubeVideoToArea(youtubeVideo),
-                    cacheValue: youtubeVideo.id
+                    cacheValue: JSON.stringify(youtubeVideo.id)
                 });
             })
             .catch((e) => {
@@ -68,13 +68,16 @@ function onNewSubscription(
             .get<YouTubeSubcriptionsResponse>(url, config)
             .then(({ data }) => {
                 if (1 !== data.items.length)
-                    return resolve({ data: null, cacheValue: "" });
+                    return resolve({
+                        data: null,
+                        cacheValue: JSON.stringify("")
+                    });
                 const youtubeSubscription = data.items[0];
                 return resolve({
                     data: transformYoutubeSubscriptionToArea(
                         youtubeSubscription
                     ),
-                    cacheValue: youtubeSubscription.id
+                    cacheValue: JSON.stringify(youtubeSubscription.id)
                 });
             })
             .catch((e) => {
@@ -108,11 +111,14 @@ function onNewUploadedVideo(
             .get<YouTubeVideoListResponse>(url, config)
             .then(({ data }) => {
                 if (1 !== data.items.length)
-                    return resolve({ data: null, cacheValue: "" });
+                    return resolve({
+                        data: null,
+                        cacheValue: JSON.stringify("")
+                    });
                 const youtubeVideo = data.items[0];
                 return resolve({
                     data: transformYouTubeVideoToArea(youtubeVideo),
-                    cacheValue: youtubeVideo.id
+                    cacheValue: JSON.stringify(youtubeVideo.id)
                 });
             })
             .catch((e) => {

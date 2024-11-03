@@ -20,7 +20,10 @@ function new_post_in_sub(
         try {
             const { data } = await axios.get(url, config);
             const newestPost = data.data.children[0].data;
-            return resolve({ data: newestPost, cacheValue: newestPost.id });
+            return resolve({
+                data: newestPost,
+                cacheValue: JSON.stringify(newestPost.id)
+            });
         } catch (e) {
             if (e.response && e.response.status === 403) {
                 reject(new ForbiddenException("Access token expired."));

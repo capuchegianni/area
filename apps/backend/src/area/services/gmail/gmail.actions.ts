@@ -26,7 +26,7 @@ async function onNewMail(
                 if (1 !== data.messages.length) return null;
                 return resolve({
                     data: data.messages[0],
-                    cacheValue: data.messages[0].id
+                    cacheValue: JSON.stringify(data.messages[0].id)
                 });
             })
             .catch((e) => {
