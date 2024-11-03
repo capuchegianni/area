@@ -102,9 +102,7 @@ function onNewUploadedVideo(accessToken: string): Promise<ActionResource> {
                     return resolve({ data: null, cacheValue: "" });
                 const youtubeVideo = data.items[0];
                 return resolve({
-                    data: transformYouTubeVideoToArea(
-                        youtubeVideo
-                    ),
+                    data: transformYouTubeVideoToArea(youtubeVideo),
                     cacheValue: youtubeVideo.id
                 });
             })
