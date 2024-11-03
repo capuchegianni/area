@@ -100,13 +100,18 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         return credential.access_token;
     }
 
-    private async getResource(task: AreaTask): Promise<ActionResource> {
+    private async getResource(
+        task: AreaTask,
+        oldCache: object
+    ): Promise<ActionResource> {
         const accessToken = await this.getServiceOAuth(
             task.userId,
             task.action
         );
-
-        return await task.action.config.trigger(accessToken);
+        console.debug(
+            `FETCHING RESOURCE FOR ${task.action.service}.${task.action.method}`
+        );
+        return await task.action.config.trigger(accessToken, oldCache);
     }
 
     async postData(task: AreaTask, transformedData: object): Promise<boolean> {
@@ -140,10 +145,12 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
 
     async executeTask(task: AreaTask): Promise<boolean> {
         this.logTask(task);
+        const oldCache: string = await this.cacheManager.get(task.name);
+
         let data: ActionResource;
         try {
-            data = await this.getResource(task);
-        } catch {
+            data = await this.getResource(task, JSON.parse(oldCache));
+        } catch (e) {
             return false;
         }
 
@@ -154,11 +161,9 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
                   })
                 : null;
 
-        const oldCache = await this.cacheManager.get(task.name);
-
         await this.cacheManager.set(
             task.name,
-            data.cacheValue,
+            JSON.stringify(data.cacheValue),
             (task.delay + 60) * 1000
         );
 
@@ -173,13 +178,13 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
     }
 
     scheduleTask(task: AreaTask) {
-        const clockId = setTimeout(async () => {
+        const clockId = setInterval(async () => {
             const keepPolling = await this.executeTask(task);
-            clearTimeout(clockId);
-            if (keepPolling && Object.keys(this.clockIds).includes(task.name))
-                return this.scheduleTask(task);
-
-            if (!keepPolling) {
+            if (
+                !keepPolling ||
+                !Object.keys(this.clockIds).includes(task.name)
+            ) {
+                clearInterval(clockId);
                 delete this.clockIds[task.name];
                 await this.areaService.update(task.userId, task.areaId, {
                     status: AreaStatus.ERROR
