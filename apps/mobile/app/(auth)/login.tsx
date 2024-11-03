@@ -8,7 +8,7 @@ import { Input } from "~/components/ui/input";
 import React, { useState } from "react";
 import api from "@common/api/api";
 import type { LoginDto } from "@common/types/auth/dto/login.dto";
-import hashPassword from "~/lib/auth/hashPassword";
+import hashPassword from "@common/utils/hash/hashPassword";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginPage() {

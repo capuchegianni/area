@@ -1,6 +1,6 @@
 <script lang="ts">
     import { enhance, applyAction } from "$app/forms";
-    import hashPassword from "@common/hash/hashPassword";
+    import hashPassword from "@common/utils/hash/hashPassword";
     import { Button } from "$lib/components/ui/button";
     import { Input } from "$lib/components/ui/input";
     import { Checkbox } from "$lib/components/ui/checkbox";
@@ -26,7 +26,7 @@
         <form
             method="POST"
             use:enhance={async ({ formData }) => {
-                formData.set("password", await hashPassword(formData.get("password")));
+                formData.set("password", hashPassword(formData.get("password")));
                 formData.set("terms", checked.toString());
                 return async ({ result }) => await applyAction(result);
             }}

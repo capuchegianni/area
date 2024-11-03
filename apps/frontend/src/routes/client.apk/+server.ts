@@ -2,7 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { error } from "@sveltejs/kit";
 
-export async function GET() {
+export const GET = async () => {
     try {
         const apkPath = path.resolve("static/apk/client.apk");
         const apkContent = fs.readFileSync(apkPath);
@@ -16,4 +16,4 @@ export async function GET() {
     } catch {
         error(404, "File not found");
     }
-}
+};

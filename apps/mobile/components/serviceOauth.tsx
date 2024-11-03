@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
 import api from "@common/api/api";
@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform, Pressable } from "react-native";
 import { Text } from "./ui/text";
 import type { AboutJson } from "@common/types/about/interfaces/about.interface";
-import type { Service as ServiceName } from "@common/api/types/Service";
+import type { OAuthService } from "@common/api/types/OAuthService";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -22,7 +22,7 @@ function getRedirectUri() {
 }
 
 type ServiceOauthProps = {
-    name: ServiceName
+    name: OAuthService
     scope: string
     color: `#${string}`
     service: Service
@@ -31,17 +31,11 @@ type ServiceOauthProps = {
 export default function ServiceOauth(props: ServiceOauthProps) {
     const { service } = props;
     const [isPressed, setIsPressed] = useState(false);
-    // const [isDisabled, setIsDisabled] = useState(false);
-
-
-    useEffect(() => {
-        getCredentials();
-    }, []);
 
     const getCredentials = async () => {
         const token = await AsyncStorage.getItem("@access_token");
         if (!token)
-            return;
+            return false;
 
         const res = await api.oauth.credentials(process.env.EXPO_PUBLIC_API_URL, props.name, token);
 
@@ -53,14 +47,18 @@ export default function ServiceOauth(props: ServiceOauthProps) {
             case 500:
                 console.error("An internal error happened.");
             }
-            return;
+            return false;
         }
-        // goal is to disable the connection button only if the user is already logged in to this service but I might not do it this way
-        // if (Array.isArray(res.body) && res.body.length)
-        //     setIsDisabled(true);
+        if (Array.isArray(res.body) && res.body.length) {
+            console.log(res.body);
+            return true;
+        }
+        return false;
     };
 
     const fetchOauthUrl = async () => {
+        if (await (getCredentials()))
+            return;
         const token = await AsyncStorage.getItem("@access_token");
         if (!token)
             return;
@@ -98,7 +96,6 @@ export default function ServiceOauth(props: ServiceOauthProps) {
             onPress={fetchOauthUrl}
             onPressIn={() => setIsPressed(true)}
             onPressOut={() => setIsPressed(false)}
-            disabled={false} // use isDisabled when needed
             style={{
                 backgroundColor: isPressed ? getColor(props.color, 20) : getColor(props.color, 30),
                 borderColor: props.color,

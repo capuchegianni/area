@@ -9,12 +9,13 @@
     onMount(() => QRCode.toDataURL(window.location.href).then((url) => qrCodeUrl = url).catch(() => qrCodeUrl = ""));
 </script>
 
+<!-- TODO: fix incomplete file error -->
 <div class="flex flex-col items-center justify-center space-y-10 h-[600px]">
     <h1 class="font-bold text-2xl">{$LL.apk.title()}</h1>
     {#if qrCodeUrl}
         <img src={qrCodeUrl} alt={window.location.href} class="dark:invert" />
     {/if}
-    <a href="/apk/client.apk" download class={buttonVariants()}>
+    <a href="/apk/client.apk" download="client.apk" class={buttonVariants()}>
         {$LL.apk.download()}
     </a>
 </div>
