@@ -1,7 +1,9 @@
+import { YouTubeSubscriberResource as YouTubeSubscriptionResource } from "./interfaces/youtube-subscribers.interface";
 import {
     YouTubeVideo,
-    AreaYouTubeVideo
-} from "./interfaces/youtubeVideo.interface";
+    AreaYouTubeVideo,
+    AreaYouTubeSubscriber as AreaYouTubeSubscription
+} from "./interfaces/youtube-video.interface";
 
 export function transformYouTubeVideoToArea(
     raw: YouTubeVideo
@@ -23,7 +25,21 @@ export function transformYouTubeVideoToArea(
         likes: +raw.statistics.likeCount,
         views: +raw.statistics.viewCount,
         publishedAt: new Date(raw.snippet.publishedAt),
-        tags: raw.snippet.tags ?? [],
+        tags: raw.snippet.tags,
         thumbnail: (maxres ?? standard ?? high ?? medium ?? low).url
+    };
+}
+
+export function transformYoutubeSubscriberToArea(
+    raw: YouTubeSubscriptionResource
+): AreaYouTubeSubscription {
+    const { default: low, medium, high } = raw.snippet.thumbnails;
+    return {
+        id: raw.snippet.channelId,
+        name: raw.snippet.title,
+        description: raw.snippet.description,
+        thumbnail: (high ?? medium ?? low).url,
+        subscribedAt: raw.snippet.publishedAt,
+        url: `https://www.youtube.com/channel/${raw.snippet.channelId}`
     };
 }

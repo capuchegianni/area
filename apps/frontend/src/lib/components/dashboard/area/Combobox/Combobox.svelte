@@ -13,9 +13,11 @@
     export let choices: Choice[];
     export let value: string;
     export let setValue: (value: string) => unknown;
+    export let clearOption: boolean = false;
 
     let open = false;
 
+    $: selectedGroup = choices.find(f => f.value === value)?.group ?? null;
     $: selectedValue = choices.find(f => f.value === value)?.label ?? $LL.area.combobox.select({ element: title });
 
     const closeAndFocusTrigger = (triggerId: string) => {
@@ -33,17 +35,27 @@
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                class="w-[350px] justify-between"
+                class="justify-between"
             >
-                {selectedValue}
+                {selectedGroup ? selectedGroup + " - " : ""}{selectedValue}
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
         </Popover.Trigger>
-        <Popover.Content class="w-[350px] p-0">
+        <Popover.Content>
             <Command.Root>
                 <Command.Input placeholder={$LL.area.combobox.search({ element: title })} />
                 <Command.Empty>{$LL.area.combobox.no({ element: title })}</Command.Empty>
                 <Command.Group>
+                    {#if clearOption && value}
+                        <Command.Item
+                            onSelect={() => {
+                                setValue("");
+                                closeAndFocusTrigger(ids.trigger);
+                            }}
+                        >
+                            {$LL.area.combobox.clear()}
+                        </Command.Item>
+                    {/if}
                     {#each choices as action}
                         <Command.Item
                             value={action.value}
@@ -51,6 +63,8 @@
                                 setValue(currentValue);
                                 closeAndFocusTrigger(ids.trigger);
                             }}
+                            disabled={action.disabled || action.isGroup}
+                            class={cn(action.isGroup && "font-bold")}
                         >
                             <Check
                                 class={cn(

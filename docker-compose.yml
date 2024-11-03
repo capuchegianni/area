@@ -70,8 +70,7 @@ services:
     image: area-frontend:latest
     environment:
       - PORT=${FRONTEND_PORT}
-      - SERVER_API_URL=http://server:${REST_API_PORT}
-      - CLIENT_API_URL=${REST_API_URL}
+      - API_URL=http://server:${REST_API_PORT}
     env_file:
       - .env
     ports:

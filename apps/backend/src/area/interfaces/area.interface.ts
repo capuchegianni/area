@@ -1,4 +1,4 @@
-import { AreaServiceAuthentication, AreaStatus } from "@prisma/client";
+import { AreaStatus, OAuthCredential } from "@prisma/client";
 import {
     ActionDescription,
     ReactionDescription
@@ -22,10 +22,10 @@ export interface AreaTask {
     areaId: Area["id"];
     name: string;
     action: AreaAction;
-    actionAuth: Omit<AreaServiceAuthentication, "id">;
+    actionOAuthId: OAuthCredential["id"];
     reaction: AreaReaction;
     reactionBody: object;
-    reactionAuth: Omit<AreaServiceAuthentication, "id">;
+    reactionOAuthId: OAuthCredential["id"];
     delay: number;
     userId: User["id"];
 }
@@ -53,11 +53,10 @@ export abstract class Area {
     readonly action_id: string;
 
     @ApiProperty({
-        description:
-            "The ID of the service authentication method used to get data.",
+        description: "The ID of the OAuth credential used to get data.",
         example: 1
     })
-    readonly action_auth_id: number;
+    readonly action_oauth_id: number;
 
     @ApiProperty({
         description: "The AREA Reaction ID.",
@@ -79,11 +78,10 @@ export abstract class Area {
     readonly reaction_body: object;
 
     @ApiProperty({
-        description:
-            "The ID of the service authentication method used to post data.",
+        description: "The ID of the OAuth credential used to post data.",
         example: 1
     })
-    readonly reaction_auth_id: number;
+    readonly reaction_oauth_id: number;
 
     @ApiProperty({
         description:

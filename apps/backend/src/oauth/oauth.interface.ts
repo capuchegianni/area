@@ -105,11 +105,17 @@ export function OAuthController_getAuthorizationUrl(): MethodDecorator &
     );
 }
 
+class OAuthCallbackResponse {
+    @ApiProperty({ description: "The ID of the OAuth Credential" })
+    readonly id: number;
+}
+
 export function OAuthController_callback(): MethodDecorator & ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
         Get("/:provider/callback"),
         HttpCode(HttpStatus.OK),
+        ApiExtraModels(OAuthCallbackResponse),
         ApiParam({
             name: "provider",
             description: "The OAuth2.0 provider",
@@ -120,11 +126,14 @@ export function OAuthController_callback(): MethodDecorator & ClassDecorator {
         }),
         ApiBearerAuth("bearer"),
         ApiOkResponse({
-            description: "The auth flow has been completed successfully."
+            description: "The auth flow has been completed successfully.",
+            schema: {
+                $ref: getSchemaPath(OAuthCallbackResponse)
+            }
         }),
         ApiForbiddenResponse({
             description:
-                "The 'state' attribute stored in the user' session is either invalid or does not match the one returned by the OAuth provider. This may happen during a CSRF attack."
+                "The 'state' attribute stored in the user's session is either invalid or does not match the one returned by the OAuth provider. This may happen during a CSRF attack."
         }),
         ApiBadRequestResponse({
             description: "The 'code' is invalid."
@@ -160,9 +169,8 @@ export function OAuthController_credentials(): MethodDecorator &
         ApiOkResponse({
             description:
                 "Returns all the OAuth2.0 credentials related to the user.",
-            schema: {
-                $ref: getSchemaPath(OAuthCredential)
-            }
+            isArray: true,
+            type: OAuthCredential
         }),
         ApiUnauthorizedResponse({
             description:

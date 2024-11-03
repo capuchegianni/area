@@ -68,12 +68,13 @@ const fr = {
         createArea: "Créer une AREA",
         createAreaDescription: "Reliez une Action et une REAction pour créer une AREA",
         combobox: {
-            select: "Sélectionner une {element}",
-            search: "Rechercher une {element}",
-            no: "Aucune {element} trouvée"
+            select: "Sélectionner un(e) {element}",
+            search: "Rechercher un(e) {element}",
+            no: "Aucun(e) {element} trouvée",
+            clear: "Effacer la sélection"
         },
         oauth: {
-            action: "Connexion avec Google"
+            action: "Connexion avec {service}"
         }
     }
 } satisfies Translation;

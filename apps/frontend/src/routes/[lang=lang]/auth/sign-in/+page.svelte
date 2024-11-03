@@ -6,7 +6,7 @@
     import PasswordInput from "$lib/components/auth/inputs/Password.svelte";
     import LL from "$i18n/i18n-svelte";
     import type { ActionData } from "./$types";
-    import hashPassword from "@common/hash/hashPassword";
+    import hashPassword from "@common/utils/hash/hashPassword";
 
     export let form: ActionData;
 </script>
@@ -23,7 +23,7 @@
             method="POST"
             use:enhance={async ({ formData }) => {
                 formData.set("password", hashPassword(formData.get("password")));
-                return async ({ result }) => {await applyAction(result);};
+                return async ({ result }) => await applyAction(result);
             }}
             class="grid gap-4"
         >

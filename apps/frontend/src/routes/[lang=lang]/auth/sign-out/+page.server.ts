@@ -8,7 +8,7 @@ export const actions: Actions = {
         if (!client)
             return error(401, "Unauthorized");
 
-        const response = await api.auth.signOut(env.SERVER_API_URL, client.accessToken);
+        const response = await api.auth.signOut(env.API_URL, client.accessToken);
 
         if (response.status !== 204 && response.status !== 401)
             return error(response.status);

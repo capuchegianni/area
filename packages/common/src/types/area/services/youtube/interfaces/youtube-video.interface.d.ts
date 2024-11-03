@@ -4,11 +4,11 @@ declare interface YouTubeVideoThumbnail {
     height: number;
 }
 declare interface YouTubeVideoThumbnails {
-    default: YouTubeVideoThumbnail;
-    medium: YouTubeVideoThumbnail;
-    high: YouTubeVideoThumbnail;
-    standard: YouTubeVideoThumbnail;
-    maxres: YouTubeVideoThumbnail;
+    default?: YouTubeVideoThumbnail;
+    medium?: YouTubeVideoThumbnail;
+    high?: YouTubeVideoThumbnail;
+    standard?: YouTubeVideoThumbnail;
+    maxres?: YouTubeVideoThumbnail;
 }
 declare interface YouTubeVideoLocalized {
     title: string;
@@ -62,5 +62,13 @@ export declare class AreaYouTubeVideo {
     readonly publishedAt: Date;
     readonly tags: string[];
     readonly thumbnail: string;
+}
+export declare class AreaYouTubeSubscriber {
+    readonly id: string;
+    readonly name: string;
+    readonly description: string;
+    readonly thumbnail: string;
+    readonly subscribedAt: Date;
+    readonly url: string;
 }
 export {};

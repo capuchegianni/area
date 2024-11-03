@@ -1,6 +1,7 @@
-import { redirect, type Handle, type RequestEvent } from "@sveltejs/kit";
+import { type Handle, redirect, type RequestEvent } from "@sveltejs/kit";
 import { initAcceptLanguageHeaderDetector } from "typesafe-i18n/detectors";
 import isPublicPath from "$lib/utils/isPublicPath";
+import isNotTranslatablePagePath from "$lib/utils/isNotTranslatablePagePath";
 import getClient from "$lib/utils/getClient";
 import getServices from "$lib/utils/getServices";
 import type { Locales } from "$i18n/i18n-types.js";
@@ -40,24 +41,30 @@ function getPreferredLocale({ request, cookies }: RequestEvent): Locales {
  * @param resolve The resolve function to continue the request.
  */
 export const handle: Handle = async ({ event, resolve }) => {
-    const currentLocale = i18nUtils.getCurrentLocale(event);
-
-    if (!currentLocale)
-        return redirect(307, `/${getPreferredLocale(event)}/dashboard`);
-
-    const locale = isLocale(currentLocale) ? currentLocale : getPreferredLocale(event);
     const accessToken = event.cookies.get("accessToken");
 
     // TODO: avoid fetching client and services at each page change
 
     if (!event.locals.client) {
-        const client = await getClient(accessToken);
-
-        if (!client && !isPublicPath(event.url.pathname, locale))
-            return redirect(302, `/${locale}/auth/sign-in`);
-        event.locals.client = client;
+        event.locals.client = await getClient(accessToken);
+        if (!event.locals.client)
+            event.cookies.delete("accessToken", { path: "/" });
     }
 
+    if (isNotTranslatablePagePath(event.url.pathname))
+        return resolve(event);
+
+    const { locale: currentLocale, rest: pathname } = i18nUtils.getCurrentLocale(event);
+
+    if (!currentLocale)
+        return redirect(307, `/${getPreferredLocale(event)}/dashboard`);
+    if (!isLocale(currentLocale))
+        return redirect(307, `/${getPreferredLocale(event)}/${currentLocale}/${pathname || ""}`);
+
+    const locale = currentLocale || getPreferredLocale(event);
+
+    if (!event.locals.client && !isPublicPath(event.url.pathname, locale))
+        return redirect(302, `/${locale}/auth/sign-in`);
     if (event.locals.client && !event.locals.services)
         event.locals.services = await getServices();
 

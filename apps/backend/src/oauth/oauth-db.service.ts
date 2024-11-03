@@ -134,7 +134,7 @@ export class OAuthDBService {
     async deleteCredential(
         userId: User["id"],
         oauthCredential: OAuthCredential
-    ) {
+    ): Promise<void> {
         await this.prismaService.oAuthCredential.delete({
             where: {
                 id: oauthCredential.id,

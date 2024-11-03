@@ -1,5 +1,5 @@
 import type { TranslationFunctions } from "$i18n/i18n-types";
-import isEmail from "$lib/utils/auth/isEmail";
+import isEmail from "@common/utils/isEmail";
 
 type Credentials = {
     email: FormDataEntryValue | null;

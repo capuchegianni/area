@@ -7,11 +7,11 @@ declare interface YouTubeVideoThumbnail {
 }
 
 declare interface YouTubeVideoThumbnails {
-    default: YouTubeVideoThumbnail;
-    medium: YouTubeVideoThumbnail;
-    high: YouTubeVideoThumbnail;
-    standard: YouTubeVideoThumbnail;
-    maxres: YouTubeVideoThumbnail;
+    default?: YouTubeVideoThumbnail;
+    medium?: YouTubeVideoThumbnail;
+    high?: YouTubeVideoThumbnail;
+    standard?: YouTubeVideoThumbnail;
+    maxres?: YouTubeVideoThumbnail;
 }
 
 declare interface YouTubeVideoLocalized {
@@ -100,4 +100,24 @@ export class AreaYouTubeVideo {
         description: "The highest thumbnail quality of the YouTube video."
     })
     readonly thumbnail: string;
+}
+
+export class AreaYouTubeSubscriber {
+    @ApiProperty({ description: "" })
+    readonly id: string;
+
+    @ApiProperty({ description: "" })
+    readonly name: string;
+
+    @ApiProperty({ description: "" })
+    readonly description: string;
+
+    @ApiProperty({ description: "" })
+    readonly thumbnail: string;
+
+    @ApiProperty({ description: "" })
+    readonly subscribedAt: Date;
+
+    @ApiProperty({ description: "" })
+    readonly url: string;
 }
