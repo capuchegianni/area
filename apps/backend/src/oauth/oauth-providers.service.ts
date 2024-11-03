@@ -78,4 +78,16 @@ export class OAuthProvidersService {
             )
         };
     }
+
+    get reddit(): OAuthProvider {
+        return {
+            OAUTH_AUTHORIZATION_URL: "https://www.reddit.com/api/v1/authorize",
+            OAUTH_TOKEN_URL: "https://www.reddit.com/api/v1/access_token",
+            OAUTH_REVOKE_URL: "https://www.reddit.com/api/v1/revoke_token",
+            CLIENT_ID: this.configService.getOrThrow<string>("REDDIT_CLIENT_ID"),
+            CLIENT_SECRET: this.configService.getOrThrow<string>(
+                "REDDIT_CLIENT_SECRET"
+            )
+        };
+    }
 }
