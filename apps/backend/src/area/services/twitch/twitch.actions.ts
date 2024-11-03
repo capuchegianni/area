@@ -55,7 +55,7 @@ function stream_started(
             const twitchStream: AreaTwitchStream = streams[0];
             return resolve({
                 data: twitchStream,
-                cacheValue: twitchStream.id
+                cacheValue: JSON.stringify({ id: twitchStream.id })
             });
         } catch (error) {
             reject(error);
@@ -83,12 +83,15 @@ function new_follower(
             .get<AreaTwitchFollowers>(url, config)
             .then(({ data }) => {
                 if (1 !== data.data.length) {
-                    return resolve({ data: null, cacheValue: "" });
+                    return resolve({
+                        data: null,
+                        cacheValue: JSON.stringify({ id: "" })
+                    });
                 }
                 const follower = data.data[0];
                 return resolve({
                     data: follower,
-                    cacheValue: follower.user_id
+                    cacheValue: JSON.stringify({ id: follower.user_id })
                 });
             })
             .catch((e) => {
@@ -113,7 +116,10 @@ function stream_ended(
                 metadata["streamerName"]
             );
             if (streams.data.length === 0) {
-                return resolve({ data: "Stream ended", cacheValue: null });
+                return resolve({
+                    data: "Stream ended",
+                    cacheValue: JSON.stringify({ id: null })
+                });
             } else {
                 reject(new Error("User is still streaming"));
             }
