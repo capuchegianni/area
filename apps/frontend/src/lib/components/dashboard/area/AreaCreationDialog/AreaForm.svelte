@@ -11,7 +11,6 @@
     import { ScrollArea } from "$lib/components/ui/scroll-area";
     import { Button } from "$lib/components/ui/button";
     import LL from "$i18n/i18n-svelte";
-    import Combobox from "$lib/components/dashboard/area/Combobox/Combobox.svelte";
     import { Switch } from "$lib/components/ui/switch";
     import servicesItemsToChoices from "$lib/utils/dashboard/servicesItemsToChoices";
     import { onMount } from "svelte";
@@ -160,7 +159,7 @@
             service: null,
             id: null
         };
-    }
+    };
 </script>
 
 <ScrollArea class="max-h-[500px]">

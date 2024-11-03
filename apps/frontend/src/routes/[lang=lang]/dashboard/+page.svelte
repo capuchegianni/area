@@ -15,7 +15,7 @@
                         success: null,
                         service: null,
                         id: null
-                    }
+                    };
             }}
             services={data.services}
             oauthCredentials={data.oauthCredentials}
