@@ -24,13 +24,9 @@ function getSwaggerDocumentConfig(): Omit<OpenAPIObject, "paths"> {
         )
         .addTag(
             "OAuth",
-            "Describes all the endpoints to deal with Google OAuth2.0 credentials."
+            "Describes all the endpoints to deal with OAuth2.0 credentials."
         )
         .addTag("AREA", "Describes all the routes to deal with AREA's CRUD.")
-        .addTag(
-            "Webhooks",
-            "Describes all the endpoints to deal with the AREA webhooks."
-        )
         .addTag("Users", "Describes all the routes to deal with users CRUD.")
         .addBearerAuth({
             type: "http",

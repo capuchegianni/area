@@ -5,14 +5,11 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { DeepMockProxy, mockDeep } from "jest-mock-extended";
 import { Area as PrismaArea, AreaStatus, PrismaClient } from "@prisma/client";
 import { YOUTUBE_ACTIONS } from "./services/youtube/youtube.actions";
-import { DISCORD_REACTIONS } from "./services/discord/discord.reactions";
-import {
-    NotFoundException,
-    UnprocessableEntityException
-} from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
 import { Area, AreaTask } from "./interfaces/area.interface";
 import { CreateAreaDto } from "./dto/createArea.dto";
 import { UpdateAreaDto } from "./dto/updateArea.dto";
+import { GMAIL_REACTIONS } from "./services/gmail/gmail.reactions";
 
 describe("AreaService", () => {
     let service: AreaService;
@@ -40,7 +37,7 @@ describe("AreaService", () => {
     describe("getAreaConfig", () => {
         it("should return action and reaction based on registered services", () => {
             const actionId = "youtube.on_liked_video";
-            const reactionId = "discord.send_embed";
+            const reactionId = "gmail.send_mail";
 
             const action = service.getAreaConfig(actionId, "action");
             expect(action.config).toStrictEqual(
@@ -48,9 +45,7 @@ describe("AreaService", () => {
             );
 
             const reaction = service.getAreaConfig(reactionId, "reaction");
-            expect(reaction.config).toStrictEqual(
-                DISCORD_REACTIONS["send_embed"]
-            );
+            expect(reaction.config).toStrictEqual(GMAIL_REACTIONS["send_mail"]);
         });
         it("should throw an error for unknowned action or reaction", () => {
             try {
@@ -88,10 +83,10 @@ describe("AreaService", () => {
                     name: "areaName",
                     description: "areaDescription",
                     actionId: "actionId",
-                    actionAuthId: 1,
+                    actionOAuthId: 1,
                     reactionId: "reactionId",
                     reactionBody: {},
-                    reactionAuthId: 2,
+                    reactionOAuthId: 2,
                     delay: 10,
                     status: AreaStatus.STOPPED,
                     userId: "user-id"
@@ -104,10 +99,10 @@ describe("AreaService", () => {
                     name: "areaName",
                     description: "areaDescription",
                     action_id: "actionId",
-                    action_auth_id: 1,
+                    action_oauth_id: 1,
                     reaction_id: "reactionId",
                     reaction_body: {},
-                    reaction_auth_id: 2,
+                    reaction_oauth_id: 2,
                     delay: 10,
                     status: AreaStatus.STOPPED
                 }
@@ -126,10 +121,10 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
-                    actionAuthId: true,
+                    actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
-                    reactionAuthId: true,
+                    reactionOAuthId: true,
                     delay: true,
                     status: true
                 }
@@ -146,10 +141,10 @@ describe("AreaService", () => {
                 name: "areaName",
                 description: "areaDescription",
                 actionId: "actionId",
-                actionAuthId: 1,
+                actionOAuthId: 1,
                 reactionId: "reactionId",
                 reactionBody: {},
-                reactionAuthId: 2,
+                reactionOAuthId: 2,
                 delay: 10,
                 status: AreaStatus.STOPPED,
                 userId: "user-id"
@@ -160,10 +155,10 @@ describe("AreaService", () => {
                 name: "areaName",
                 description: "areaDescription",
                 action_id: "actionId",
-                action_auth_id: 1,
+                action_oauth_id: 1,
                 reaction_id: "reactionId",
                 reaction_body: {},
-                reaction_auth_id: 2,
+                reaction_oauth_id: 2,
                 delay: 10,
                 status: AreaStatus.STOPPED
             };
@@ -182,10 +177,10 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
-                    actionAuthId: true,
+                    actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
-                    reactionAuthId: true,
+                    reactionOAuthId: true,
                     delay: true,
                     status: true,
                     userId: true
@@ -214,10 +209,10 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
-                    actionAuthId: true,
+                    actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
-                    reactionAuthId: true,
+                    reactionOAuthId: true,
                     delay: true,
                     status: true,
                     userId: true
@@ -230,80 +225,39 @@ describe("AreaService", () => {
         it("should return the area task", async () => {
             const area: PrismaArea = {
                 id: "area-id",
-                actionAuthId: 1,
+                actionOAuthId: 1,
                 actionId: "youtube.on_liked_video",
-                reactionAuthId: 2,
-                reactionId: "discord.send_embed",
+                reactionOAuthId: 2,
+                reactionId: "gmail.send_mail",
                 delay: 10,
                 description: "description",
-                name: "area-id|youtube.on_liked_video|discord.send_embed",
+                name: "area-id|youtube.on_liked_video|gmail.send_mail",
                 reactionBody: {},
                 status: AreaStatus.RUNNING,
                 userId: "user-id"
             };
 
-            prismaService.areaServiceAuthentication.findUnique.mockResolvedValue(
-                { apiKey: null, oauth: 1, webhook: null } as any
-            );
-
             const areaTask = await service.getAreaTask(area);
 
             const expectedAreaTask: AreaTask = {
                 areaId: "area-id",
-                name: "area-id|youtube.on_liked_video|discord.send_embed",
+                name: "area-id|youtube.on_liked_video|gmail.send_mail",
                 action: {
                     service: "youtube",
                     method: "on_liked_video",
                     config: YOUTUBE_ACTIONS["on_liked_video"]
                 },
-                actionAuth: {
-                    apiKey: null,
-                    oauth: 1,
-                    webhook: null
-                },
+                actionOAuthId: 1,
                 reaction: {
-                    service: "discord",
-                    method: "send_embed",
-                    config: DISCORD_REACTIONS["send_embed"]
+                    service: "gmail",
+                    method: "send_mail",
+                    config: GMAIL_REACTIONS["send_mail"]
                 },
                 reactionBody: {},
-                reactionAuth: {
-                    apiKey: null,
-                    oauth: 1,
-                    webhook: null
-                },
+                reactionOAuthId: 2,
                 delay: 10,
                 userId: "user-id"
             };
-
-            expect(
-                prismaService.areaServiceAuthentication.findUnique
-            ).toHaveBeenCalledWith({
-                where: {
-                    id: area.actionAuthId
-                },
-                select: {
-                    apiKey: true,
-                    oauth: true,
-                    webhook: true
-                }
-            });
-
-            expect(
-                prismaService.areaServiceAuthentication.findUnique
-            ).toHaveBeenCalledWith({
-                where: {
-                    id: area.reactionAuthId
-                },
-                select: {
-                    apiKey: true,
-                    oauth: true,
-                    webhook: true
-                }
-            });
-
-            prismaService.areaServiceAuthentication.findUnique.mockClear();
-
             expect(areaTask).toStrictEqual(expectedAreaTask);
         });
     });
@@ -315,24 +269,16 @@ describe("AreaService", () => {
                 name: "areaName",
                 description: "areaDescription",
                 actionId: "youtube.on_liked_video",
-                actionAuthId: 1,
-                reactionId: "discord.send_embed",
+                actionOAuthId: 1,
+                reactionId: "gmail.send_mail",
                 reactionBody: {},
-                reactionAuthId: 2,
+                reactionOAuthId: 2,
                 delay: 10,
                 status: AreaStatus.STOPPED,
                 userId: "user-id"
             };
 
             prismaService.area.findUnique.mockResolvedValueOnce(area);
-
-            prismaService.areaServiceAuthentication.findUnique.mockResolvedValue(
-                {
-                    apiKey: null,
-                    oauth: 1,
-                    webhook: null
-                } as any
-            );
 
             await service.schedule(area.id);
 
@@ -345,10 +291,10 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
-                    actionAuthId: true,
+                    actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
-                    reactionAuthId: true,
+                    reactionOAuthId: true,
                     delay: true,
                     status: true,
                     userId: true
@@ -364,10 +310,10 @@ describe("AreaService", () => {
                 name: "areaName",
                 description: "areaDescription",
                 actionId: "youtube.on_liked_video",
-                actionAuthId: 1,
-                reactionId: "discord.send_embed",
+                actionOAuthId: 1,
+                reactionId: "gmail.send_mail",
                 reactionBody: {},
-                reactionAuthId: 2,
+                reactionOAuthId: 2,
                 delay: 10,
                 status: AreaStatus.RUNNING,
                 userId: "user-id"
@@ -375,38 +321,22 @@ describe("AreaService", () => {
 
             prismaService.area.findUnique.mockResolvedValueOnce(area);
 
-            prismaService.areaServiceAuthentication.findUnique.mockResolvedValue(
-                {
-                    apiKey: null,
-                    oauth: 1,
-                    webhook: null
-                } as any
-            );
-
             const areaTask: AreaTask = {
                 areaId: "area-id",
-                name: "area-id|youtube.on_liked_video|discord.send_embed",
+                name: "area-id|youtube.on_liked_video|gmail.send_mail",
                 action: {
                     service: "youtube",
                     method: "on_liked_video",
                     config: YOUTUBE_ACTIONS["on_liked_video"]
                 },
-                actionAuth: {
-                    apiKey: null,
-                    oauth: 1,
-                    webhook: null
-                },
+                actionOAuthId: 1,
                 reaction: {
-                    service: "discord",
-                    method: "send_embed",
-                    config: DISCORD_REACTIONS["send_embed"]
+                    service: "gmail",
+                    method: "send_mail",
+                    config: GMAIL_REACTIONS["send_mail"]
                 },
                 reactionBody: {},
-                reactionAuth: {
-                    apiKey: null,
-                    oauth: 1,
-                    webhook: null
-                },
+                reactionOAuthId: 2,
                 delay: 10,
                 userId: "user-id"
             };
@@ -425,14 +355,14 @@ describe("AreaService", () => {
         it("should create a new area", async () => {
             const userId = "user-id";
             const createDto: CreateAreaDto = {
-                actionAuth: { oauth: 1 },
-                reactionAuth: { webhook: "http://..." },
-                actionId: "youtube.on_liked_video",
-                reactionId: "discord.send_embed",
+                action_oauth_id: 1,
+                reaction_oauth_id: 2,
+                action_id: "youtube.on_liked_video",
+                reaction_id: "gmail.send_mail",
                 delay: 10,
                 description: "description",
                 name: "name",
-                reactionBody: {}
+                reaction_body: {}
             };
 
             prismaService.area.create.mockResolvedValueOnce({
@@ -440,10 +370,10 @@ describe("AreaService", () => {
                 name: "name",
                 description: "description",
                 actionId: "youtube.on_liked_video",
-                actionAuthId: 1,
-                reactionId: "discord.send_embed",
+                actionOAuthId: 1,
+                reactionId: "gmail.send_mail",
                 reactionBody: {},
-                reactionAuthId: 1,
+                reactionOAuthId: 2,
                 delay: 10,
                 status: AreaStatus.STOPPED
             } as any);
@@ -451,11 +381,11 @@ describe("AreaService", () => {
             const expectedArea: Area = {
                 name: createDto.name,
                 description: createDto.description,
-                action_id: createDto.actionId,
-                action_auth_id: 1,
-                reaction_id: createDto.reactionId,
-                reaction_auth_id: 1,
-                reaction_body: createDto.reactionBody,
+                action_id: createDto.action_id,
+                action_oauth_id: createDto.action_oauth_id,
+                reaction_id: createDto.reaction_id,
+                reaction_oauth_id: createDto.reaction_oauth_id,
+                reaction_body: createDto.reaction_body,
                 delay: createDto.delay,
                 status: AreaStatus.STOPPED,
                 id: "area-id"
@@ -468,15 +398,15 @@ describe("AreaService", () => {
                     user: { connect: { id: userId } },
                     name: createDto.name,
                     description: createDto.description,
-                    actionId: createDto.actionId,
-                    actionAuth: {
-                        create: createDto.actionAuth
+                    actionId: createDto.action_id,
+                    actionOAuth: {
+                        connect: { id: createDto.action_oauth_id }
                     },
-                    reactionId: createDto.reactionId,
-                    reactionAuth: {
-                        create: createDto.reactionAuth
+                    reactionId: createDto.reaction_id,
+                    reactionOAuth: {
+                        connect: { id: createDto.reaction_oauth_id }
                     },
-                    reactionBody: createDto.reactionBody,
+                    reactionBody: createDto.reaction_body,
                     delay: createDto.delay
                 },
                 select: {
@@ -484,37 +414,16 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
-                    actionAuthId: true,
+                    actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
-                    reactionAuthId: true,
+                    reactionOAuthId: true,
                     delay: true,
                     status: true
                 }
             });
 
             expect(area).toStrictEqual(expectedArea);
-        });
-        it("should throw an UnprocessableEntityException when the auth fields do not match the service's authentication method", async () => {
-            const createDto: CreateAreaDto = {
-                actionAuth: { oauth: 1 },
-                reactionAuth: { oauth: 1 },
-                actionId: "youtube.on_liked_video",
-                reactionId: "discord.send_embed",
-                delay: 10,
-                description: "description",
-                name: "name",
-                reactionBody: {}
-            };
-
-            try {
-                await service.create("user-id", createDto);
-                fail("This should throw an error.");
-            } catch (e) {
-                expect(e).toBeInstanceOf(UnprocessableEntityException);
-            }
-
-            expect(prismaService.area.create).not.toHaveBeenCalled();
         });
     });
 
@@ -523,32 +432,32 @@ describe("AreaService", () => {
             const userId = "user-id";
             const areaId = "area-id";
             const updateDto: UpdateAreaDto = {
+                action_oauth_id: 1,
+                reaction_oauth_id: 2,
+                delay: 10,
+                description: "new description",
+                name: "new name",
+                reaction_body: {},
                 status: AreaStatus.RUNNING
             };
 
-            const area = {
+            const area: Partial<PrismaArea> = {
                 actionId: "youtube.on_liked_video",
-                reactionId: "discord.send_embed",
-                actionAuth: {
-                    id: 1,
-                    oauth: 1
-                },
-                reactionAuth: {
-                    id: 2,
-                    webhook: "https://"
-                }
+                reactionId: "gmail.send_mail",
+                actionOAuthId: 1,
+                reactionOAuthId: 2
             };
 
             const updatedArea = {
                 userId: userId,
                 id: areaId,
-                name: "name",
-                description: "description",
+                name: "new name",
+                description: "new description",
                 actionId: "youtube.on_liked_video",
-                actionAuthId: 1,
-                reactionId: "discord.send_embed",
+                actionOAuthId: 1,
+                reactionId: "gmail.send_mail",
                 reactionBody: {},
-                reactionAuthId: 1,
+                reactionOAuthId: 2,
                 delay: 10,
                 status: AreaStatus.RUNNING
             };
@@ -571,8 +480,8 @@ describe("AreaService", () => {
                 select: {
                     actionId: true,
                     reactionId: true,
-                    actionAuth: true,
-                    reactionAuth: true
+                    actionOAuth: true,
+                    reactionOAuth: true
                 }
             });
             expect(prismaService.area.update).toHaveBeenCalledWith({
@@ -580,28 +489,24 @@ describe("AreaService", () => {
                     id: areaId
                 },
                 data: {
-                    name: updateDto.name,
-                    description: updateDto.description,
-                    actionAuth: {
-                        update: updateDto.actionAuth
+                    name: updatedArea.name,
+                    description: updatedArea.description,
+                    actionOAuth: {
+                        update: { id: updatedArea.actionOAuthId }
                     },
-                    reactionAuth: {
-                        update: updateDto.reactionAuth
+                    reactionOAuth: {
+                        update: { id: updatedArea.reactionOAuthId }
                     },
-                    reactionBody: updateDto.reactionBody,
-                    delay: updateDto.delay,
-                    status: updateDto.status
+                    reactionBody: updatedArea.reactionBody,
+                    delay: updatedArea.delay,
+                    status: updatedArea.status
                 },
                 select: {
-                    userId: true,
-                    id: true,
                     name: true,
                     description: true,
-                    actionId: true,
-                    actionAuthId: true,
-                    reactionId: true,
+                    actionOAuthId: true,
                     reactionBody: true,
-                    reactionAuthId: true,
+                    reactionOAuthId: true,
                     delay: true,
                     status: true
                 }
@@ -609,59 +514,16 @@ describe("AreaService", () => {
 
             expect(resultUpdatedArea).toStrictEqual({
                 id: areaId,
-                name: "name",
-                description: "description",
+                name: "new name",
+                description: "new description",
                 action_id: "youtube.on_liked_video",
-                action_auth_id: 1,
-                reaction_id: "discord.send_embed",
+                action_oauth_id: 1,
+                reaction_id: "gmail.send_mail",
                 reaction_body: {},
-                reaction_auth_id: 1,
+                reaction_oauth_id: 2,
                 delay: 10,
                 status: AreaStatus.RUNNING
             });
-        });
-        it("should throw an UnprocessableEntityException when the auth fields do not match the service's authentication method", async () => {
-            const userId = "user-id";
-            const areaId = "area-id";
-            const updateDto: UpdateAreaDto = {
-                status: AreaStatus.RUNNING
-            };
-
-            const area = {
-                actionId: "youtube.on_liked_video",
-                reactionId: "discord.send_embed",
-                actionAuth: {
-                    id: 1,
-                    oauth: 1
-                },
-                reactionAuth: {
-                    id: 2,
-                    oauth: 1
-                }
-            };
-
-            prismaService.area.findUnique.mockResolvedValueOnce(area as any);
-
-            try {
-                await service.update(userId, areaId, updateDto);
-            } catch (e) {
-                expect(e).toBeInstanceOf(UnprocessableEntityException);
-            }
-
-            expect(prismaService.area.findUnique).toHaveBeenCalledWith({
-                where: {
-                    id: areaId,
-                    userId
-                },
-                select: {
-                    actionId: true,
-                    reactionId: true,
-                    actionAuth: true,
-                    reactionAuth: true
-                }
-            });
-
-            expect(prismaService.area.update).not.toHaveBeenCalled();
         });
     });
 
@@ -673,20 +535,16 @@ describe("AreaService", () => {
             const area: PrismaArea = {
                 id: areaId,
                 userId,
-                actionAuthId: 1,
+                actionOAuthId: 1,
                 actionId: "youtube.on_liked_video",
                 delay: 10,
                 description: "description",
                 name: "name",
-                reactionAuthId: 1,
-                reactionId: "discord.send_embed",
+                reactionOAuthId: 1,
+                reactionId: "gmail.send_mail",
                 reactionBody: {},
                 status: AreaStatus.STOPPED
             };
-
-            prismaService.areaServiceAuthentication.findUnique.mockResolvedValue(
-                { apiKey: null, oauth: 1, webhook: null } as any
-            );
 
             prismaService.area.findUnique.mockResolvedValueOnce(area);
 
@@ -694,33 +552,8 @@ describe("AreaService", () => {
 
             await service.delete(userId, areaId);
 
-            expect(
-                prismaService.areaServiceAuthentication.findUnique
-            ).toHaveBeenCalledWith({
-                where: {
-                    id: area.actionAuthId
-                },
-                select: {
-                    apiKey: true,
-                    oauth: true,
-                    webhook: true
-                }
-            });
-            expect(
-                prismaService.areaServiceAuthentication.findUnique
-            ).toHaveBeenCalledWith({
-                where: {
-                    id: area.reactionAuthId
-                },
-                select: {
-                    apiKey: true,
-                    oauth: true,
-                    webhook: true
-                }
-            });
-
             expect(schedulerService.stopPolling).toHaveBeenCalledWith(
-                `area-id|youtube.on_liked_video|discord.send_embed`
+                `area-id|youtube.on_liked_video|gmail.send_mail`
             );
 
             expect(prismaService.area.delete).toHaveBeenCalledWith({
@@ -729,12 +562,10 @@ describe("AreaService", () => {
                     id: areaId
                 },
                 include: {
-                    actionAuth: true,
-                    reactionAuth: true
+                    actionOAuth: true,
+                    reactionOAuth: true
                 }
             });
-
-            prismaService.areaServiceAuthentication.findUnique.mockClear();
         });
     });
 });
