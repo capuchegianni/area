@@ -22,6 +22,7 @@ export interface AreaTask {
     areaId: Area["id"];
     name: string;
     action: AreaAction;
+    actionMetadata: object;
     actionOAuthId: OAuthCredential["id"];
     reaction: AreaReaction;
     reactionBody: object;
@@ -51,6 +52,15 @@ export abstract class Area {
         example: "youtube.on_liked_video"
     })
     readonly action_id: string;
+
+    @ApiProperty({
+        description:
+            "The Action metadata. Those fields will be used to granuraly contorl an area.",
+        example: {
+            streamerName: "SomeoneYouLikeHere",
+        }
+    })
+    readonly action_metadata: object;
 
     @ApiProperty({
         description: "The ID of the OAuth credential used to get data.",

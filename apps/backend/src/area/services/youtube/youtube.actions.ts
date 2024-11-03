@@ -11,7 +11,10 @@ import {
 } from "./youtube.transformers";
 import { YouTubeSubscribersResponse as YouTubeSubcriptionsResponse } from "./interfaces/youtube-subscribers.interface";
 
-function onLikedVideo(accessToken: string): Promise<ActionResource> {
+function onLikedVideo(
+    accessToken: string,
+    _metadata: object
+): Promise<ActionResource> {
     const url = "https://www.googleapis.com/youtube/v3/videos";
     const config: AxiosRequestConfig = {
         params: {
@@ -44,7 +47,10 @@ function onLikedVideo(accessToken: string): Promise<ActionResource> {
     });
 }
 
-function onNewSubscription(accessToken: string): Promise<ActionResource> {
+function onNewSubscription(
+    accessToken: string,
+    _metadata: object
+): Promise<ActionResource> {
     const url = "https://www.googleapis.com/youtube/v3/subscriptions";
     const config: AxiosRequestConfig = {
         params: {
@@ -81,7 +87,10 @@ function onNewSubscription(accessToken: string): Promise<ActionResource> {
     });
 }
 
-function onNewUploadedVideo(accessToken: string): Promise<ActionResource> {
+function onNewUploadedVideo(
+    accessToken: string,
+    _metadata: object
+): Promise<ActionResource> {
     const url = "https://www.googleapis.com/youtube/v3/activities";
     const config: AxiosRequestConfig = {
         params: {
@@ -121,6 +130,7 @@ export const YOUTUBE_ACTIONS: { [name: string]: ActionDescription } = {
         description: "This event is triggered once a video has been liked.",
         oauthScopes: ["https://www.googleapis.com/auth/youtube.readonly"],
         oauthProvider: "google",
+        metadata: {},
         trigger: onLikedVideo
     },
     on_new_subscriber: {
@@ -128,6 +138,7 @@ export const YOUTUBE_ACTIONS: { [name: string]: ActionDescription } = {
             "This event is triggered once a YouTube user subscribes to your channel.",
         oauthScopes: ["https://www.googleapis.com/auth/youtube.readonly"],
         oauthProvider: "google",
+        metadata: {},
         trigger: onNewSubscription
     },
     on_new_uploaded_video: {
@@ -135,6 +146,7 @@ export const YOUTUBE_ACTIONS: { [name: string]: ActionDescription } = {
             "This event is triggered once a new video is uploaded to your channel.",
         oauthScopes: ["https://www.googleapis.com/auth/youtube.readonly"],
         oauthProvider: "google",
+        metadata: {},
         trigger: onNewUploadedVideo
     }
 };

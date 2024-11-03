@@ -77,6 +77,7 @@ export class AreaService {
         name,
         description,
         actionId,
+        actionMetadata,
         actionOAuthId,
         reactionId,
         reactionBody,
@@ -89,6 +90,7 @@ export class AreaService {
             name,
             description,
             action_id: actionId,
+            action_metadata: actionMetadata as object,
             action_oauth_id: actionOAuthId,
             reaction_id: reactionId,
             reaction_body: reactionBody as object,
@@ -108,6 +110,7 @@ export class AreaService {
                 name: true,
                 description: true,
                 actionId: true,
+                actionMetadata: true,
                 actionOAuthId: true,
                 reactionId: true,
                 reactionBody: true,
@@ -137,6 +140,7 @@ export class AreaService {
                 name: true,
                 description: true,
                 actionId: true,
+                actionMetadata: true,
                 actionOAuthId: true,
                 reactionId: true,
                 reactionBody: true,
@@ -169,6 +173,7 @@ export class AreaService {
             areaId: area.id,
             name: taskName,
             action,
+            actionMetadata: area.actionMetadata as object,
             actionOAuthId: area.actionOAuthId,
             reaction,
             reactionBody: area.reactionBody as object,
@@ -201,6 +206,7 @@ export class AreaService {
                 name: createAreaDto.name,
                 description: createAreaDto.description,
                 actionId: createAreaDto.action_id,
+                actionMetadata: createAreaDto.action_metadata,
                 actionOAuth: { connect: { id: createAreaDto.action_oauth_id } },
                 reactionId: createAreaDto.reaction_id,
                 reactionOAuth: {
@@ -214,6 +220,7 @@ export class AreaService {
                 name: true,
                 description: true,
                 actionId: true,
+                actionMetadata: true,
                 actionOAuthId: true,
                 reactionId: true,
                 reactionBody: true,
@@ -255,6 +262,7 @@ export class AreaService {
             data: {
                 name: updateAreaDto.name,
                 description: updateAreaDto.description,
+                actionMetadata: updateAreaDto.action_metadata,
                 actionOAuth: {
                     update: { id: updateAreaDto.action_oauth_id }
                 },
@@ -268,6 +276,7 @@ export class AreaService {
             select: {
                 name: true,
                 description: true,
+                actionMetadata: true,
                 actionOAuthId: true,
                 reactionBody: true,
                 reactionOAuthId: true,

@@ -57,6 +57,17 @@ export class UpdateAreaDto {
 
     @ApiPropertyOptional({
         description:
+            "The fields to filter the AREA and make them match a particular context.",
+        example: {
+            streamerName: "SomeoneYouLike"
+        }
+    })
+    @IsObject()
+    @IsOptional()
+    readonly action_metadata?: object;
+
+    @ApiPropertyOptional({
+        description:
             "The action service authentication method used to post data. The value is the ID of an authentication"
     })
     @IsNumber()

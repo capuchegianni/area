@@ -5,14 +5,23 @@ import {
     ActionResource
 } from "../interfaces/service.interface";
 import { AreaTwitchStreamer } from "./interfaces/twitch-streamer.interface";
-import { AreaTwitchStreams, AreaTwitchStream } from "./interfaces/twitch-stream.interface";
-import { AreaTwitchFollowers, AreaTwitchFollower } from "./interfaces/twitch-follower.interface";
+import {
+    AreaTwitchStreams,
+    AreaTwitchStream
+} from "./interfaces/twitch-stream.interface";
+import {
+    AreaTwitchFollowers,
+    AreaTwitchFollower
+} from "./interfaces/twitch-follower.interface";
 
-async function getStreams(accessToken: string, streamer_name: string): Promise<AreaTwitchStreams> {
+async function getStreams(
+    accessToken: string,
+    streamerName: string
+): Promise<AreaTwitchStreams> {
     const url = "https://api.twitch.tv/helix/streams";
     const config: AxiosRequestConfig = {
         params: {
-            user_login: streamer_name,
+            user_login: streamerName,
             type: "live"
         },
         headers: {
@@ -21,7 +30,10 @@ async function getStreams(accessToken: string, streamer_name: string): Promise<A
     };
 
     try {
-        const response = await axios.get<{ data: AreaTwitchStreams }>(url, config);
+        const response = await axios.get<{ data: AreaTwitchStreams }>(
+            url,
+            config
+        );
         return response.data.data;
     } catch (error) {
         if (error.response && error.response.status === 401) {
@@ -31,12 +43,18 @@ async function getStreams(accessToken: string, streamer_name: string): Promise<A
     }
 }
 
-function stream_started(accessToken: string, streamer: AreaTwitchStreamer): Promise<ActionResource> {
+function stream_started(
+    accessToken: string,
+    metadata: object
+): Promise<ActionResource> {
     return new Promise(async (resolve, reject) => {
         try {
-            const streams = await getStreams(accessToken, streamer.name);
+            const streams = await getStreams(
+                accessToken,
+                metadata["streamerName"]
+            );
             if (streams.data.length === 0) {
-                return reject(new Error('User is not streaming'));
+                return reject(new Error("User is not streaming"));
             }
             const twitchStream: AreaTwitchStream = streams[0];
             return resolve({
@@ -49,11 +67,14 @@ function stream_started(accessToken: string, streamer: AreaTwitchStreamer): Prom
     });
 }
 
-function new_follower(accessToken: string, streamer: AreaTwitchStreamer): Promise<ActionResource> {
+function new_follower(
+    accessToken: string,
+    metadata: object
+): Promise<ActionResource> {
     const url = "https://api.twitch.tv/helix/channels/followers";
     const config: AxiosRequestConfig = {
         params: {
-            broadcaster_id: streamer.id,
+            broadcaster_id: metadata["streamerId"],
             first: 1
         },
         headers: {
@@ -76,21 +97,29 @@ function new_follower(accessToken: string, streamer: AreaTwitchStreamer): Promis
             })
             .catch((e) => {
                 if (401 === e.status) {
-                    return reject(new ForbiddenException("Access token expired."));
+                    return reject(
+                        new ForbiddenException("Access token expired.")
+                    );
                 }
                 return reject(e);
             });
     });
 }
 
-function stream_ended(accessToken: string, streamer: AreaTwitchStreamer): Promise<ActionResource> {
+function stream_ended(
+    accessToken: string,
+    metadata: object
+): Promise<ActionResource> {
     return new Promise(async (resolve, reject) => {
         try {
-            const streams = await getStreams(accessToken, streamer.name);
+            const streams = await getStreams(
+                accessToken,
+                metadata["streamerName"]
+            );
             if (streams.data.length === 0) {
-                return resolve({ data: 'Stream ended', cacheValue: null });
+                return resolve({ data: "Stream ended", cacheValue: null });
             } else {
-                reject(new Error('User is still streaming'));
+                reject(new Error("User is still streaming"));
             }
         } catch (error) {
             reject(error);
@@ -103,18 +132,22 @@ export const TWITCH_ACTIONS: { [name: string]: ActionDescription } = {
         description: "This event is triggered once the user starts a stream.",
         oauthScopes: [""],
         oauthProvider: "twitch",
+        metadata: { streamerName: "The streamer's username" },
         trigger: stream_started
     },
     new_follower: {
-        description: "This event is triggered once the user gets a new follower.",
+        description:
+            "This event is triggered once the user gets a new follower.",
         oauthScopes: ["moderator:read:followers"],
         oauthProvider: "twitch",
+        metadata: { streamerName: "The streamer's ID" },
         trigger: new_follower
     },
     stream_ended: {
         description: "This event is triggered once the user ends a stream.",
         oauthScopes: [""],
         oauthProvider: "twitch",
+        metadata: { streamerName: "The streamer's username" },
         trigger: stream_ended
     }
 };
