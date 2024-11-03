@@ -13,7 +13,6 @@ import {
     ValidatorConstraint,
     ValidatorConstraintInterface
 } from "class-validator";
-import { AreaServiceAuthDto } from "./areaServiceAuth.dto";
 
 @ValidatorConstraint({ name: "UpdateAreaDto", async: false })
 class UpdateAreaDtoConstraint implements ValidatorConstraintInterface {
@@ -26,12 +25,6 @@ class UpdateAreaDtoConstraint implements ValidatorConstraintInterface {
         ];
 
         if (!statusKeys.includes(dto.status)) return false;
-
-        if (
-            undefined !== dto.actionAuth?.webhook &&
-            "local" !== dto.actionAuth?.webhook
-        )
-            return false;
 
         return true;
     }
@@ -64,22 +57,11 @@ export class UpdateAreaDto {
 
     @ApiPropertyOptional({
         description:
-            "The action service authentication method used to receive data. The webhook value for this attribute MUST BE 'local'. 'oauth' is the ID of the OAuth credential stored in database.",
-        type: AreaServiceAuthDto,
-        examples: [
-            { apiKey: "<API_KEY_HERE>" },
-            { oauth: 1 },
-            { webhook: "local" }
-        ]
+            "The action service authentication method used to post data. The value is the ID of an authentication"
     })
-    @IsObject()
+    @IsNumber()
     @IsOptional()
-    @Validate(UpdateAreaDtoConstraint, {
-        message(validationArguments) {
-            return `Invalid value for ${validationArguments.property} : ${JSON.stringify(validationArguments.object)}`;
-        }
-    })
-    readonly actionAuth?: AreaServiceAuthDto;
+    readonly action_oauth_id?: number;
 
     @ApiPropertyOptional({
         description:
@@ -94,26 +76,15 @@ export class UpdateAreaDto {
     })
     @IsOptional()
     @IsObject()
-    readonly reactionBody?: object;
+    readonly reaction_body?: object;
 
     @ApiPropertyOptional({
         description:
-            "The action service authentication method used to post data. 'oauth' is the ID of the OAuth credential stored in database.",
-        type: AreaServiceAuthDto,
-        examples: [
-            { apiKey: "<API_KEY_HERE>" },
-            { oauth: 1 },
-            { webhook: "https://discord.com/webhooks/webhookId/webhookSecret" }
-        ]
+            "The action service authentication method used to post data. The value is the ID of an authentication"
     })
-    @IsObject()
+    @IsNumber()
     @IsOptional()
-    @Validate(UpdateAreaDtoConstraint, {
-        message(validationArguments) {
-            return `Invalid value for ${validationArguments.property} : ${JSON.stringify(validationArguments.object)}`;
-        }
-    })
-    readonly reactionAuth?: AreaServiceAuthDto;
+    readonly reaction_oauth_id?: number;
 
     @ApiPropertyOptional({
         description:

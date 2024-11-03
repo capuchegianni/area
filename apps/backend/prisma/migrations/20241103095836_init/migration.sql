@@ -26,25 +26,15 @@ CREATE TABLE "oauth_credentials" (
 );
 
 -- CreateTable
-CREATE TABLE "area_service_authentications" (
-    "id" SERIAL NOT NULL,
-    "api_key" TEXT,
-    "oauth" INTEGER,
-    "webhook" TEXT,
-
-    CONSTRAINT "area_service_authentications_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "areas" (
     "id" UUID NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "description" TEXT NOT NULL,
     "action_id" VARCHAR(255) NOT NULL,
-    "action_auth_id" INTEGER,
+    "action_oauth_id" INTEGER NOT NULL,
     "reaction_id" VARCHAR(255) NOT NULL,
     "reaction_body" JSONB,
-    "reaction_auth_id" INTEGER,
+    "reaction_oauth_id" INTEGER NOT NULL,
     "delay" INTEGER NOT NULL,
     "status" "area_status" NOT NULL DEFAULT 'STOPPED',
     "user_id" UUID
@@ -69,13 +59,10 @@ CREATE UNIQUE INDEX "areas_id_key" ON "areas"("id");
 ALTER TABLE "oauth_credentials" ADD CONSTRAINT "oauth_credentials_users_id_fkey" FOREIGN KEY ("users_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "area_service_authentications" ADD CONSTRAINT "area_service_authentications_oauth_fkey" FOREIGN KEY ("oauth") REFERENCES "oauth_credentials"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "areas" ADD CONSTRAINT "areas_action_oauth_id_fkey" FOREIGN KEY ("action_oauth_id") REFERENCES "oauth_credentials"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "areas" ADD CONSTRAINT "areas_action_auth_id_fkey" FOREIGN KEY ("action_auth_id") REFERENCES "area_service_authentications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "areas" ADD CONSTRAINT "areas_reaction_auth_id_fkey" FOREIGN KEY ("reaction_auth_id") REFERENCES "area_service_authentications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "areas" ADD CONSTRAINT "areas_reaction_oauth_id_fkey" FOREIGN KEY ("reaction_oauth_id") REFERENCES "oauth_credentials"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "areas" ADD CONSTRAINT "areas_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

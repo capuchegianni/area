@@ -1,7 +1,7 @@
 import {
     YouTubeVideo,
     AreaYouTubeVideo
-} from "./interfaces/youtubeVideo.interface";
+} from "./interfaces/youtube-video.interface";
 import { transformYouTubeVideoToArea } from "./youtube.transformers";
 
 const thumbnails = {

@@ -63,4 +63,12 @@ export declare class AreaYouTubeVideo {
     readonly tags: string[];
     readonly thumbnail: string;
 }
+export declare class AreaYouTubeSubscriber {
+    readonly id: string;
+    readonly name: string;
+    readonly description: string;
+    readonly thumbnail: string;
+    readonly subscribedAt: Date;
+    readonly url: string;
+}
 export {};

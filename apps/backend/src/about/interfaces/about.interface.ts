@@ -1,12 +1,11 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { AreaServiceAuth } from "../../area/services/interfaces/service.interface";
+import { ApiProperty } from "@nestjs/swagger";
 
 class AboutJsonClient {
     @ApiProperty({ description: "The host (IP address) of the client." })
     readonly host: string;
 }
 
-class AboutJsonServerServiceAction {
+class AboutJsonServerServiceOAuth {
     @ApiProperty({
         description: "The name of the action."
     })
@@ -17,49 +16,20 @@ class AboutJsonServerServiceAction {
     })
     readonly description: string;
 
-    @ApiPropertyOptional({
-        description: "The name of the field.",
+    @ApiProperty({
+        description: "The name of the OAuth provider.",
         type: String,
-        examples: ["apiKey", "oauth", "webhook"]
+        examples: ["google", "discord", "twitch"]
     })
-    readonly auth?: keyof AreaServiceAuth;
+    readonly oauthProvider: string;
 
-    @ApiPropertyOptional({
-        description:
-            "The required OAuth scopes. Only set when the 'name' property is set to 'oauth'.",
+    @ApiProperty({
+        description: "The required OAuth scopes.",
         type: String,
         isArray: true,
         examples: ["https://www.googleapis.com/auth/youtube.readonly"]
     })
-    readonly oauthScopes?: string[];
-}
-
-class AboutJsonServerServiceReaction {
-    @ApiProperty({
-        description: "The name of the reaction."
-    })
-    readonly name: string;
-
-    @ApiProperty({
-        description: "The description of the reaction."
-    })
-    readonly description: string;
-
-    @ApiPropertyOptional({
-        description: "The name of the field.",
-        type: String,
-        examples: ["apiKey", "oauth", "webhook"]
-    })
-    readonly auth?: keyof AreaServiceAuth;
-
-    @ApiPropertyOptional({
-        description:
-            "The required OAuth scopes. Only set when the 'name' property is set to 'oauth'.",
-        type: String,
-        isArray: true,
-        examples: ["https://www.googleapis.com/auth/youtube.readonly"]
-    })
-    readonly oauthScopes?: string[];
+    readonly oauthScopes: string[];
 }
 
 class AboutJsonServerService {
@@ -71,17 +41,17 @@ class AboutJsonServerService {
 
     @ApiProperty({
         description: "The actions available for this service.",
-        type: AboutJsonServerServiceAction,
+        type: AboutJsonServerServiceOAuth,
         isArray: true
     })
-    readonly actions: AboutJsonServerServiceAction[];
+    readonly actions: AboutJsonServerServiceOAuth[];
 
     @ApiProperty({
         description: "The reactions available for this service.",
-        type: AboutJsonServerServiceReaction,
+        type: AboutJsonServerServiceOAuth,
         isArray: true
     })
-    readonly reactions: AboutJsonServerServiceReaction[];
+    readonly reactions: AboutJsonServerServiceOAuth[];
 }
 
 class AboutJsonServer {

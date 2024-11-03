@@ -1,9 +1,9 @@
-import { DISCORD_ACTIONS } from "./discord.actions";
-import { DISCORD_REACTIONS } from "./discord.reactions";
+import { GMAIL_ACTIONS } from "./gmail.actions";
+import { GMAIL_REACTIONS } from "./gmail.reactions";
 
 export default {
-    name: "discord",
-    actions: Object.entries(DISCORD_ACTIONS).map(
+    name: "gmail",
+    actions: Object.entries(GMAIL_ACTIONS).map(
         ([name, { description, oauthProvider, oauthScopes }]) => ({
             name,
             description,
@@ -11,7 +11,7 @@ export default {
             oauthScopes
         })
     ),
-    reactions: Object.entries(DISCORD_REACTIONS).map(
+    reactions: Object.entries(GMAIL_REACTIONS).map(
         ([name, { description, oauthProvider, oauthScopes }]) => ({
             name,
             description,

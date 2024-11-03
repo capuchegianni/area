@@ -101,3 +101,23 @@ export class AreaYouTubeVideo {
     })
     readonly thumbnail: string;
 }
+
+export class AreaYouTubeSubscriber {
+    @ApiProperty({ description: "" })
+    readonly id: string;
+
+    @ApiProperty({ description: "" })
+    readonly name: string;
+
+    @ApiProperty({ description: "" })
+    readonly description: string;
+
+    @ApiProperty({ description: "" })
+    readonly thumbnail: string;
+
+    @ApiProperty({ description: "" })
+    readonly subscribedAt: Date;
+
+    @ApiProperty({ description: "" })
+    readonly url: string;
+}
