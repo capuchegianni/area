@@ -35,7 +35,7 @@ type ParsedPathname = {
 
 /**
  * Parse the pathname information from the URL.
- * Get the locale and the rest of the pathname from the URL and return them.
+ * Get the locale and the rest (including search params) of the pathname from the URL and return them.
  * For example, if the URL is "http://localhost:3000/en/foo", the result will be { locale: "en", rest: "foo" }.
  *
  * @param url The URL to parse.
@@ -45,7 +45,7 @@ type ParsedPathname = {
 function parsePathname(url: URL): ParsedPathname {
     const [, locale, ...rest] = url.pathname.replace(new RegExp(`^${base}`), "").split("/");
 
-    return { locale, rest: rest.join("/") };
+    return { locale, rest: rest.join("/") + url.search };
 }
 
 /**
@@ -54,10 +54,10 @@ function parsePathname(url: URL): ParsedPathname {
  *
  * @param url The URL object.
  *
- * @returns The current locale, or `undefined` if the locale is not found.
+ * @returns The current locale, or `undefined` if the locale is not found, and the rest of the pathname.
  */
-export function getCurrentLocale({ url }: RequestEvent): string | undefined {
-    return parsePathname(url).locale;
+export function getCurrentLocale({ url }: RequestEvent): ParsedPathname {
+    return parsePathname(url);
 }
 
 /**

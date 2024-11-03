@@ -1,27 +1,23 @@
-import { AreaDiscordEmbed } from "../discord/interfaces/discordEmbed.interface";
-import { AreaYouTubeVideo } from "../youtube/interfaces/youtubeVideo.interface";
-
-export interface AreaServiceAuth {
-    readonly apiKey?: string;
-    readonly oauth?: string;
-    readonly webhook?: string;
-}
+import {
+    AreaYouTubeSubscriber,
+    AreaYouTubeVideo
+} from "../youtube/interfaces/youtube-video.interface";
 
 export interface ActionResource {
-    data: AreaYouTubeVideo;
-    cacheValue: string;
+    data: AreaYouTubeVideo | AreaYouTubeSubscriber | null;
+    cacheValue: string | null;
 }
 
 export interface ActionDescription {
     description: string;
-    oauthScopes?: string[];
-    auth?: keyof AreaServiceAuth;
-    trigger: (auth: AreaServiceAuth) => Promise<ActionResource>;
+    oauthScopes: string[];
+    oauthProvider: string;
+    trigger: (accessToken: string) => Promise<ActionResource>;
 }
 
 export interface ReactionDescription {
     description: string;
     oauthScopes?: string[];
-    auth?: keyof AreaServiceAuth;
-    produce: (auth: AreaServiceAuth, data: AreaDiscordEmbed) => Promise<void>;
+    oauthProvider: string;
+    produce: (accessToken: string, data: object) => Promise<void>;
 }

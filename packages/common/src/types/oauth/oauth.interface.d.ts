@@ -1,7 +1,4 @@
-import { User } from "../users/interfaces/user.interface";
-import { HttpRedirectResponse } from "@nestjs/common";
-import { Request } from "express";
-import { OAuthDBService } from "./oauthDb.service";
+import { OAuthDBService } from "./oauth-db.service";
 export declare class OAuthCredential {
     readonly id?: number;
     readonly access_token: string;
@@ -17,17 +14,12 @@ export declare abstract class OAuthManager extends OAuthDBService {
     abstract refreshCredential(oauthCredential: OAuthCredential): Promise<OAuthCredential>;
     abstract revokeCredential(oauthCredential: OAuthCredential): Promise<void>;
 }
-export declare function OAuthController_getOAuthUrl(): MethodDecorator & ClassDecorator;
+export declare function OAuthController_getAuthorizationUrl(): MethodDecorator & ClassDecorator;
 export declare function OAuthController_callback(): MethodDecorator & ClassDecorator;
 export declare function OAuthController_credentials(): MethodDecorator & ClassDecorator;
 export declare function OAuthController_revoke(): MethodDecorator & ClassDecorator;
-export declare abstract class OAuthController {
-    static prepareOAuthSession(session: Request["session"], userId: User["id"], redirectUri: string): string;
-    static verifyState(session: Request["session"], state: string): void;
-    abstract getOAuthUrl(req: Request, scope: string, redirectUri: string): {
-        redirect_uri: string;
-    };
-    abstract callback(req: Request, code: string, state: string): Promise<HttpRedirectResponse>;
-    abstract credentials(req: Request): Promise<OAuthCredential[]>;
-    abstract revoke(req: Request, oauthCredentialId: OAuthCredential["id"]): Promise<void>;
+export interface OAuthMetadata {
+    state: string;
+    requestedAt: number;
+    redirectUri: string;
 }

@@ -18,8 +18,7 @@ import { RedisOptions } from "./app.config";
 import { AboutModule } from "./about/about.module";
 import { PrismaService } from "./prisma/prisma.service";
 import { AreaService } from "./area/area.service";
-import { WebhookModule } from "./webhook/webhook.module";
-import { OAuthDBService } from "./oauth/oauthDb.service";
+import { OAuthDBService } from "./oauth/oauth-db.service";
 
 @Module({
     imports: [
@@ -34,8 +33,7 @@ import { OAuthDBService } from "./oauth/oauthDb.service";
         AreaModule,
         ScheduleModule.forRoot(),
         SchedulerModule,
-        AboutModule,
-        WebhookModule
+        AboutModule
     ],
     providers: [JwtGuard, OAuthDBService],
     controllers: []

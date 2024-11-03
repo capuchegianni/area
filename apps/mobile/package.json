@@ -8,20 +8,24 @@
             "name": "Gianni Henriques",
             "email": "gianni.henriques@epitech.eu",
             "url": "https://github.com/capuchegianni"
-          },
+        },
         {
             "name": "Clément Liénard",
             "email": "clement.lienard@epitech.eu",
             "url": "https://github.com/Clement-Z4RM"
-          }
+        }
     ],
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
         "build": "npm run build:prod",
+        "build:local": "npm run build:prod:local",
         "build:dev": "eas build -p android --profile development",
         "build:preview": "eas build -p android --profile preview",
         "build:prod": "eas build -p android --profile production",
+        "build:dev:local": "eas build -p android --profile development --local",
+        "build:preview:local": "eas build -p android --profile preview --local",
+        "build:prod:local": "eas build -p android --profile production --local --output=client.apk",
         "dev": "npm run start",
         "dev:android": "npm run start:android",
         "dev:ios": "npm run start:ios",
@@ -68,15 +72,17 @@
         "@react-navigation/native": "^6.0.2",
         "@rn-primitives/avatar": "~1.0.4",
         "@rn-primitives/checkbox": "^1.0.4",
+        "@rn-primitives/menubar": "^1.1.0",
         "@rn-primitives/portal": "~1.0.3",
         "@rn-primitives/progress": "~1.0.3",
+        "@rn-primitives/select": "^1.1.0",
         "@rn-primitives/slot": "~1.0.3",
         "@rn-primitives/tooltip": "~1.0.3",
         "@rn-primitives/types": "~1.0.3",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.0",
-        "crypto-js": "^4.2.0",
         "expo": "~51.0.38",
+        "expo-auth-session": "~5.5.2",
         "expo-linking": "~6.3.1",
         "expo-localization": "~15.0.3",
         "expo-navigation-bar": "~3.0.7",
@@ -84,6 +90,7 @@
         "expo-splash-screen": "~0.27.5",
         "expo-status-bar": "~1.12.1",
         "expo-system-ui": "~3.0.7",
+        "expo-web-browser": "~13.0.3",
         "i18next": "^23.15.1",
         "lucide-react-native": "^0.378.0",
         "nativewind": "^4.0.33",
@@ -100,9 +107,7 @@
         "tailwind-merge": "^2.2.1",
         "tailwindcss": "3.3.5",
         "tailwindcss-animate": "^1.0.7",
-        "zustand": "^4.4.7",
-        "expo-web-browser": "~13.0.3",
-        "expo-auth-session": "~5.5.2"
+        "zustand": "^4.4.7"
     },
     "devDependencies": {
         "@babel/core": "^7.20.0",
