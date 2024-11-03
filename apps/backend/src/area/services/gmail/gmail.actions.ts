@@ -8,7 +8,7 @@ import { GmailMailsResponse } from "./interfaces/gmail-mail";
 
 async function onNewMail(
     accessToken: string,
-    _metadata: object
+    _metadata: object // eslint-disable-line
 ): Promise<ActionResource> {
     const url = "https://gmail.googleapis.com/gmail/v1/users/me/messages";
     const config: AxiosRequestConfig = {
