@@ -1,7 +1,8 @@
 import type { LayoutLoad } from "./$types";
+import type { Services } from "@common/area/types/area";
 import type { Locales } from "$i18n/i18n-types";
 import { loadLocaleAsync } from "$i18n/i18n-util.async";
-import type { Services, Client } from "~/app";
+import type { Client } from "~/app";
 
 /**
  * Load locale dictionary into memory and pass locale to the "rendering context".

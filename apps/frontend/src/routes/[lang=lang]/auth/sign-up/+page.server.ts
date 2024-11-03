@@ -53,7 +53,7 @@ export const actions: Actions = {
         if (payload.error)
             return fail(400, payload);
 
-        const response = await api.auth.signUp(env.SERVER_API_URL, payload);
+        const response = await api.auth.signUp(env.API_URL, payload);
 
         if (!response.success)
             return fail(

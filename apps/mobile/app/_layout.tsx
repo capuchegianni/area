@@ -6,17 +6,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { type Theme, ThemeProvider } from "@react-navigation/native";
 import { SplashScreen, Stack, useRouter, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import useMount from "react-use/lib/useMount";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { NAV_THEME } from "~/lib/constants";
 import { useColorScheme } from "~/lib/useColorScheme";
 import { PortalHost } from "@rn-primitives/portal";
 import { ThemeToggle } from "~/components/ThemeToggle";
-import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
+import api from "area-common/src/api/api";
+import { LogOut } from "~/lib/icons/Logout";
+import FooterMenu from "~/components/footer";
 
 const LIGHT_THEME: Theme = {
     dark: false,
@@ -52,7 +54,9 @@ export default function RootLayout() {
     useMount(() => {
         (async () => {
             const theme = await AsyncStorage.getItem("theme");
+            const language = await AsyncStorage.getItem("@language") || undefined;
 
+            i18n.changeLanguage(language);
             if (Platform.OS === "web") {
                 // Adds the background color to the html element to prevent white background on overscroll.
                 document.documentElement.classList.add("bg-background");
@@ -67,32 +71,41 @@ export default function RootLayout() {
 
             if (colorTheme !== colorScheme) {
                 setColorScheme(colorTheme);
-                setAndroidNavigationBar(colorTheme);
                 setIsColorSchemeLoaded(true);
                 return;
             }
-            setAndroidNavigationBar(colorTheme);
             setIsColorSchemeLoaded(true);
         })().finally(() => {
             SplashScreen.hideAsync();
         });
     });
 
-    useEffect(() => {
-        const updateAuth = async () => {
-            const token = await AsyncStorage.getItem("@access_token");
+    const getToken = (): Promise<string | null> => {
+        return AsyncStorage.getItem("@access_token");
+    };
 
-            if (isColorSchemeLoaded) {
-                if (token && (pathName === "/login" || pathName === "/signup")) {
-                    router.replace("/dashboard");
-                } else if (!token && pathName !== "/login" && pathName !== "/signup") {
-                    router.replace("/(auth)/login");
-                }
+    const logout = async () => {
+        const token = await getToken();
+        if (!token)
+            return;
+
+        const res = await api.auth.signOut(process.env.EXPO_PUBLIC_API_URL, token);
+
+        if (!res.success) {
+            switch (res.status) {
+            case 401:
+                AsyncStorage.removeItem("@access_token");
+                router.navigate("/(auth)/login");
+                break;
+            case 500:
+                console.error("An internal error happened.");
+                break;
             }
-        };
-
-        updateAuth();
-    }, [pathName, router, isColorSchemeLoaded]);
+            return;
+        }
+        AsyncStorage.removeItem("@access_token");
+        router.navigate("/(auth)/login");
+    };
 
     if (!isColorSchemeLoaded) return null;
 
@@ -101,36 +114,63 @@ export default function RootLayout() {
             <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
             <Stack screenOptions={{
                 headerLeft: () => (
-                    <Button
-                        className="m-2"
-                        variant="ghost"
-                        onPress={changeLanguage}
-                    >
-                        <Text>{t("language")}</Text>
-                    </Button>
+                    <Text className="font-bold text-4xl ml-2">
+                        AREA
+                    </Text>
                 ),
-                headerRight: () => <ThemeToggle />,
+                headerRight: () => (
+                    <View className="flex flex-row">
+                        <Button
+                            className="mt-2 mr-1"
+                            variant="outline"
+                            size="icon"
+                            onPress={changeLanguage}
+                        >
+                            <Text>{t("language")}</Text>
+                        </Button>
+                        <ThemeToggle />
+                        {isColorSchemeLoaded && pathName !== "/login" && pathName !== "/signup" && (
+                            <Button
+                                className="mt-2 mr-2"
+                                variant="secondary"
+                                size="icon"
+                                onPress={() => logout()}
+                            >
+                                <LogOut className="text-primary"/>
+                            </Button>
+                        )}
+                    </View>
+                ),
             }}>
                 <Stack.Screen
                     name="(auth)/login"
                     options={{
-                        title: t("login")
+                        title: ""
                     }}
                 />
                 <Stack.Screen
                     name="(auth)/signup"
                     options={{
-                        title: t("signup")
+                        title: ""
                     }}
                 />
                 <Stack.Screen
                     name="(tabs)/dashboard"
                     options={{
-                        title: t("home")
+                        title: ""
+                    }}
+                />
+                <Stack.Screen
+                    name="(tabs)/area"
+                    options={{
+                        title: ""
                     }}
                 />
             </Stack>
             <PortalHost />
+            {isColorSchemeLoaded && pathName !== "/login" && pathName !== "/signup" &&
+                <FooterMenu />
+            }
         </ThemeProvider>
     );
 }

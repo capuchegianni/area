@@ -25,7 +25,6 @@
         "lint:fix": "eslint . --fix"
     },
     "dependencies": {
-        "bits-ui": "^0.21.16",
         "clsx": "^2.1.1",
         "cmdk-sv": "^0.0.18",
         "lucide-svelte": "^0.446.0",
@@ -43,6 +42,7 @@
         "@types/node": "^22.6.0",
         "@types/qrcode": "^1.5.5",
         "autoprefixer": "^10.4.20",
+        "bits-ui": "^0.21.16",
         "cross-env": "^7.0.3",
         "cypress": "^13.15.0",
         "cypress-plugin-dotenv": "^1.3.0",
