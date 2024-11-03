@@ -28,6 +28,8 @@ import { GMAIL_ACTIONS } from "./services/gmail/gmail.actions";
 import { GMAIL_REACTIONS } from "./services/gmail/gmail.reactions";
 import { TWITCH_ACTIONS } from "./services/twitch/twitch.actions";
 import { TWITCH_REACTIONS } from "./services/twitch/twitch.reactions";
+import { REDDIT_ACTIONS } from "./services/reddit/reddit.actions";
+import { REDDIT_REACTIONS } from "./services/reddit/reddit.reactions";
 
 @Injectable()
 export class AreaService {
@@ -36,13 +38,15 @@ export class AreaService {
             youtube: YOUTUBE_ACTIONS,
             discord: DISCORD_ACTIONS,
             twitch: TWITCH_ACTIONS,
-            gmail: GMAIL_ACTIONS
+            gmail: GMAIL_ACTIONS,
+            reddit: REDDIT_ACTIONS
         },
         reaction: {
             youtube: YOUTUBE_REACTIONS,
             discord: DISCORD_REACTIONS,
             twitch: TWITCH_REACTIONS,
-            gmail: GMAIL_REACTIONS
+            gmail: GMAIL_REACTIONS,
+            reddit: REDDIT_REACTIONS
         }
     };
 
