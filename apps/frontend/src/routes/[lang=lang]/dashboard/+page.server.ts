@@ -47,24 +47,15 @@ export const actions: Actions = {
 
         const data = await request.formData();
         const service = data.get("service");
-        const redirectUri = data.get("redirect-uri");
         const scope = data.get("scope");
 
-        if (!service || !redirectUri || !scope)
+        if (!service || !scope)
             return badRequestFail(400, LL);
-        if (typeof service !== "string" || typeof redirectUri !== "string" || typeof scope !== "string")
+        if (typeof service !== "string" || typeof scope !== "string")
             return badRequestFail(400, LL);
         if (!isOauthService(service))
             return badRequestFail(400, LL);
 
-        const response = await api.oauth.oauth(env.API_URL, service, {
-            redirect_uri: redirectUri,
-            scope
-        }, client.accessToken);
-
-        if (!response.success)
-            return error(401, "Unauthorized");
-
-        return redirect(303, response.body.redirect_uri);
+        return redirect(303, `/oauth/${service}?scope=${scope}`);
     }
 };

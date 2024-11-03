@@ -62,7 +62,6 @@
             action="?/oauth"
             use:enhance={async ({ formData }) => {
                 formData.set("service", service);
-                formData.set("redirect-uri", `${window.location.origin}/oauth/${service}/callback`);
                 formData.set("scope", oauthScopes?.join(" ") || "");
                 setLastUpdated();
                 return async ({ result }) => await applyAction(result);
