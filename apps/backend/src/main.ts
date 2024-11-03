@@ -10,9 +10,6 @@ import { AppModule } from "./app.module";
 import { ConfigService } from "@nestjs/config";
 import { ValidationPipe } from "@nestjs/common";
 import { SwaggerTheme, SwaggerThemeNameEnum } from "swagger-themes";
-import * as session from "express-session";
-import RedisStore from "connect-redis";
-import { createClient } from "redis";
 
 function getSwaggerDocumentConfig(): Omit<OpenAPIObject, "paths"> {
     return new DocumentBuilder()
@@ -26,18 +23,10 @@ function getSwaggerDocumentConfig(): Omit<OpenAPIObject, "paths"> {
             "Describes all the routes for authentication purposes."
         )
         .addTag(
-            "Google OAuth",
-            "Describes all the endpoints to deal with Google OAuth2.0 credentials."
-        )
-        .addTag(
-            "Discord OAuth",
-            "Describes all the endpoints to deal with Discord OAuth2.0 credentials."
+            "OAuth",
+            "Describes all the endpoints to deal with OAuth2.0 credentials."
         )
         .addTag("AREA", "Describes all the routes to deal with AREA's CRUD.")
-        .addTag(
-            "Webhooks",
-            "Describes all the endpoints to deal with the AREA webhooks."
-        )
         .addTag("Users", "Describes all the routes to deal with users CRUD.")
         .addBearerAuth({
             type: "http",
@@ -72,34 +61,6 @@ async function bootstrap() {
         origin: configService.getOrThrow("ORIGIN"),
         credentials: true
     });
-
-    const redisClient = createClient({
-        socket: {
-            host: configService.getOrThrow("REDIS_HOST"),
-            port: configService.getOrThrow<number>("REDIS_PORT")
-        }
-    });
-    await redisClient.connect();
-
-    const redisStore = new RedisStore({
-        client: redisClient
-    });
-
-    app.use(
-        session({
-            secret: configService.getOrThrow("EXPRESS_SESSION_SECRET"),
-            resave: false,
-            saveUninitialized: false,
-            store: redisStore,
-            name: "area_backend",
-            cookie: {
-                secure: false,
-                httpOnly: true,
-                maxAge: 24 * 60 * 60 * 1000,
-                sameSite: "lax"
-            }
-        })
-    );
 
     const swaggerDocumentConfig = getSwaggerDocumentConfig();
 

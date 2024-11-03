@@ -1,27 +1,41 @@
-import { AreaDiscordEmbed } from "../discord/interfaces/discordEmbed.interface";
-import { AreaYouTubeVideo } from "../youtube/interfaces/youtubeVideo.interface";
+import { DiscordGuild } from "../discord/interface/discord-guilds.interface";
+import { AreaTwitchStream } from "../twitch/interfaces/twitch-stream.interface";
+import { AreaTwitchFollower } from "../twitch/interfaces/twitch-follower.interface";
 
-export interface AreaServiceAuth {
-    readonly apiKey?: string;
-    readonly oauth?: string;
-    readonly webhook?: string;
-}
+import {
+    AreaYouTubeSubscriber,
+    AreaYouTubeVideo
+} from "../youtube/interfaces/youtube-video.interface";
+import { GmailMail } from "../gmail/interfaces/gmail-mail";
 
 export interface ActionResource {
-    data: AreaYouTubeVideo;
-    cacheValue: string;
+    data:
+        | AreaYouTubeVideo
+        | AreaYouTubeSubscriber
+        | DiscordGuild
+        | AreaTwitchStream
+        | AreaTwitchFollower
+        | GmailMail
+        | string
+        | null;
+    cacheValue: string | null;
 }
 
 export interface ActionDescription {
     description: string;
-    oauthScopes?: string[];
-    auth?: keyof AreaServiceAuth;
-    trigger: (auth: AreaServiceAuth) => Promise<ActionResource>;
+    oauthScopes: string[];
+    oauthProvider: string;
+    metadata: object;
+    trigger: (
+        accessToken: string,
+        metadata: object,
+        previous?: object
+    ) => Promise<ActionResource>;
 }
 
 export interface ReactionDescription {
     description: string;
     oauthScopes?: string[];
-    auth?: keyof AreaServiceAuth;
-    produce: (auth: AreaServiceAuth, data: AreaDiscordEmbed) => Promise<void>;
+    oauthProvider: string;
+    produce: (accessToken: string, data: object) => Promise<void>;
 }

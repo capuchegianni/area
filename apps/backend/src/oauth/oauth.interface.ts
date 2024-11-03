@@ -1,4 +1,5 @@
 import {
+    ApiBadRequestResponse,
     ApiBearerAuth,
     ApiExtraModels,
     ApiForbiddenResponse,
@@ -8,33 +9,28 @@ import {
     ApiParam,
     ApiProperty,
     ApiQuery,
-    ApiSeeOtherResponse,
     ApiUnauthorizedResponse,
     ApiUnprocessableEntityResponse,
     getSchemaPath
 } from "@nestjs/swagger";
-import { User } from "../users/interfaces/user.interface";
 import { JwtGuard } from "src/auth/guards/jwt.guard";
 import {
     applyDecorators,
-    ForbiddenException,
+    Delete,
     Get,
     HttpCode,
-    HttpRedirectResponse,
     HttpStatus,
-    Redirect,
     UseGuards
 } from "@nestjs/common";
-import { Request } from "express";
-import { OAuthDBService } from "./oauthDb.service";
-import { hash } from "node:crypto";
+import { OAuthDBService } from "./oauth-db.service";
 
 export class OAuthCredential {
-    @ApiProperty({ description: "The ID of the Google OAuth authorization." })
+    @ApiProperty({ description: "The ID of the OAuth2.0 credential." })
     readonly id?: number;
 
     @ApiProperty({
-        description: "The access token used to interact with the Google API."
+        description:
+            "The access token used to interact with the OAuth provider's API."
     })
     readonly access_token: string;
 
@@ -71,16 +67,24 @@ export abstract class OAuthManager extends OAuthDBService {
     abstract revokeCredential(oauthCredential: OAuthCredential): Promise<void>;
 }
 
-export function OAuthController_getOAuthUrl(): MethodDecorator &
+export function OAuthController_getAuthorizationUrl(): MethodDecorator &
     ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
-        Get("/"),
+        Get("/:provider"),
         HttpCode(HttpStatus.OK),
+        ApiParam({
+            name: "provider",
+            description: "The OAuth2.0 provider",
+            example: "discord"
+        }),
         ApiBearerAuth("bearer"),
         ApiOkResponse({
             description:
                 "Returns the OAuth2.0 URL to which the user will have to log in to the service."
+        }),
+        ApiNotFoundResponse({
+            description: "The specified provider is not supported."
         }),
         ApiUnauthorizedResponse({
             description:
@@ -90,31 +94,59 @@ export function OAuthController_getOAuthUrl(): MethodDecorator &
             name: "scope",
             description:
                 "The scopes required for the OAuth2.0 credential. It's a whitespace-joined string list.",
-            example:
-                "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtubepartner https://www.googleapis.com/auth/youtube.force-ssl"
+            example: "identify connections email"
         }),
         ApiQuery({
             name: "redirect_uri",
             description:
                 "The URI to which the user will be redirected once the authentication flow is successful.",
-            example: "http://localhost:5173/dashboard",
-            required: false
+            example: "http://localhost:8081/oauth/discord/callback"
         })
     );
 }
 
+class OAuthCallbackResponse {
+    @ApiProperty({ description: "The ID of the OAuth Credential" })
+    readonly id: number;
+}
+
 export function OAuthController_callback(): MethodDecorator & ClassDecorator {
     return applyDecorators(
-        Get("/callback"),
-        HttpCode(HttpStatus.SEE_OTHER),
-        Redirect("/", HttpStatus.SEE_OTHER),
-        ApiSeeOtherResponse({
-            description:
-                "The auth flow has been completed successfully. The Google OAuth2.0 credentials are stored in database and the client is being redirected."
+        UseGuards(JwtGuard),
+        Get("/:provider/callback"),
+        HttpCode(HttpStatus.OK),
+        ApiExtraModels(OAuthCallbackResponse),
+        ApiParam({
+            name: "provider",
+            description: "The OAuth2.0 provider",
+            example: "discord"
+        }),
+        ApiNotFoundResponse({
+            description: "The specified provider is not supported."
+        }),
+        ApiBearerAuth("bearer"),
+        ApiOkResponse({
+            description: "The auth flow has been completed successfully.",
+            schema: {
+                $ref: getSchemaPath(OAuthCallbackResponse)
+            }
         }),
         ApiForbiddenResponse({
             description:
-                "The 'state' attribute stored in the user' session is either invalid or does not match the one sent by Google. This may happen during a CSRF attack."
+                "The 'state' attribute stored in the user's session is either invalid or does not match the one returned by the OAuth provider. This may happen during a CSRF attack."
+        }),
+        ApiBadRequestResponse({
+            description: "The 'code' is invalid."
+        }),
+        ApiQuery({
+            name: "code",
+            description:
+                "The 'code' query returned by the OAuth provider. It will be used as an exchange method for access and refresh tokens."
+        }),
+        ApiQuery({
+            name: "state",
+            description:
+                "The 'state' query returned by the OAuth provider. It is a hash generated by the backend when requesting the OAuth URL for authorization. That query must appear in the OAuth provider's response in order to check for a potential CSRF attack and protect the user."
         })
     );
 }
@@ -123,15 +155,22 @@ export function OAuthController_credentials(): MethodDecorator &
     ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
-        Get("/credentials"),
+        Get("/:provider/credentials"),
         ApiExtraModels(OAuthCredential),
         ApiBearerAuth("bearer"),
+        ApiParam({
+            name: "provider",
+            description: "The OAuth2.0 provider",
+            example: "discord"
+        }),
+        ApiNotFoundResponse({
+            description: "The specified provider is not supported."
+        }),
         ApiOkResponse({
             description:
                 "Returns all the OAuth2.0 credentials related to the user.",
-            schema: {
-                $ref: getSchemaPath(OAuthCredential)
-            }
+            isArray: true,
+            type: OAuthCredential
         }),
         ApiUnauthorizedResponse({
             description:
@@ -143,19 +182,25 @@ export function OAuthController_credentials(): MethodDecorator &
 export function OAuthController_revoke(): MethodDecorator & ClassDecorator {
     return applyDecorators(
         UseGuards(JwtGuard),
-        Get("/revoke/:oauthCredentialId"),
+        Delete("/:provider/revoke/:id"),
         ApiParam({
-            name: "oauthCredentialId",
+            name: "provider",
+            description: "The OAuth2.0 provider",
+            example: "discord"
+        }),
+        ApiParam({
+            name: "id",
             description: "The ID of the credential to revoke.",
             type: Number
         }),
+        HttpCode(HttpStatus.NO_CONTENT),
         ApiBearerAuth("bearer"),
         ApiNoContentResponse({
             description: "Revokes an oauth credential."
         }),
         ApiNotFoundResponse({
             description:
-                "The given credential ID was either not found or does not belong to the current user."
+                "Either the provider name or the credential ID was invalid."
         }),
         ApiUnprocessableEntityResponse({
             description:
@@ -170,56 +215,8 @@ export function OAuthController_revoke(): MethodDecorator & ClassDecorator {
     );
 }
 
-export abstract class OAuthController {
-    static prepareOAuthSession(
-        session: Request["session"],
-        userId: User["id"],
-        redirectUri: string
-    ): string {
-        session["created_at"] = Date.now();
-        session["user_id"] = userId;
-        const stateData = `${session["user_id"]}:${session["created_at"]}`;
-        const state = hash("SHA-512", stateData, "hex");
-
-        session["state"] = state;
-        session["redirect_uri"] = redirectUri;
-        session.save((err) => {
-            if (err) console.error(err);
-        });
-
-        return state;
-    }
-
-    static verifyState(session: Request["session"], state: string): void {
-        if (
-            undefined === session["user_id"] ||
-            undefined === session["created_at"]
-        )
-            throw new ForbiddenException("Session expired.");
-        const stateData = `${session["user_id"]}:${session["created_at"]}`;
-        const currentState = hash("SHA-512", stateData, "hex");
-        if (state !== currentState)
-            throw new ForbiddenException(
-                "Invalid state. Possibly due to a CSRF attack attempt."
-            );
-    }
-
-    abstract getOAuthUrl(
-        req: Request,
-        scope: string,
-        redirectUri: string
-    ): { redirect_uri: string };
-
-    abstract callback(
-        req: Request,
-        code: string,
-        state: string
-    ): Promise<HttpRedirectResponse>;
-
-    abstract credentials(req: Request): Promise<OAuthCredential[]>;
-
-    abstract revoke(
-        req: Request,
-        oauthCredentialId: OAuthCredential["id"]
-    ): Promise<void>;
+export interface OAuthMetadata {
+    state: string;
+    requestedAt: number;
+    redirectUri: string;
 }

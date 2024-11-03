@@ -2,8 +2,7 @@ import {
     forwardRef,
     Inject,
     Injectable,
-    NotFoundException,
-    UnprocessableEntityException
+    NotFoundException
 } from "@nestjs/common";
 import { User } from "../users/interfaces/user.interface";
 import { CreateAreaDto } from "./dto/createArea.dto";
@@ -25,18 +24,30 @@ import {
 } from "./interfaces/area.interface";
 import { AreaStatus, Area as PrismaArea } from "@prisma/client";
 import { UpdateAreaDto } from "./dto/updateArea.dto";
-import { AreaServiceAuthDto } from "./dto/areaServiceAuth.dto";
+import { GMAIL_ACTIONS } from "./services/gmail/gmail.actions";
+import { GMAIL_REACTIONS } from "./services/gmail/gmail.reactions";
+import { TWITCH_ACTIONS } from "./services/twitch/twitch.actions";
+import { TWITCH_REACTIONS } from "./services/twitch/twitch.reactions";
+import { REDDIT_ACTIONS } from "./services/reddit/reddit.actions";
+import { REDDIT_REACTIONS } from "./services/reddit/reddit.reactions";
 
 @Injectable()
 export class AreaService {
-    private readonly actions = {
-        youtube: YOUTUBE_ACTIONS,
-        discord: DISCORD_ACTIONS
-    };
-
-    private readonly reactions = {
-        youtube: YOUTUBE_REACTIONS,
-        discord: DISCORD_REACTIONS
+    private readonly configs = {
+        action: {
+            youtube: YOUTUBE_ACTIONS,
+            discord: DISCORD_ACTIONS,
+            twitch: TWITCH_ACTIONS,
+            gmail: GMAIL_ACTIONS,
+            reddit: REDDIT_ACTIONS
+        },
+        reaction: {
+            youtube: YOUTUBE_REACTIONS,
+            discord: DISCORD_REACTIONS,
+            twitch: TWITCH_REACTIONS,
+            gmail: GMAIL_REACTIONS,
+            reddit: REDDIT_REACTIONS
+        }
     };
 
     constructor(
@@ -45,44 +56,28 @@ export class AreaService {
         private readonly schedulerService: SchedulerService
     ) {}
 
-    getAction(actionId: string): AreaAction {
-        const [actionService, actionMethod] = actionId.split(/\./);
+    getAreaConfig(
+        id: string,
+        kind: "action" | "reaction"
+    ): AreaAction | AreaReaction {
+        const [service, method] = id.split(/\./);
+        const referer = this.configs[kind];
 
-        if (!Object.keys(this.actions).includes(actionService))
+        if (!Object.keys(referer).includes(service))
             throw new NotFoundException(
-                `Invalid action service ID : ${actionService}.`
+                `Invalid action service ID : ${service}.`
             );
 
-        const action: ActionDescription =
-            this.actions[actionService][actionMethod];
-        if (undefined !== action)
+        const config: ActionDescription & ReactionDescription =
+            referer[service][method];
+        if (undefined !== config)
             return {
-                service: actionService,
-                method: actionMethod,
-                config: action
+                service,
+                method,
+                config
             };
-        throw new NotFoundException(`Invalid action method : ${actionMethod}.`);
-    }
 
-    getReaction(reactionId: string): AreaReaction {
-        const [reactionService, reactionMethod] = reactionId.split(/\./);
-
-        if (!Object.keys(this.reactions).includes(reactionService))
-            throw new NotFoundException(
-                `Invalid reaction service ID : ${reactionService}.`
-            );
-
-        const reaction: ReactionDescription =
-            this.reactions[reactionService][reactionMethod];
-        if (undefined !== reaction)
-            return {
-                service: reactionService,
-                method: reactionMethod,
-                config: reaction
-            };
-        throw new NotFoundException(
-            `Invalid reaction method : ${reactionMethod}.`
-        );
+        throw new NotFoundException(`Invalid ${kind} method : ${method}.`);
     }
 
     private prismaAreaToArea({
@@ -90,10 +85,11 @@ export class AreaService {
         name,
         description,
         actionId,
-        actionAuthId,
+        actionMetadata,
+        actionOAuthId,
         reactionId,
         reactionBody,
-        reactionAuthId,
+        reactionOAuthId,
         delay,
         status
     }: Partial<PrismaArea>): Area {
@@ -102,10 +98,11 @@ export class AreaService {
             name,
             description,
             action_id: actionId,
-            action_auth_id: actionAuthId,
+            action_metadata: actionMetadata as object,
+            action_oauth_id: actionOAuthId,
             reaction_id: reactionId,
             reaction_body: reactionBody as object,
-            reaction_auth_id: reactionAuthId,
+            reaction_oauth_id: reactionOAuthId,
             delay,
             status
         };
@@ -121,10 +118,11 @@ export class AreaService {
                 name: true,
                 description: true,
                 actionId: true,
-                actionAuthId: true,
+                actionMetadata: true,
+                actionOAuthId: true,
                 reactionId: true,
                 reactionBody: true,
-                reactionAuthId: true,
+                reactionOAuthId: true,
                 delay: true,
                 status: true
             }
@@ -150,10 +148,11 @@ export class AreaService {
                 name: true,
                 description: true,
                 actionId: true,
-                actionAuthId: true,
+                actionMetadata: true,
+                actionOAuthId: true,
                 reactionId: true,
                 reactionBody: true,
-                reactionAuthId: true,
+                reactionOAuthId: true,
                 delay: true,
                 status: true,
                 userId: true
@@ -168,41 +167,25 @@ export class AreaService {
     }
 
     async getAreaTask(area: PrismaArea): Promise<AreaTask> {
-        const action = this.getAction(area.actionId);
-        const reaction = this.getReaction(area.reactionId);
+        const action = this.getAreaConfig(
+            area.actionId,
+            "action"
+        ) as AreaAction;
+        const reaction = this.getAreaConfig(
+            area.reactionId,
+            "reaction"
+        ) as AreaReaction;
         const taskName = `${area.id}|${action.service}.${action.method}|${reaction.service}.${reaction.method}`;
 
-        const actionAuth =
-            await this.prismaService.areaServiceAuthentication.findUnique({
-                where: {
-                    id: area.actionAuthId
-                },
-                select: {
-                    apiKey: true,
-                    oauth: true,
-                    webhook: true
-                }
-            });
-
-        const reactionAuth =
-            await this.prismaService.areaServiceAuthentication.findUnique({
-                where: {
-                    id: area.reactionAuthId
-                },
-                select: {
-                    apiKey: true,
-                    oauth: true,
-                    webhook: true
-                }
-            });
         return {
             areaId: area.id,
             name: taskName,
             action,
-            actionAuth,
+            actionMetadata: area.actionMetadata as object,
+            actionOAuthId: area.actionOAuthId,
             reaction,
             reactionBody: area.reactionBody as object,
-            reactionAuth,
+            reactionOAuthId: area.reactionOAuthId,
             delay: area.delay,
             userId: area.userId
         };
@@ -217,58 +200,27 @@ export class AreaService {
             this.schedulerService.startPolling(task);
     }
 
-    private checkServiceAuthRequirements(
-        actionAuth: AreaServiceAuthDto,
-        action: AreaAction,
-        reactionAuth: AreaServiceAuthDto,
-        reaction: AreaReaction
-    ): boolean {
-        const actionField = Object.keys(actionAuth).filter(
-            (key) => key === action.config.auth
-        )[0] as keyof string;
-
-        const reactionField = Object.keys(reactionAuth).filter(
-            (key) => key === reaction.config.auth
-        )[0] as keyof string;
-        return (
-            (action.config.auth as string) === actionField &&
-            (reaction.config.auth as string) === reactionField
-        );
-    }
-
     async create(
         userId: User["id"],
         createAreaDto: CreateAreaDto
     ): Promise<Area> {
-        const action = this.getAction(createAreaDto.actionId);
-        const reaction = this.getReaction(createAreaDto.reactionId);
+        this.getAreaConfig(createAreaDto.action_id, "action");
 
-        if (
-            !this.checkServiceAuthRequirements(
-                createAreaDto.actionAuth,
-                action,
-                createAreaDto.reactionAuth,
-                reaction
-            )
-        )
-            throw new UnprocessableEntityException(
-                "The authentication methods for the AREA are invalid. Check the requirements at /about.json ."
-            );
+        this.getAreaConfig(createAreaDto.reaction_id, "reaction");
 
         const area = await this.prismaService.area.create({
             data: {
                 user: { connect: { id: userId } },
                 name: createAreaDto.name,
                 description: createAreaDto.description,
-                actionId: createAreaDto.actionId,
-                actionAuth: {
-                    create: createAreaDto.actionAuth
+                actionId: createAreaDto.action_id,
+                actionMetadata: createAreaDto.action_metadata,
+                actionOAuth: { connect: { id: createAreaDto.action_oauth_id } },
+                reactionId: createAreaDto.reaction_id,
+                reactionOAuth: {
+                    connect: { id: createAreaDto.reaction_oauth_id }
                 },
-                reactionId: createAreaDto.reactionId,
-                reactionAuth: {
-                    create: createAreaDto.reactionAuth
-                },
-                reactionBody: createAreaDto.reactionBody,
+                reactionBody: createAreaDto.reaction_body,
                 delay: createAreaDto.delay
             },
             select: {
@@ -276,10 +228,11 @@ export class AreaService {
                 name: true,
                 description: true,
                 actionId: true,
-                actionAuthId: true,
+                actionMetadata: true,
+                actionOAuthId: true,
                 reactionId: true,
                 reactionBody: true,
-                reactionAuthId: true,
+                reactionOAuthId: true,
                 delay: true,
                 status: true
             }
@@ -301,24 +254,14 @@ export class AreaService {
             select: {
                 actionId: true,
                 reactionId: true,
-                actionAuth: true,
-                reactionAuth: true
+                actionOAuth: true,
+                reactionOAuth: true
             }
         });
-        const action = this.getAction(area.actionId);
-        const reaction = this.getReaction(area.reactionId);
 
-        if (
-            !this.checkServiceAuthRequirements(
-                updateAreaDto.actionAuth ?? area.actionAuth,
-                action,
-                updateAreaDto.reactionAuth ?? area.reactionAuth,
-                reaction
-            )
-        )
-            throw new UnprocessableEntityException(
-                "The authentication methods for the AREA are invalid. Check the requirements at /about.json ."
-            );
+        this.getAreaConfig(area.actionId, "action");
+
+        this.getAreaConfig(area.reactionId, "reaction");
 
         const updated = await this.prismaService.area.update({
             where: {
@@ -327,34 +270,40 @@ export class AreaService {
             data: {
                 name: updateAreaDto.name,
                 description: updateAreaDto.description,
-                actionAuth: {
-                    update: updateAreaDto.actionAuth
+                actionMetadata: updateAreaDto.action_metadata,
+                actionOAuth: {
+                    update: { id: updateAreaDto.action_oauth_id }
                 },
-                reactionAuth: {
-                    update: updateAreaDto.reactionAuth
+                reactionOAuth: {
+                    update: { id: updateAreaDto.reaction_oauth_id }
                 },
-                reactionBody: updateAreaDto.reactionBody,
+                reactionBody: updateAreaDto.reaction_body,
                 delay: updateAreaDto.delay,
                 status: updateAreaDto.status
             },
             select: {
-                userId: true,
-                id: true,
                 name: true,
                 description: true,
-                actionId: true,
-                actionAuthId: true,
-                reactionId: true,
+                actionMetadata: true,
+                actionOAuthId: true,
                 reactionBody: true,
-                reactionAuthId: true,
+                reactionOAuthId: true,
                 delay: true,
                 status: true
             }
         });
 
-        await this.schedule(areaId, updated);
+        const fullyUpdated: PrismaArea = {
+            ...updated,
+            actionId: area.actionId,
+            reactionId: area.reactionId,
+            id: areaId,
+            userId
+        };
 
-        return this.prismaAreaToArea(updated);
+        await this.schedule(areaId, fullyUpdated);
+
+        return this.prismaAreaToArea(fullyUpdated);
     }
 
     async delete(userId: User["id"], areaId: Area["id"]) {
@@ -367,8 +316,8 @@ export class AreaService {
                 userId
             },
             include: {
-                actionAuth: true,
-                reactionAuth: true
+                actionOAuth: true,
+                reactionOAuth: true
             }
         });
     }

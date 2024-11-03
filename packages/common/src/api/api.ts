@@ -1,16 +1,24 @@
 import signUp from "./auth/signUp";
 import signIn from "./auth/signIn";
+import signOut from "./auth/signOut";
 
 import me from "./users/me";
 
 import getById from "./area/getById";
 import getAll from "./area/getAll";
 import patchById from "./area/patchById";
+import createArea from "./area/createArea";
+import deleteArea from "./area/deleteArea";
 
-import google from "./oauth/google";
+import oauth from "./oauth/oauth";
+import callback from "./oauth/callback";
+import credentials from "./oauth/credentials";
+import revoke from "./oauth/revoke";
 
 import about from "./about/about";
 
+import getWebhook from "./webhooks/getWebhook";
+import executeWebhook from "./webhooks/executeWebhook";
 
 type RequestResponseStatus<T> = {
     status: T;
@@ -39,7 +47,8 @@ export type Empty = Record<PropertyKey, never>;
 const api = {
     auth: {
         signUp,
-        signIn
+        signIn,
+        signOut
     },
     users: {
         me
@@ -47,10 +56,19 @@ const api = {
     area: {
         getById,
         getAll,
-        patchById
+        patchById,
+        createArea,
+        deleteArea
     },
     oauth: {
-        google
+        oauth,
+        callback,
+        credentials,
+        revoke
+    },
+    webhooks: {
+        getWebhook,
+        executeWebhook
     },
     about
 };

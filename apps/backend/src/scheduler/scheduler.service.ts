@@ -4,13 +4,14 @@ import {
     forwardRef,
     Inject,
     Injectable,
+    NotFoundException,
     OnModuleDestroy,
     OnModuleInit
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
-import { transformer } from "../area/generic_transformer";
-import { OAuthManager, OAuthCredential } from "../oauth/oauth.interface";
-import { AreaServiceAuthentication, AreaStatus } from "@prisma/client";
+import { transformer } from "../area/generic.transformers";
+import { OAuthCredential } from "../oauth/oauth.interface";
+import { AreaStatus } from "@prisma/client";
 import {
     AreaAction,
     AreaReaction,
@@ -18,11 +19,13 @@ import {
 } from "../area/interfaces/area.interface";
 import { AreaService } from "../area/area.service";
 import { OAuthService } from "../oauth/oauth.service";
-import {
-    ActionResource,
-    AreaServiceAuth
-} from "../area/services/interfaces/service.interface";
+import { ActionResource } from "../area/services/interfaces/service.interface";
 import { User } from "src/users/interfaces/user.interface";
+import { OAuthDBService } from "src/oauth/oauth-db.service";
+import {
+    OAuthProvider,
+    OAuthProvidersService
+} from "src/oauth/oauth-providers.service";
 
 @Injectable()
 export class SchedulerService implements OnModuleInit, OnModuleDestroy {
@@ -32,7 +35,9 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         @Inject(forwardRef(() => AreaService))
         private readonly areaService: AreaService,
-        private readonly oauthService: OAuthService
+        private readonly oauthService: OAuthService,
+        private readonly oauthDbService: OAuthDBService,
+        private readonly oauthProvidersService: OAuthProvidersService
     ) {}
 
     async onModuleInit() {
@@ -47,70 +52,82 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
 
     private async getOAuthCredential(
         userId: User["id"],
-        scopes: string[],
-        credentialsManager: OAuthManager
+        providerName: string,
+        scopes: string[]
     ): Promise<OAuthCredential | null> {
+        const provider: OAuthProvider =
+            this.oauthProvidersService[providerName];
+
+        if (undefined === provider)
+            throw new NotFoundException(
+                `The provider ${providerName} was not found.`
+            );
+
         const credentials: OAuthCredential[] =
-            await credentialsManager.loadCredentialsByScopes(
+            await this.oauthDbService.loadCredentialsByScopes(
                 userId,
                 scopes,
-                credentialsManager.OAUTH_TOKEN_URL,
-                credentialsManager.OAUTH_REVOKE_URL
+                provider.OAUTH_TOKEN_URL,
+                provider.OAUTH_REVOKE_URL
             );
+
         if (0 === credentials.length) return null;
 
         const credential = credentials[0];
+
         if (credential.expires_at > new Date()) return credential;
-        return await credentialsManager.refreshCredential(credential);
-    }
 
-    private async getServiceAuth(
-        userId: User["id"],
-        kind: AreaAction | AreaReaction,
-        auth: Omit<AreaServiceAuthentication, "id">
-    ): Promise<AreaServiceAuth> {
-        if (0 < kind.config.oauthScopes?.length) {
-            const credentialsManager =
-                this.oauthService.getOAuthCredentialsManager(kind.service);
-            const credential = await this.getOAuthCredential(
-                userId,
-                kind.config.oauthScopes,
-                credentialsManager
-            );
-            if (null === credential)
-                throw new ForbiddenException("Token was revoked.");
-            return { oauth: credential.access_token };
-        }
-
-        if (auth.apiKey) return { apiKey: auth.apiKey };
-
-        if (auth.webhook) return { webhook: auth.webhook };
-    }
-
-    private async getResource(task: AreaTask): Promise<ActionResource> {
-        const auth = await this.getServiceAuth(
-            task.userId,
-            task.action,
-            task.actionAuth
+        const refreshedCredentials = await this.oauthService.refresh(
+            provider,
+            credential
         );
+        await this.oauthDbService.updateCredential(refreshedCredentials);
 
-        return await task.action.config.trigger(auth);
+        return refreshedCredentials;
+    }
+
+    private async getServiceOAuth(
+        userId: User["id"],
+        kind: AreaAction | AreaReaction
+    ): Promise<OAuthCredential["access_token"]> {
+        const credential = await this.getOAuthCredential(
+            userId,
+            kind.config.oauthProvider!,
+            kind.config.oauthScopes
+        );
+        if (null === credential)
+            throw new ForbiddenException("Token was revoked.");
+        return credential.access_token;
+    }
+
+    private async getResource(
+        task: AreaTask,
+        oldCache: object
+    ): Promise<ActionResource> {
+        const accessToken = await this.getServiceOAuth(
+            task.userId,
+            task.action
+        );
+        return await task.action.config.trigger(
+            accessToken,
+            task.actionMetadata,
+            oldCache
+        );
     }
 
     async postData(task: AreaTask, transformedData: object): Promise<boolean> {
-        let auth: AreaServiceAuth;
+        let accessToken: OAuthCredential["access_token"];
         try {
-            auth = await this.getServiceAuth(
+            accessToken = await this.getServiceOAuth(
                 task.userId,
-                task.reaction,
-                task.reactionAuth
+                task.reaction
             );
         } catch {
             return false;
         }
 
         try {
-            await task.reaction.config.produce(auth, transformedData);
+            await task.reaction.config.produce(accessToken, transformedData);
         } catch {
             return false;
         }
@@ -127,20 +144,24 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
         console.log(`--- [AREA ${task.areaId} Log End] ---`);
     }
 
-    private async executeTask(task: AreaTask): Promise<boolean> {
+    async executeTask(task: AreaTask): Promise<boolean> {
         this.logTask(task);
+        const oldCache: string = await this.cacheManager.get(task.name);
+        const parsedOldCache = JSON.parse(oldCache);
+
         let data: ActionResource;
         try {
-            data = await this.getResource(task);
+            data = await this.getResource(task, parsedOldCache);
         } catch {
             return false;
         }
 
-        const transformedData = transformer(data.data, {
-            ...task.reactionBody
-        });
-
-        const oldCache = await this.cacheManager.get(task.name);
+        const transformedData =
+            null !== data.data
+                ? transformer(data.data, {
+                      ...task.reactionBody
+                  })
+                : null;
 
         await this.cacheManager.set(
             task.name,
@@ -148,19 +169,24 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
             (task.delay + 60) * 1000
         );
 
-        if (null === oldCache || data.cacheValue === oldCache) return true;
+        if (
+            null === oldCache ||
+            data.cacheValue === parsedOldCache ||
+            null === transformedData
+        )
+            return true;
 
         return await this.postData(task, transformedData);
     }
 
     scheduleTask(task: AreaTask) {
-        const clockId = setTimeout(async () => {
+        const clockId = setInterval(async () => {
             const keepPolling = await this.executeTask(task);
-            clearTimeout(clockId);
-            if (keepPolling && Object.keys(this.clockIds).includes(task.name))
-                return this.scheduleTask(task);
-
-            if (!keepPolling) {
+            if (
+                !keepPolling ||
+                !Object.keys(this.clockIds).includes(task.name)
+            ) {
+                clearInterval(clockId);
                 delete this.clockIds[task.name];
                 await this.areaService.update(task.userId, task.areaId, {
                     status: AreaStatus.ERROR
@@ -179,7 +205,7 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
             return;
         }
 
-        if (null === task.actionAuth.webhook) this.scheduleTask(task);
+        this.scheduleTask(task);
     }
 
     isRunning(taskName: string): boolean {

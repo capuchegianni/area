@@ -22,16 +22,17 @@ model User {
 }
 
 model OAuthCredential {
-    id                        Int                         @id @default(autoincrement())
-    accessToken               String                      @unique @map("access_token")
-    refreshToken              String                      @unique @map("refresh_token")
-    expiresAt                 DateTime                    @map("expires_at") @db.Timestamp()
-    scopes                    String[]
-    revokeUrl                 String                      @map("revoke_url")
-    tokenUrl                  String                      @map("token_url")
-    User                      User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId                    String                      @map("users_id") @db.Uuid
-    AreaServiceAuthentication AreaServiceAuthentication[]
+    id           Int      @id @default(autoincrement())
+    accessToken  String   @unique @map("access_token")
+    refreshToken String   @unique @map("refresh_token")
+    expiresAt    DateTime @map("expires_at") @db.Timestamp()
+    scopes       String[]
+    revokeUrl    String   @map("revoke_url")
+    tokenUrl     String   @map("token_url")
+    User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId       String   @map("users_id") @db.Uuid
+    AreaAction   Area[]   @relation(name: "actionOAuth")
+    AreaReaction Area[]   @relation(name: "reactionOAuth")
 
     @@map("oauth_credentials")
 }
@@ -44,31 +45,20 @@ enum AreaStatus {
     @@map("area_status")
 }
 
-model AreaServiceAuthentication {
-    id              Int              @id @default(autoincrement())
-    apiKey          String?          @map("api_key")
-    oauthCredential OAuthCredential? @relation(fields: [oauth], references: [id], onDelete: Cascade)
-    oauth           Int?             @map("oauth")
-    webhook         String?
-    Action          Area[]           @relation(name: "actionAuth")
-    Reaction        Area[]           @relation(name: "reactionAuth")
-
-    @@map("area_service_authentications")
-}
-
 model Area {
     id          String @unique @default(uuid()) @db.Uuid
     name        String @db.VarChar(255)
     description String @db.Text
 
-    actionId     String                     @map("action_id") @db.VarChar(255)
-    actionAuth   AreaServiceAuthentication? @relation(name: "actionAuth", fields: [actionAuthId], references: [id], onDelete: Cascade)
-    actionAuthId Int?                       @map("action_auth_id")
+    actionId       String          @map("action_id") @db.VarChar(255)
+    actionOAuth    OAuthCredential @relation(name: "actionOAuth", fields: [actionOAuthId], references: [id], onDelete: Cascade)
+    actionMetadata Json?           @map("action_metadata")
+    actionOAuthId  Int             @map("action_oauth_id")
 
-    reactionId     String                     @map("reaction_id") @db.VarChar(255)
-    reactionBody   Json?                      @map("reaction_body")
-    reactionAuth   AreaServiceAuthentication? @relation(name: "reactionAuth", fields: [reactionAuthId], references: [id], onDelete: Cascade)
-    reactionAuthId Int?                       @map("reaction_auth_id")
+    reactionId      String          @map("reaction_id") @db.VarChar(255)
+    reactionBody    Json?           @map("reaction_body")
+    reactionOAuth   OAuthCredential @relation(name: "reactionOAuth", fields: [reactionOAuthId], references: [id], onDelete: Cascade)
+    reactionOAuthId Int             @map("reaction_oauth_id")
 
     delay  Int
     status AreaStatus @default(STOPPED)

@@ -44,7 +44,7 @@
         if (!data.client)
             return error(401, "Unauthorized");
 
-        const response = await api.oauth.google(data.apiUrl, {
+        const response = await api.oauth.oauth(data.apiUrl, "google", {
             redirect_uri: window.location.href,
             scope: actions[action]?.oauthScopes?.join(" ") || ""
         }, data.client.accessToken);

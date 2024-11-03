@@ -12,6 +12,7 @@ export const RedisOptions: CacheModuleAsyncOptions = {
                 port: configService.get<number>("REDIS_PORT")
             }
         });
+
         return {
             store: () => store
         };

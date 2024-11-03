@@ -3,39 +3,12 @@ import {
     IsNotEmpty,
     IsNumber,
     IsObject,
+    IsOptional,
     IsPositive,
     IsString,
     Matches,
-    MaxLength,
-    Validate,
-    ValidationArguments,
-    ValidatorConstraint,
-    ValidatorConstraintInterface
+    MaxLength
 } from "class-validator";
-import { AreaServiceAuthDto } from "./areaServiceAuth.dto";
-import { Optional } from "@nestjs/common";
-
-@ValidatorConstraint({ name: "CreateAreaDto", async: false })
-class CreateAreaDtoConstraint implements ValidatorConstraintInterface {
-    validate(_prop: object, clazz: ValidationArguments) {
-        const dto = clazz.object as CreateAreaDto;
-
-        if (
-            undefined !== dto.actionAuth.webhook &&
-            "local" !== dto.actionAuth.webhook
-        )
-            return false;
-
-        if (undefined === dto.actionAuth.webhook && null === dto.delay)
-            return false;
-
-        return true;
-    }
-
-    defaultMessage(args: ValidationArguments) {
-        return `Invalid value for ${args.property} : ${args.value}.`;
-    }
-}
 
 export class CreateAreaDto {
     @ApiProperty({
@@ -64,25 +37,25 @@ export class CreateAreaDto {
     @IsString()
     @Matches(/[a-z_]+\.[a-z_]+/)
     @IsNotEmpty()
-    readonly actionId: string;
+    readonly action_id: string;
 
-    @ApiProperty({
+    @ApiPropertyOptional({
         description:
-            "The action service authentication method used to receive data. The webhook value for this attribute MUST BE 'local'. 'oauth' is the ID of the OAuth credential stored in database.",
-        type: AreaServiceAuthDto,
-        examples: [
-            { apiKey: "<API_KEY_HERE>" },
-            { oauth: 1 },
-            { webhook: "local" }
-        ]
-    })
-    @IsObject()
-    @Validate(CreateAreaDtoConstraint, {
-        message(validationArguments) {
-            return `Invalid value for ${validationArguments.property} : ${JSON.stringify(validationArguments.object)}`;
+            "The fields to filter the AREA and make them match a particular context.",
+        example: {
+            streamerName: "SomeoneYouLike"
         }
     })
-    readonly actionAuth: AreaServiceAuthDto;
+    @IsObject()
+    @IsOptional()
+    readonly action_metadata?: object;
+
+    @ApiPropertyOptional({
+        description:
+            "The action service authentication method used to post data. The value is the ID of an authentication"
+    })
+    @IsNumber()
+    readonly action_oauth_id: number;
 
     @ApiProperty({
         description:
@@ -92,7 +65,7 @@ export class CreateAreaDto {
     @IsString()
     @Matches(/[a-z_]+\.[a-z_]+/)
     @IsNotEmpty()
-    readonly reactionId: string;
+    readonly reaction_id: string;
 
     @ApiPropertyOptional({
         description:
@@ -106,34 +79,21 @@ export class CreateAreaDto {
         }
     })
     @IsObject()
-    readonly reactionBody: object;
+    readonly reaction_body: object;
 
     @ApiProperty({
         description:
-            "The reaction service authentication method used to post data. 'oauth' is the ID of the OAuth credential stored in database.",
-        type: AreaServiceAuthDto,
-        examples: [
-            { apiKey: "<API_KEY_HERE>" },
-            { oauth: 1 },
-            { webhook: "https://discord.com/webhooks/webhookId/webhookSecret" }
-        ]
+            "The action service authentication method used to post data. The value is the ID of an authentication"
     })
-    @IsObject()
-    @Validate(CreateAreaDtoConstraint, {
-        message(validationArguments) {
-            return `Invalid value for ${validationArguments.property} : ${JSON.stringify(validationArguments.object)}`;
-        }
-    })
-    readonly reactionAuth: AreaServiceAuthDto;
+    @IsNumber()
+    readonly reaction_oauth_id: number;
 
     @ApiPropertyOptional({
         description:
-            "The delay in seconds to which the poll-based event should be triggered. If the 'actionAuth' is a webhook, this value is ignored.",
+            "The delay in seconds to which the poll-based event should be triggered.",
         example: 10
     })
     @IsNumber()
-    @Optional()
     @IsPositive()
-    @Validate(CreateAreaDtoConstraint)
     readonly delay: number;
 }

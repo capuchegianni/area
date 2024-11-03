@@ -1,11 +1,11 @@
-import { AreaServiceAuthDto } from "./areaServiceAuth.dto";
 export declare class CreateAreaDto {
     readonly name: string;
     readonly description: string;
-    readonly actionId: string;
-    readonly actionAuth: AreaServiceAuthDto;
-    readonly reactionId: string;
-    readonly reactionBody: object;
-    readonly reactionAuth: AreaServiceAuthDto;
+    readonly action_id: string;
+    readonly action_metadata?: object;
+    readonly action_oauth_id: number;
+    readonly reaction_id: string;
+    readonly reaction_body: object;
+    readonly reaction_oauth_id: number;
     readonly delay: number;
 }
