@@ -24,6 +24,13 @@ class AboutJsonServerServiceOAuth {
     readonly oauthProvider: string;
 
     @ApiProperty({
+        description:
+            "The metadata used to targets something special to the AREA (twitch username, ...)",
+        example: { streamerName: "STREAMER_NAME", streamerId: "STREAMER_ID" }
+    })
+    readonly metadata?: object;
+
+    @ApiProperty({
         description: "The required OAuth scopes.",
         type: String,
         isArray: true,

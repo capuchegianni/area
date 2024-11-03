@@ -77,12 +77,13 @@ describe("AreaService", () => {
 
     describe("findMany", () => {
         it("should find all the areas", async () => {
-            const areas = [
+            const areas: PrismaArea[] = [
                 {
                     id: "areaId",
                     name: "areaName",
                     description: "areaDescription",
                     actionId: "actionId",
+                    actionMetadata: {},
                     actionOAuthId: 1,
                     reactionId: "reactionId",
                     reactionBody: {},
@@ -103,6 +104,7 @@ describe("AreaService", () => {
                     reaction_id: "reactionId",
                     reaction_body: {},
                     reaction_oauth_id: 2,
+                    action_metadata: {},
                     delay: 10,
                     status: AreaStatus.STOPPED
                 }
@@ -121,6 +123,7 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
+                    actionMetadata: true,
                     actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
@@ -136,13 +139,14 @@ describe("AreaService", () => {
 
     describe("findUnique", () => {
         it("should find an area based on it's ID and the userId", async () => {
-            const areas = {
+            const areas: PrismaArea = {
                 id: "areaId",
                 name: "areaName",
                 description: "areaDescription",
                 actionId: "actionId",
                 actionOAuthId: 1,
                 reactionId: "reactionId",
+                actionMetadata: {},
                 reactionBody: {},
                 reactionOAuthId: 2,
                 delay: 10,
@@ -160,6 +164,7 @@ describe("AreaService", () => {
                 reaction_body: {},
                 reaction_oauth_id: 2,
                 delay: 10,
+                action_metadata: {},
                 status: AreaStatus.STOPPED
             };
 
@@ -177,6 +182,7 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
+                    actionMetadata: true,
                     actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
@@ -209,6 +215,7 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
+                    actionMetadata: true,
                     actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
@@ -231,6 +238,7 @@ describe("AreaService", () => {
                 reactionId: "gmail.send_mail",
                 delay: 10,
                 description: "description",
+                actionMetadata: {},
                 name: "area-id|youtube.on_liked_video|gmail.send_mail",
                 reactionBody: {},
                 status: AreaStatus.RUNNING,
@@ -248,6 +256,7 @@ describe("AreaService", () => {
                     config: YOUTUBE_ACTIONS["on_liked_video"]
                 },
                 actionOAuthId: 1,
+                actionMetadata: {},
                 reaction: {
                     service: "gmail",
                     method: "send_mail",
@@ -264,7 +273,7 @@ describe("AreaService", () => {
 
     describe("schedule", () => {
         it("should schedule an area based on it's ID", async () => {
-            const area = {
+            const area: PrismaArea = {
                 id: "areaId",
                 name: "areaName",
                 description: "areaDescription",
@@ -273,6 +282,7 @@ describe("AreaService", () => {
                 reactionId: "gmail.send_mail",
                 reactionBody: {},
                 reactionOAuthId: 2,
+                actionMetadata: {},
                 delay: 10,
                 status: AreaStatus.STOPPED,
                 userId: "user-id"
@@ -291,6 +301,7 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
+                    actionMetadata: true,
                     actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
@@ -305,8 +316,9 @@ describe("AreaService", () => {
         });
 
         it("should schedule an area based on it's object and ID", async () => {
-            const area = {
+            const area: PrismaArea = {
                 id: "area-id",
+                actionMetadata: {},
                 name: "areaName",
                 description: "areaDescription",
                 actionId: "youtube.on_liked_video",
@@ -330,6 +342,7 @@ describe("AreaService", () => {
                     config: YOUTUBE_ACTIONS["on_liked_video"]
                 },
                 actionOAuthId: 1,
+                actionMetadata: {},
                 reaction: {
                     service: "gmail",
                     method: "send_mail",
@@ -362,7 +375,8 @@ describe("AreaService", () => {
                 delay: 10,
                 description: "description",
                 name: "name",
-                reaction_body: {}
+                reaction_body: {},
+                action_metadata: {}
             };
 
             prismaService.area.create.mockResolvedValueOnce({
@@ -374,6 +388,7 @@ describe("AreaService", () => {
                 reactionId: "gmail.send_mail",
                 reactionBody: {},
                 reactionOAuthId: 2,
+                actionMetadata: {},
                 delay: 10,
                 status: AreaStatus.STOPPED
             } as any);
@@ -382,6 +397,7 @@ describe("AreaService", () => {
                 name: createDto.name,
                 description: createDto.description,
                 action_id: createDto.action_id,
+                action_metadata: createDto.action_metadata,
                 action_oauth_id: createDto.action_oauth_id,
                 reaction_id: createDto.reaction_id,
                 reaction_oauth_id: createDto.reaction_oauth_id,
@@ -399,6 +415,7 @@ describe("AreaService", () => {
                     name: createDto.name,
                     description: createDto.description,
                     actionId: createDto.action_id,
+                    actionMetadata: createDto.action_metadata,
                     actionOAuth: {
                         connect: { id: createDto.action_oauth_id }
                     },
@@ -414,6 +431,7 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionId: true,
+                    actionMetadata: true,
                     actionOAuthId: true,
                     reactionId: true,
                     reactionBody: true,
@@ -448,7 +466,7 @@ describe("AreaService", () => {
                 reactionOAuthId: 2
             };
 
-            const updatedArea = {
+            const updatedArea: PrismaArea = {
                 userId: userId,
                 id: areaId,
                 name: "new name",
@@ -459,7 +477,8 @@ describe("AreaService", () => {
                 reactionBody: {},
                 reactionOAuthId: 2,
                 delay: 10,
-                status: AreaStatus.RUNNING
+                status: AreaStatus.RUNNING,
+                actionMetadata: {}
             };
 
             prismaService.area.findUnique.mockResolvedValueOnce(area as any);
@@ -505,6 +524,7 @@ describe("AreaService", () => {
                     name: true,
                     description: true,
                     actionOAuthId: true,
+                    actionMetadata: true,
                     reactionBody: true,
                     reactionOAuthId: true,
                     delay: true,
@@ -522,6 +542,7 @@ describe("AreaService", () => {
                 reaction_body: {},
                 reaction_oauth_id: 2,
                 delay: 10,
+                action_metadata: {},
                 status: AreaStatus.RUNNING
             });
         });
@@ -543,6 +564,7 @@ describe("AreaService", () => {
                 reactionOAuthId: 1,
                 reactionId: "gmail.send_mail",
                 reactionBody: {},
+                actionMetadata: {},
                 status: AreaStatus.STOPPED
             };
 

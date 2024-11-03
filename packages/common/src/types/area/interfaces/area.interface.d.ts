@@ -15,6 +15,7 @@ export interface AreaTask {
     areaId: Area["id"];
     name: string;
     action: AreaAction;
+    actionMetadata: object;
     actionOAuthId: OAuthCredential["id"];
     reaction: AreaReaction;
     reactionBody: object;
@@ -27,6 +28,7 @@ export declare abstract class Area {
     readonly name: string;
     readonly description: string;
     readonly action_id: string;
+    readonly action_metadata: object;
     readonly action_oauth_id: number;
     readonly reaction_id: string;
     readonly reaction_body: object;

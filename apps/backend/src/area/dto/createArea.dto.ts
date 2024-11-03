@@ -3,6 +3,7 @@ import {
     IsNotEmpty,
     IsNumber,
     IsObject,
+    IsOptional,
     IsPositive,
     IsString,
     Matches,
@@ -37,6 +38,17 @@ export class CreateAreaDto {
     @Matches(/[a-z_]+\.[a-z_]+/)
     @IsNotEmpty()
     readonly action_id: string;
+
+    @ApiPropertyOptional({
+        description:
+            "The fields to filter the AREA and make them match a particular context.",
+        example: {
+            streamerName: "SomeoneYouLike"
+        }
+    })
+    @IsObject()
+    @IsOptional()
+    readonly action_metadata?: object;
 
     @ApiPropertyOptional({
         description:

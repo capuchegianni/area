@@ -108,7 +108,11 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
             task.userId,
             task.action
         );
-        return await task.action.config.trigger(accessToken, oldCache);
+        return await task.action.config.trigger(
+            accessToken,
+            task.actionMetadata,
+            oldCache
+        );
     }
 
     async postData(task: AreaTask, transformedData: object): Promise<boolean> {

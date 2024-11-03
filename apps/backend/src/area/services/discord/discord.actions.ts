@@ -11,6 +11,7 @@ import {
 
 async function onGuildJoin(
     accessToken: string,
+    _metadata: object, // eslint-disable-line no-unused-vars
     previous: DiscordGuild["id"][] = []
 ): Promise<ActionResource> {
     const url = "https://discord.com/api/users/@me/guilds";
@@ -67,6 +68,7 @@ async function onGuildJoin(
 
 async function onGuildLeave(
     accessToken: string,
+    _metadata: object, // eslint-disable-line no-unused-vars
     previous: DiscordGuild["id"][] = []
 ): Promise<ActionResource> {
     const url = "https://discord.com/api/users/@me/guilds";
@@ -141,12 +143,14 @@ export const DISCORD_ACTIONS: { [name: string]: ActionDescription } = {
         description: "Triggers an event when a Discord guid is joined.",
         oauthProvider: "discord",
         oauthScopes: ["guilds"],
+        metadata: {},
         trigger: onGuildJoin
     },
     on_guild_leave: {
         description: "Triggers an event when a Discord guild is left.",
         oauthProvider: "discord",
         oauthScopes: ["guilds"],
+        metadata: {},
         trigger: onGuildLeave
     }
 };

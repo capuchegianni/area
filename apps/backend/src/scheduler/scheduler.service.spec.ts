@@ -105,6 +105,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -152,6 +153,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -206,6 +208,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -265,6 +268,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -314,6 +318,7 @@ describe("SchedulerService", () => {
             );
             expect(getResourceTrigger).toHaveBeenCalledWith(
                 "access_token_here",
+                {},
                 "string"
             );
             expect(produce).toHaveBeenCalledWith("access_token_here", {});
@@ -333,6 +338,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -395,6 +401,7 @@ describe("SchedulerService", () => {
             );
             expect(getResourceTrigger).toHaveBeenCalledWith(
                 "access_token_here",
+                {},
                 "string"
             );
             expect(produce).toHaveBeenCalledWith("access_token_here", {});
@@ -415,6 +422,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -450,6 +458,7 @@ describe("SchedulerService", () => {
             );
             expect(getResourceTrigger).toHaveBeenCalledWith(
                 "access_token_here",
+                {},
                 "string"
             );
             expect(executed).toBe(false);
@@ -469,6 +478,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -506,6 +516,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
