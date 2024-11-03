@@ -71,7 +71,8 @@ const en = {
         combobox: {
             select: "Select a {element}",
             search: "Search a {element}",
-            no: "No {element} found"
+            no: "No {element} found",
+            clear: "Clear selection"
         },
         oauth: {
             action: "Sign in with {service}"

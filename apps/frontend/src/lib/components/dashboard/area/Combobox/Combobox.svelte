@@ -13,6 +13,7 @@
     export let choices: Choice[];
     export let value: string;
     export let setValue: (value: string) => unknown;
+    export let clearOption: boolean = false;
 
     let open = false;
 
@@ -40,11 +41,21 @@
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
         </Popover.Trigger>
-        <Popover.Content class="w-[375px]">
+        <Popover.Content>
             <Command.Root>
                 <Command.Input placeholder={$LL.area.combobox.search({ element: title })} />
                 <Command.Empty>{$LL.area.combobox.no({ element: title })}</Command.Empty>
                 <Command.Group>
+                    {#if clearOption && value}
+                        <Command.Item
+                            onSelect={() => {
+                                setValue("");
+                                closeAndFocusTrigger(ids.trigger);
+                            }}
+                        >
+                            {$LL.area.combobox.clear()}
+                        </Command.Item>
+                    {/if}
                     {#each choices as action}
                         <Command.Item
                             value={action.value}

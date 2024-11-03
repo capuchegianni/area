@@ -225,6 +225,10 @@ type RootTranslation = {
 			 * @param {unknown} element
 			 */
 			no: RequiredParams<'element'>
+			/**
+			 * C​l​e​a​r​ ​s​e​l​e​c​t​i​o​n
+			 */
+			clear: string
 		}
 		oauth: {
 			/**
@@ -445,6 +449,10 @@ export type TranslationFunctions = {
 			 * No {element} found
 			 */
 			no: (arg: { element: unknown }) => LocalizedString
+			/**
+			 * Clear selection
+			 */
+			clear: () => LocalizedString
 		}
 		oauth: {
 			/**

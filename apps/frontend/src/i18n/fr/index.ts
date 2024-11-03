@@ -70,7 +70,8 @@ const fr = {
         combobox: {
             select: "Sélectionner un(e) {element}",
             search: "Rechercher un(e) {element}",
-            no: "Aucun(e) {element} trouvée"
+            no: "Aucun(e) {element} trouvée",
+            clear: "Effacer la sélection"
         },
         oauth: {
             action: "Connexion avec {service}"
