@@ -69,12 +69,12 @@ const en = {
         createArea: "Create an AREA",
         createAreaDescription: "Link an Action and a REAction to create an AREA",
         combobox: {
-            select: "Select an {element}",
-            search: "Search an {element}",
+            select: "Select a {element}",
+            search: "Search a {element}",
             no: "No {element} found"
         },
         oauth: {
-            action: "Sign in with Google"
+            action: "Sign in with {service}"
         }
     }
 } satisfies BaseTranslation;

@@ -211,12 +211,12 @@ type RootTranslation = {
 		createAreaDescription: string
 		combobox: {
 			/**
-			 * S​e​l​e​c​t​ ​a​n​ ​{​e​l​e​m​e​n​t​}
+			 * S​e​l​e​c​t​ ​a​ ​{​e​l​e​m​e​n​t​}
 			 * @param {unknown} element
 			 */
 			select: RequiredParams<'element'>
 			/**
-			 * S​e​a​r​c​h​ ​a​n​ ​{​e​l​e​m​e​n​t​}
+			 * S​e​a​r​c​h​ ​a​ ​{​e​l​e​m​e​n​t​}
 			 * @param {unknown} element
 			 */
 			search: RequiredParams<'element'>
@@ -228,9 +228,10 @@ type RootTranslation = {
 		}
 		oauth: {
 			/**
-			 * S​i​g​n​ ​i​n​ ​w​i​t​h​ ​G​o​o​g​l​e
+			 * S​i​g​n​ ​i​n​ ​w​i​t​h​ ​{​s​e​r​v​i​c​e​}
+			 * @param {unknown} service
 			 */
-			action: string
+			action: RequiredParams<'service'>
 		}
 	}
 }
@@ -433,11 +434,11 @@ export type TranslationFunctions = {
 		createAreaDescription: () => LocalizedString
 		combobox: {
 			/**
-			 * Select an {element}
+			 * Select a {element}
 			 */
 			select: (arg: { element: unknown }) => LocalizedString
 			/**
-			 * Search an {element}
+			 * Search a {element}
 			 */
 			search: (arg: { element: unknown }) => LocalizedString
 			/**
@@ -447,9 +448,9 @@ export type TranslationFunctions = {
 		}
 		oauth: {
 			/**
-			 * Sign in with Google
+			 * Sign in with {service}
 			 */
-			action: () => LocalizedString
+			action: (arg: { service: unknown }) => LocalizedString
 		}
 	}
 }
