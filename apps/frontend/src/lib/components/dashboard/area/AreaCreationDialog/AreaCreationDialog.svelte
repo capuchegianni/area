@@ -12,6 +12,8 @@
     import servicesItemsToChoices from "$lib/utils/dashboard/servicesItemsToChoices";
     import { Separator } from "$lib/components/ui/separator";
 
+    export let onOpenChange: (open: boolean) => unknown;
+
     export let services: Services;
     export let oauthCredentials: PageServerData["oauthCredentials"];
     export let oauthResult: PageServerData["oauthResult"];
@@ -38,7 +40,7 @@
     });
 </script>
 
-<Dialog.Root>
+<Dialog.Root open={oauthResult.success !== null} onOpenChange={onOpenChange}>
     <Dialog.Trigger class={buttonVariants({ variant: "outline" })}>
         {$LL.area.createArea()}
     </Dialog.Trigger>

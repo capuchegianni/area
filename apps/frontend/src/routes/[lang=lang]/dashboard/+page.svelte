@@ -9,6 +9,14 @@
 <div class="p-4 space-y-4">
     {#if data.services}
         <AreaCreationDialog
+            onOpenChange={(open) => {
+                if (!open)
+                    data.oauthResult = {
+                        success: null,
+                        service: null,
+                        id: null
+                    }
+            }}
             services={data.services}
             oauthCredentials={data.oauthCredentials}
             oauthResult={data.oauthResult}
