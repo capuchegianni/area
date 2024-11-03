@@ -45,8 +45,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     // TODO: avoid fetching client and services at each page change
 
-    if (!event.locals.client)
+    if (!event.locals.client) {
         event.locals.client = await getClient(accessToken);
+        if (!event.locals.client)
+            event.cookies.delete("accessToken", { path: "/" });
+    }
 
     if (isNotTranslatablePagePath(event.url.pathname))
         return resolve(event);
