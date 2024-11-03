@@ -52,4 +52,18 @@ export class OAuthProvidersService {
             )
         };
     }
+
+    get github(): OAuthProvider {
+        const clientId = this.configService.get<string>("GITHUB_CLIENT_ID");
+
+        return {
+            OAUTH_AUTHORIZATION_URL: "https://github.com/login/oauth/authorize",
+            OAUTH_TOKEN_URL: "https://github.com/login/oauth/access_token",
+            OAUTH_REVOKE_URL: `https://api.github.com/applications/${clientId}/grant`,
+            CLIENT_ID: clientId,
+            CLIENT_SECRET: this.configService.getOrThrow<string>(
+                "GITHUB_CLIENT_SECRET"
+            )
+        };
+    }
 }
