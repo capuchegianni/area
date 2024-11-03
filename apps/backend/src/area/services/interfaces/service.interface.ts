@@ -6,6 +6,7 @@ import {
     AreaYouTubeSubscriber,
     AreaYouTubeVideo
 } from "../youtube/interfaces/youtube-video.interface";
+import { GmailMail } from "../gmail/interfaces/gmail-mail";
 
 export interface ActionResource {
     data:
@@ -14,6 +15,7 @@ export interface ActionResource {
         | DiscordGuild
         | AreaTwitchStream
         | AreaTwitchFollower
+        | GmailMail
         | string
         | null;
     cacheValue: string | null;
