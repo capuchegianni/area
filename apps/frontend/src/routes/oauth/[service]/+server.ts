@@ -34,7 +34,8 @@ export const GET: RequestHandler = async ({ url: { origin, searchParams }, param
         const redirectUri = searchParams.get("redirect_uri");
 
         cookies.set("accessToken", accessToken, { path: "/", maxAge: 300, secure: false });
-        cookies.set("redirectUri", redirectUri, { path: "/", maxAge: 300, secure: false });
+        if (redirectUri)
+            cookies.set("redirectUri", redirectUri, { path: "/", maxAge: 300, secure: false });
     }
 
     return redirect(303, response.body.redirect_uri);
