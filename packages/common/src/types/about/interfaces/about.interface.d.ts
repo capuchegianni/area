@@ -5,6 +5,7 @@ declare class AboutJsonServerServiceOAuth {
     readonly name: string;
     readonly description: string;
     readonly oauthProvider: string;
+    readonly metadata?: object;
     readonly oauthScopes: string[];
 }
 declare class AboutJsonServerService {
