@@ -3,9 +3,11 @@ import {
     AreaYouTubeSubscriber,
     AreaYouTubeVideo
 } from "../youtube/interfaces/youtube-video.interface";
+import { AreaTwitchStream } from "../twitch/interfaces/twitch-stream.interface";
+import { AreaTwitchFollower } from "../twitch/interfaces/twitch-follower.interface";
 
 export interface ActionResource {
-    data: AreaYouTubeVideo | AreaYouTubeSubscriber | DiscordGuild | null;
+    data: AreaYouTubeVideo | AreaYouTubeSubscriber | DiscordGuild| AreaTwitchStream | AreaTwitchFollower | string | null;
     cacheValue: string | null;
 }
 
