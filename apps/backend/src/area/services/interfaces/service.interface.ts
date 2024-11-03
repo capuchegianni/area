@@ -6,10 +6,16 @@ import {
     AreaYouTubeSubscriber,
     AreaYouTubeVideo
 } from "../youtube/interfaces/youtube-video.interface";
-import { Area } from "@prisma/client";
 
 export interface ActionResource {
-    data: AreaYouTubeVideo | AreaYouTubeSubscriber | DiscordGuild | AreaTwitchStream | AreaTwitchFollower | string | null;
+    data:
+        | AreaYouTubeVideo
+        | AreaYouTubeSubscriber
+        | DiscordGuild
+        | AreaTwitchStream
+        | AreaTwitchFollower
+        | string
+        | null;
     cacheValue: string | null;
 }
 
@@ -20,7 +26,7 @@ export interface ActionDescription {
     metadata: object;
     trigger: (
         accessToken: string,
-        metadata: Area["actionMetadata"],
+        metadata: object,
         previous?: object
     ) => Promise<ActionResource>;
 }

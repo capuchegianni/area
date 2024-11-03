@@ -13,7 +13,7 @@ import { YouTubeSubscribersResponse as YouTubeSubcriptionsResponse } from "./int
 
 function onLikedVideo(
     accessToken: string,
-    _metadata: object
+    _metadata: object // eslint-disable-line
 ): Promise<ActionResource> {
     const url = "https://www.googleapis.com/youtube/v3/videos";
     const config: AxiosRequestConfig = {
@@ -49,7 +49,7 @@ function onLikedVideo(
 
 function onNewSubscription(
     accessToken: string,
-    _metadata: object
+    _metadata: object // eslint-disable-line
 ): Promise<ActionResource> {
     const url = "https://www.googleapis.com/youtube/v3/subscriptions";
     const config: AxiosRequestConfig = {
@@ -89,7 +89,7 @@ function onNewSubscription(
 
 function onNewUploadedVideo(
     accessToken: string,
-    _metadata: object
+    _metadata: object // eslint-disable-line
 ): Promise<ActionResource> {
     const url = "https://www.googleapis.com/youtube/v3/activities";
     const config: AxiosRequestConfig = {

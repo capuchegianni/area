@@ -4,15 +4,11 @@ import {
     ActionDescription,
     ActionResource
 } from "../interfaces/service.interface";
-import { AreaTwitchStreamer } from "./interfaces/twitch-streamer.interface";
 import {
     AreaTwitchStreams,
     AreaTwitchStream
 } from "./interfaces/twitch-stream.interface";
-import {
-    AreaTwitchFollowers,
-    AreaTwitchFollower
-} from "./interfaces/twitch-follower.interface";
+import { AreaTwitchFollowers } from "./interfaces/twitch-follower.interface";
 
 async function getStreams(
     accessToken: string,

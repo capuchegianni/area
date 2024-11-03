@@ -11,7 +11,7 @@ import {
 
 async function onGuildJoin(
     accessToken: string,
-    _metadata: object,
+    _metadata: object, // eslint-disable-line no-unused-vars
     previous: DiscordGuild["id"][] = []
 ): Promise<ActionResource> {
     const url = "https://discord.com/api/users/@me/guilds";
@@ -68,6 +68,7 @@ async function onGuildJoin(
 
 async function onGuildLeave(
     accessToken: string,
+    _metadata: object, // eslint-disable-line no-unused-vars
     previous: DiscordGuild["id"][] = []
 ): Promise<ActionResource> {
     const url = "https://discord.com/api/users/@me/guilds";

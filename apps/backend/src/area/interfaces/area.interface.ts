@@ -57,7 +57,7 @@ export abstract class Area {
         description:
             "The Action metadata. Those fields will be used to granuraly contorl an area.",
         example: {
-            streamerName: "SomeoneYouLikeHere",
+            streamerName: "SomeoneYouLikeHere"
         }
     })
     readonly action_metadata: object;
