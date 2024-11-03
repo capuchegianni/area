@@ -66,4 +66,16 @@ export class OAuthProvidersService {
             )
         };
     }
+
+    get slack(): OAuthProvider {
+        return {
+            OAUTH_AUTHORIZATION_URL: "https://slack.com/oauth/v2/authorize",
+            OAUTH_TOKEN_URL: "https://slack.com/api/oauth.v2.access",
+            OAUTH_REVOKE_URL: "https://slack.com/api/auth.revoke",
+            CLIENT_ID: this.configService.getOrThrow<string>("SLACK_CLIENT_ID"),
+            CLIENT_SECRET: this.configService.getOrThrow<string>(
+                "SLACK_CLIENT_SECRET"
+            )
+        };
+    }
 }
