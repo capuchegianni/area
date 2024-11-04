@@ -9,7 +9,7 @@ export const GET: RequestHandler = async ({ url: { origin, searchParams }, param
     let accessToken: string | null | undefined = searchParams.get("access_token");
     const isMobile = !!accessToken;
 
-    accessToken ??= client?.accessToken;
+    accessToken ||= client?.accessToken;
 
     if (!accessToken)
         return error(401, "Unauthorized");
