@@ -1,7 +1,4 @@
-<!-- TODO: i18n -->
-
 <script lang="ts">
-    import type { HTMLInputTypeAttribute } from "svelte/elements";
     import type { PageServerData, ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
     import { applyAction, enhance } from "$app/forms";
     import type { Services, Action, Reaction } from "@common/area/types/area";
@@ -17,13 +14,6 @@
     import AREActionSelection from "./AREActionSelection.svelte";
     import { actionFields } from "area-common/src/area/actions";
     import { reactionFields } from "area-common/src/area/reactions";
-
-    type Field = {
-        name: string;
-        displayName: string;
-        type: HTMLInputTypeAttribute;
-        description: string;
-    };
 
     export let services: Services;
     export let oauthCredentials: PageServerData["oauthCredentials"];

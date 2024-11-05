@@ -1,5 +1,3 @@
-<!-- TODO: i18n -->
-
 <script lang="ts">
     import type { PageServerData, ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
     import type { Services } from "@common/area/types/area";

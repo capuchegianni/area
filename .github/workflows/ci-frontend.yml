@@ -46,7 +46,7 @@ jobs:
         working-directory: "./apps/frontend/"
         run: "npm run build"
 
-#  cypress: TODO: fix Cypress in CI
+#  cypress:
 #    name: "Cypress"
 #    needs:
 #      - "check"
