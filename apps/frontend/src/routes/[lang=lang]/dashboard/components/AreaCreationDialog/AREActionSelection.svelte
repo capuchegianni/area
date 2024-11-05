@@ -53,7 +53,6 @@
                     setOAuthId(value);
                     setLastUpdated();
                 }}
-                clearOption
             />
             <p class="text-center">ou</p>
         {/if}
@@ -68,7 +67,7 @@
             }}
             class="space-y-2"
         >
-            <Button type="submit" disabled={!!oauthId} class="w-full">
+            <Button type="submit" disabled={!!oauthCredentialChoices.length || !!oauthId} class="w-full">
                 <img src="/icons/services/{service}.png" alt="{service} service" class="mr-2 h-4" />
                 {$LL.area.oauth.action({ service: serviceName(service) })}
             </Button>
