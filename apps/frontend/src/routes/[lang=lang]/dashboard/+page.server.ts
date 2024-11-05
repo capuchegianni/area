@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ url: { searchParams }, locals: { lo
 };
 
 function badRequestFail(LL: TranslationFunctions, field: string) {
-    return fail(400, { errorMessage: LL.error.api.incorrectField({ field }) });
+    return fail(400, { errorMessage: LL.error.incorrectField({ field }) });
 }
 
 function oauthBadRequestFail(LL: TranslationFunctions) {
