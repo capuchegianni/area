@@ -12,6 +12,14 @@ const en = {
             invalidCredentials: "Invalid credentials"
         }
     },
+    components: {
+        combobox: {
+            select: "Select a {element}",
+            search: "Search a {element}",
+            no: "No {element} found",
+            clear: "Clear selection"
+        }
+    },
     header: {
         selectLanguage: "Select language",
         toggleTheme: "Toggle theme",
@@ -68,12 +76,6 @@ const en = {
     area: {
         createArea: "Create an AREA",
         createAreaDescription: "Link an Action and a REAction to create an AREA",
-        combobox: {
-            select: "Select a {element}",
-            search: "Search a {element}",
-            no: "No {element} found",
-            clear: "Clear selection"
-        },
         oauth: {
             action: "Sign in with {service}"
         }

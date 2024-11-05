@@ -12,6 +12,14 @@ const fr = {
             invalidCredentials: "Identifiants incorrects"
         }
     },
+    components: {
+        combobox: {
+            select: "Sélectionner un(e) {element}",
+            search: "Rechercher un(e) {element}",
+            no: "Aucun(e) {element} trouvée",
+            clear: "Effacer la sélection"
+        }
+    },
     header: {
         selectLanguage: "Sélectionner la langue",
         toggleTheme: "Changer le thème",
@@ -67,12 +75,6 @@ const fr = {
     area: {
         createArea: "Créer une AREA",
         createAreaDescription: "Reliez une Action et une REAction pour créer une AREA",
-        combobox: {
-            select: "Sélectionner un(e) {element}",
-            search: "Rechercher un(e) {element}",
-            no: "Aucun(e) {element} trouvée",
-            clear: "Effacer la sélection"
-        },
         oauth: {
             action: "Connexion avec {service}"
         }

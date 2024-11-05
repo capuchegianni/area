@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { PageServerData, ActionData } from "./$types";
-    import AreaCreationDialog from "$lib/components/dashboard/area/AreaCreationDialog/AreaCreationDialog.svelte";
+    import AreaCreationDialog from "./components/AreaCreationDialog/AreaCreationDialog.svelte";
 
     export let data: PageServerData;
     export let form: ActionData;

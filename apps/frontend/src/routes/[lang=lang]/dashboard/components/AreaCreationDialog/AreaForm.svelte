@@ -14,7 +14,7 @@
     import { Switch } from "$lib/components/ui/switch";
     import servicesItemsToChoices from "$lib/utils/dashboard/servicesItemsToChoices";
     import { onMount } from "svelte";
-    import AREActionSelection from "$lib/components/dashboard/area/AreaCreationDialog/AREActionSelection.svelte";
+    import AREActionSelection from "./AREActionSelection.svelte";
 
     type Field = {
         name: string;

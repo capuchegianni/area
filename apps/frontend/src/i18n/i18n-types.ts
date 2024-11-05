@@ -46,6 +46,29 @@ type RootTranslation = {
 			invalidCredentials: string
 		}
 	}
+	components: {
+		combobox: {
+			/**
+			 * S​e​l​e​c​t​ ​a​ ​{​e​l​e​m​e​n​t​}
+			 * @param {unknown} element
+			 */
+			select: RequiredParams<'element'>
+			/**
+			 * S​e​a​r​c​h​ ​a​ ​{​e​l​e​m​e​n​t​}
+			 * @param {unknown} element
+			 */
+			search: RequiredParams<'element'>
+			/**
+			 * N​o​ ​{​e​l​e​m​e​n​t​}​ ​f​o​u​n​d
+			 * @param {unknown} element
+			 */
+			no: RequiredParams<'element'>
+			/**
+			 * C​l​e​a​r​ ​s​e​l​e​c​t​i​o​n
+			 */
+			clear: string
+		}
+	}
 	header: {
 		/**
 		 * S​e​l​e​c​t​ ​l​a​n​g​u​a​g​e
@@ -209,27 +232,6 @@ type RootTranslation = {
 		 * L​i​n​k​ ​a​n​ ​A​c​t​i​o​n​ ​a​n​d​ ​a​ ​R​E​A​c​t​i​o​n​ ​t​o​ ​c​r​e​a​t​e​ ​a​n​ ​A​R​E​A
 		 */
 		createAreaDescription: string
-		combobox: {
-			/**
-			 * S​e​l​e​c​t​ ​a​ ​{​e​l​e​m​e​n​t​}
-			 * @param {unknown} element
-			 */
-			select: RequiredParams<'element'>
-			/**
-			 * S​e​a​r​c​h​ ​a​ ​{​e​l​e​m​e​n​t​}
-			 * @param {unknown} element
-			 */
-			search: RequiredParams<'element'>
-			/**
-			 * N​o​ ​{​e​l​e​m​e​n​t​}​ ​f​o​u​n​d
-			 * @param {unknown} element
-			 */
-			no: RequiredParams<'element'>
-			/**
-			 * C​l​e​a​r​ ​s​e​l​e​c​t​i​o​n
-			 */
-			clear: string
-		}
 		oauth: {
 			/**
 			 * S​i​g​n​ ​i​n​ ​w​i​t​h​ ​{​s​e​r​v​i​c​e​}
@@ -271,6 +273,26 @@ export type TranslationFunctions = {
 			 * Invalid credentials
 			 */
 			invalidCredentials: () => LocalizedString
+		}
+	}
+	components: {
+		combobox: {
+			/**
+			 * Select a {element}
+			 */
+			select: (arg: { element: unknown }) => LocalizedString
+			/**
+			 * Search a {element}
+			 */
+			search: (arg: { element: unknown }) => LocalizedString
+			/**
+			 * No {element} found
+			 */
+			no: (arg: { element: unknown }) => LocalizedString
+			/**
+			 * Clear selection
+			 */
+			clear: () => LocalizedString
 		}
 	}
 	header: {
@@ -436,24 +458,6 @@ export type TranslationFunctions = {
 		 * Link an Action and a REAction to create an AREA
 		 */
 		createAreaDescription: () => LocalizedString
-		combobox: {
-			/**
-			 * Select a {element}
-			 */
-			select: (arg: { element: unknown }) => LocalizedString
-			/**
-			 * Search a {element}
-			 */
-			search: (arg: { element: unknown }) => LocalizedString
-			/**
-			 * No {element} found
-			 */
-			no: (arg: { element: unknown }) => LocalizedString
-			/**
-			 * Clear selection
-			 */
-			clear: () => LocalizedString
-		}
 		oauth: {
 			/**
 			 * Sign in with {service}

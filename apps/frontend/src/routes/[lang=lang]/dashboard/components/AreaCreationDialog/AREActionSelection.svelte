@@ -3,8 +3,8 @@
     import type { PageServerData, ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
     import { serviceName } from "@common/area/services.js";
     import { Button } from "$lib/components/ui/button/index.js";
-    import type { Choice } from "$lib/components/dashboard/area/Combobox/Combobox";
-    import Combobox from "$lib/components/dashboard/area/Combobox/Combobox.svelte";
+    import type { Choice } from "$lib/components/Combobox/Combobox";
+    import Combobox from "$lib/components/Combobox/Combobox.svelte";
     import LL from "$i18n/i18n-svelte";
 
     export let title: "Action" | "REAction";
