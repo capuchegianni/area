@@ -40,6 +40,6 @@ export const actions: Actions = {
             return signInFail(500, locals.LL);
         locals.client = client;
         cookies.set("accessToken", response.body.access_token, { path: "/", secure: false });
-        return redirect(303, "/");
+        return redirect(303, "/" + locals.locale + "/dashboard");
     }
 };
