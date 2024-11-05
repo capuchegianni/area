@@ -7,6 +7,7 @@ const en = {
             unknown: "An unknown error occurred",
             unauthorized: "You are not authorized to perform this action",
             incorrectFields: "One or more fields are incorrect",
+            incorrectField: "Missing or invalid field: {field}",
             emailAlreadyTaken: "The email is already taken",
             termsDenied: "You must accept the terms and conditions",
             invalidCredentials: "Invalid credentials"

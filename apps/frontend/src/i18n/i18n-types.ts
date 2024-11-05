@@ -33,6 +33,11 @@ type RootTranslation = {
 			 */
 			incorrectFields: string
 			/**
+			 * M​i​s​s​i​n​g​ ​o​r​ ​i​n​v​a​l​i​d​ ​f​i​e​l​d​:​ ​{​f​i​e​l​d​}
+			 * @param {unknown} field
+			 */
+			incorrectField: RequiredParams<'field'>
+			/**
 			 * T​h​e​ ​e​m​a​i​l​ ​i​s​ ​a​l​r​e​a​d​y​ ​t​a​k​e​n
 			 */
 			emailAlreadyTaken: string
@@ -261,6 +266,10 @@ export type TranslationFunctions = {
 			 * One or more fields are incorrect
 			 */
 			incorrectFields: () => LocalizedString
+			/**
+			 * Missing or invalid field: {field}
+			 */
+			incorrectField: (arg: { field: unknown }) => LocalizedString
 			/**
 			 * The email is already taken
 			 */

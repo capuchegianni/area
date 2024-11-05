@@ -7,6 +7,7 @@ const fr = {
             unknown: "Une erreur inconnue est survenue",
             unauthorized: "Vous n'êtes pas autorisé à effectuer cette action",
             incorrectFields: "Un ou plusieurs champs sont incorrects",
+            incorrectField: "Champ manquant ou incorrect : {field}",
             emailAlreadyTaken: "L'adresse mail est déjà utilisée",
             termsDenied: "Vous devez accepter les conditions d'utilisation",
             invalidCredentials: "Identifiants incorrects"
