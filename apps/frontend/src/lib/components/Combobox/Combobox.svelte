@@ -41,7 +41,7 @@
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
         </Popover.Trigger>
-        <Popover.Content>
+        <Popover.Content class="max-h-52 overflow-y-auto">
             <Command.Root>
                 <Command.Input placeholder={$LL.components.combobox.search({ element: title })} />
                 <Command.Empty>{$LL.components.combobox.no({ element: title })}</Command.Empty>

@@ -34,18 +34,11 @@
     $: actionService = actions[actionId]?.oauthProvider;
     $: reactionService = reactions[reactionId]?.oauthProvider;
 
-    $: actionOAuthCredentialChoices = oauthCredentials[actionService]?.map(credential => ({
-        value: credential,
-        label: credential
-    })) || [];
-    $: reactionOAuthCredentialChoices = oauthCredentials[reactionService]?.map(credential => ({
-        value: credential,
-        label: credential
-    })) || [];
+    $: selectedActionFields = actionFields(actionId).map(field => field.name).join(", ");
 
-    let oauthIds = {
-        action: "",
-        reaction: ""
+    $: oauthIds = {
+        action: oauthCredentials[actionService] || "",
+        reaction: oauthCredentials[reactionService] || ""
     };
 
     let error = "";
@@ -76,7 +69,6 @@
         };
     };
 </script>
-
 
 <ScrollArea class="max-h-[500px]">
     <form
@@ -113,12 +105,7 @@
                 sessionStorage.setItem("actionId", actionId);
             }}
             service={actionService}
-            oauthCredentialChoices={actionOAuthCredentialChoices}
             oauthId={oauthIds.action}
-            setOAuthId={value => {
-                oauthIds.action = value;
-                sessionStorage.setItem("actionOAuthId", oauthIds.action);
-            }}
             oauthScopes={actions[actionId]?.oauthScopes}
             setLastUpdated={() => setLastUpdated("action")}
             oauthResult={lastUpdated === "action" ? oauthResult : undefined}
@@ -134,19 +121,13 @@
                 sessionStorage.setItem("reactionId", reactionId);
             }}
             service={reactionService}
-            oauthCredentialChoices={reactionOAuthCredentialChoices}
             oauthId={oauthIds.reaction}
-            setOAuthId={value => {
-                oauthIds.reaction = value;
-                sessionStorage.setItem("reactionOAuthId", oauthIds.reaction);
-            }}
             oauthScopes={reactions[reactionId]?.oauthScopes}
             setLastUpdated={() => setLastUpdated("reaction")}
             oauthResult={lastUpdated === "reaction" ? oauthResult : undefined}
             form={lastUpdated === "reaction" ? form : undefined}
         />
         {#if actions[actionId] && reactions[reactionId]}
-            <Separator />
             <div class="py-4">
                 <Separator />
             </div>
@@ -170,17 +151,19 @@
             {/if}
             <Separator />
             <div class="space-y-4">
-                <p class="text-xs">
-                    Here are the list of fields you can use for <strong>{actions[actionId].name}</strong>.<br />
-                    You can use them in the fields below to customize <strong>{reactions[reactionId].name}</strong>.<br />
-                    To use them, type <strong>{"{{<field_name>}}"}</strong> in the field.<br />
-                    For example, to set a combination of the video title and channel name in a field,
-                    type <strong>{"{{title}} by {{channelName}}"}</strong> in this field field below.
-                </p>
-                <p class="px-2 text-muted-foreground text-xs text-justify">
-                    {actionFields(actionId).map(field => field.name).join(", ")}
-                </p>
-                <Separator />
+                {#if selectedActionFields}
+                    <p class="text-xs">
+                        Here are the list of fields you can use for <strong>{actions[actionId].name}</strong>.<br />
+                        You can use them in the fields below to customize <strong>{reactions[reactionId].name}</strong>.<br />
+                        To use them, type <strong>{"{{<field_name>}}"}</strong> in the field.<br />
+                        For example, to set a combination of the video title and channel name in a field,
+                        type <strong>{"{{title}} by {{channelName}}"}</strong> in this field field below.
+                    </p>
+                    <p class="px-2 text-muted-foreground text-xs text-justify">
+                        {selectedActionFields}
+                    </p>
+                    <Separator />
+                {/if}
                 {#each reactionFields(reactionId) as field}
                     <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
                         <Label for={field.name}>{field.name}</Label>

@@ -16,11 +16,11 @@ export const load: PageServerLoad = async ({ url: { searchParams }, locals: { lo
     if (!areas.success)
         return error(500, "Internal Server Error");
 
-    const oauthCredentials: Record<string, string[]> = {};
+    const oauthCredentials: Record<string, string> = {};
     for (const service of OAUTH_SERVICES) {
         const credentials = await api.oauth.credentials(env.API_URL, service, client.accessToken);
         if (credentials.success)
-            oauthCredentials[service] = credentials.body.filter(credential => credential.id !== undefined).map(credential => credential.id.toString());
+            oauthCredentials[service] = credentials.body.filter(credential => credential.id !== undefined)[0]?.id.toString();
     }
 
     const oauthResult = {

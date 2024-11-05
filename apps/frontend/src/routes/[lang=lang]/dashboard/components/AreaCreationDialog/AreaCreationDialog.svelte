@@ -19,7 +19,7 @@
     <Dialog.Trigger class={buttonVariants({ variant: "outline" })}>
         {$LL.area.createArea()}
     </Dialog.Trigger>
-    <Dialog.Content class="sm:max-w-[425px]">
+    <Dialog.Content class="min-h-[500px] sm:max-w-[425px]">
         <Dialog.Header>
             <Dialog.Title>{$LL.area.createArea()}</Dialog.Title>
             <Dialog.Description>
