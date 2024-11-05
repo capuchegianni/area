@@ -65,16 +65,13 @@ export function getCurrentLocale({ url }: RequestEvent): ParsedPathname {
  *
  * @param url The URL object.
  * @param locale The new locale.
- * @param full Whether to return the full URL or just the pathname.
  *
  * @returns The URL with the new locale.
  */
-export function replaceLocaleInUrl(url: URL, locale: string, full = false): string {
+export function replaceLocaleInUrl(url: URL, locale: string): string {
+    url.search = "";
+
     const newPathname = `/${locale}/${parsePathname(url).rest || ""}`;
-
-    if (!full)
-        return `${newPathname}${url.search}`;
-
     const newUrl = new URL(url.toString());
 
     newUrl.pathname = base + newPathname;
