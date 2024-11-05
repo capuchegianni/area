@@ -105,6 +105,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -152,6 +153,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -206,6 +208,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -265,6 +268,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -295,7 +299,9 @@ describe("SchedulerService", () => {
             ]);
             const produce = jest.spyOn(task.reaction.config, "produce");
             produce.mockResolvedValueOnce();
+            cache.get.mockResolvedValueOnce('"string"');
             const executed = await service.executeTask(task);
+            expect(cache.get).toHaveBeenCalledWith(task.name);
             expect(consoleLog).toHaveBeenCalled();
             consoleLog.mockClear();
             expect(oauthDbService.loadCredentialsByScopes).toHaveBeenCalledWith(
@@ -311,7 +317,9 @@ describe("SchedulerService", () => {
                 oauthProvidersService.google.OAUTH_REVOKE_URL
             );
             expect(getResourceTrigger).toHaveBeenCalledWith(
-                "access_token_here"
+                "access_token_here",
+                {},
+                "string"
             );
             expect(produce).toHaveBeenCalledWith("access_token_here", {});
             expect(executed).toBe(true);
@@ -330,6 +338,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -368,7 +377,9 @@ describe("SchedulerService", () => {
             ]);
             const produce = jest.spyOn(task.reaction.config, "produce");
             produce.mockResolvedValueOnce();
+            cache.get.mockResolvedValueOnce('"string"');
             const executed = await service.executeTask(task);
+            expect(cache.get).toHaveBeenCalledWith(task.name);
             expect(consoleLog).toHaveBeenCalled();
             consoleLog.mockClear();
             expect(oauthService.refresh).toHaveBeenCalledWith(
@@ -389,7 +400,9 @@ describe("SchedulerService", () => {
                 oauthProvidersService.google.OAUTH_REVOKE_URL
             );
             expect(getResourceTrigger).toHaveBeenCalledWith(
-                "access_token_here"
+                "access_token_here",
+                {},
+                "string"
             );
             expect(produce).toHaveBeenCalledWith("access_token_here", {});
             expect(executed).toBe(true);
@@ -409,6 +422,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -427,10 +441,13 @@ describe("SchedulerService", () => {
                 data: {} as any,
                 cacheValue: "video-id"
             });
+
+            cache.get.mockResolvedValueOnce('"string"');
             oauthDbService.loadCredentialsByScopes.mockResolvedValueOnce([]);
             const produce = jest.spyOn(task.reaction.config, "produce");
             produce.mockResolvedValueOnce();
             const executed = await service.executeTask(task);
+            expect(cache.get).toHaveBeenCalledWith(task.name);
             expect(consoleLog).toHaveBeenCalled();
             consoleLog.mockClear();
             expect(oauthDbService.loadCredentialsByScopes).toHaveBeenCalledWith(
@@ -440,7 +457,9 @@ describe("SchedulerService", () => {
                 oauthProvidersService.google.OAUTH_REVOKE_URL
             );
             expect(getResourceTrigger).toHaveBeenCalledWith(
-                "access_token_here"
+                "access_token_here",
+                {},
+                "string"
             );
             expect(executed).toBe(false);
             expect(produce).toHaveBeenCalledWith("access_token_here", {});
@@ -459,6 +478,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
@@ -496,6 +516,7 @@ describe("SchedulerService", () => {
                     method: "send_mail",
                     config: GMAIL_REACTIONS["send_mail"]
                 },
+                actionMetadata: {},
                 actionOAuthId: 1,
                 reactionOAuthId: 2,
                 areaId: "area-id",
