@@ -4,6 +4,7 @@
     import type { Services, Action, Reaction } from "@common/area/types/area";
     import { Label } from "$lib/components/ui/label";
     import { Input } from "$lib/components/ui/input";
+    import { Textarea } from "$lib/components/ui/textarea";
     import { Separator } from "$lib/components/ui/separator";
     import { ScrollArea } from "$lib/components/ui/scroll-area";
     import { Button } from "$lib/components/ui/button";
@@ -166,7 +167,11 @@
                 {#each reactionFields(reactionId) as field}
                     <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
                         <Label for={field.name}>{field.name}</Label>
-                        <Input type={field.type} id={field.name} name={field.name} placeholder={field.name} required={!field.optional} />
+                        {#if field.type === "textarea"}
+                            <Textarea id={field.name} name={field.name} placeholder={field.name} required={!field.optional} />
+                        {:else}
+                            <Input type={field.type} id={field.name} name={field.name} placeholder={field.name} required={!field.optional} />
+                        {/if}
 <!--                       TODO <p class="text-muted-foreground text-sm">{field.description}</p>-->
                     </div>
                 {/each}
