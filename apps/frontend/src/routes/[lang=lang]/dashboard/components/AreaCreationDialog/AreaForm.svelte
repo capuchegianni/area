@@ -12,8 +12,8 @@
     import servicesItemsToChoices from "$lib/utils/dashboard/servicesItemsToChoices";
     import { onMount } from "svelte";
     import AREActionSelection from "./AREActionSelection.svelte";
-    import { actionFields } from "area-common/src/area/actions";
-    import { reactionFields } from "area-common/src/area/reactions";
+    import { actionFields } from "@common/area/actions";
+    import { reactionFields } from "@common/area/reactions";
 
     export let services: Services;
     export let oauthCredentials: PageServerData["oauthCredentials"];
@@ -34,7 +34,7 @@
     $: actionService = actions[actionId]?.oauthProvider;
     $: reactionService = reactions[reactionId]?.oauthProvider;
 
-    $: selectedActionFields = actionFields(actionId).map(field => field.name).join(", ");
+    $: selectedActionFields = actionFields(actionId).join(", ");
 
     $: oauthIds = {
         action: oauthCredentials[actionService] || "",
@@ -94,7 +94,6 @@
         }}
         class="grid gap-4"
     >
-        <!-- TODO: remove comboboxes (always one choice), add revoke instead -->
         <AREActionSelection
             title="Action"
             description={actions[actionId]?.description}
@@ -156,8 +155,8 @@
                         Here are the list of fields you can use for <strong>{actions[actionId].name}</strong>.<br />
                         You can use them in the fields below to customize <strong>{reactions[reactionId].name}</strong>.<br />
                         To use them, type <strong>{"{{<field_name>}}"}</strong> in the field.<br />
-                        For example, to set a combination of the video title and channel name in a field,
-                        type <strong>{"{{title}} by {{channelName}}"}</strong> in this field field below.
+                        For example, with a YouTube video, to set a combination of the video title and channel name in a field,
+                        type <strong>{"{{title}} by {{channelName}}"}</strong> in this field below.
                     </p>
                     <p class="px-2 text-muted-foreground text-xs text-justify">
                         {selectedActionFields}

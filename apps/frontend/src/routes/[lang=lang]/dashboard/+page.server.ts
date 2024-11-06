@@ -2,9 +2,11 @@ import type { PageServerLoad, Actions } from "./$types";
 import api from "@common/api/api";
 import { env } from "$env/dynamic/private";
 import { error, fail, redirect } from "@sveltejs/kit";
-import { isOauthService, OAUTH_SERVICES } from "area-common/src/api/types/OAuthService";
+import { isOauthService, OAUTH_SERVICES } from "@common/api/types/OAuthService";
 import type { TranslationFunctions } from "$i18n/i18n-types";
-import { reactionFields } from "area-common/src/area/reactions";
+import { reactionFields } from "@common/area/reactions";
+
+const METADATA_PREFIX = "metadata-";
 
 export const load: PageServerLoad = async ({ url: { searchParams }, locals: { locale, services, client } }) => {
     if (!client)
@@ -20,7 +22,7 @@ export const load: PageServerLoad = async ({ url: { searchParams }, locals: { lo
     for (const service of OAUTH_SERVICES) {
         const credentials = await api.oauth.credentials(env.API_URL, service, client.accessToken);
         if (credentials.success)
-            oauthCredentials[service] = credentials.body.filter(credential => credential.id !== undefined)[0]?.id.toString();
+            oauthCredentials[service] = credentials.body.find(credential => credential.id !== undefined)?.id.toString() || "";
     }
 
     const oauthResult = {
@@ -53,7 +55,7 @@ function getPayload(data: FormData) {
         name: getOrThrow(data, "name"),
         description: getOrThrow(data, "description"),
         action_id: getOrThrow(data, "action-id"),
-        action_metadata: {} as Record<string, string>, // TODO
+        action_metadata: {} as Record<string, string>,
         action_oauth_id: Number(getOrThrow(data, "action-oauth-id")),
         reaction_id: getOrThrow(data, "reaction-id"),
         reaction_body: {} as Record<string, string>,
@@ -61,6 +63,14 @@ function getPayload(data: FormData) {
         delay: Number(getOrThrow(data, "delay"))
     };
 
+    data.forEach((value, key) => {
+        if (!key.startsWith(METADATA_PREFIX))
+            return;
+        key = key.slice(METADATA_PREFIX.length);
+        if (!value || typeof value !== "string")
+            throw new Error(key);
+        payload.action_metadata[key] = value;
+    });
     reactionFields(payload.reaction_id).forEach(({ name, optional }) => {
         if (optional) {
             const value = data.get(name);

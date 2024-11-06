@@ -2,7 +2,7 @@ import type { PageServerLoad } from "./$types";
 import { env } from "$env/dynamic/private";
 import { error, redirect } from "@sveltejs/kit";
 import api from "@common/api/api";
-import { isOauthService } from "area-common/src/api/types/OAuthService";
+import { isOauthService } from "@common/api/types/OAuthService";
 
 export const load: PageServerLoad = async ({ url: { origin, searchParams }, params: { service }, locals: { client }, cookies }) => {
     let accessToken: string | null | undefined = searchParams.get("access_token");
