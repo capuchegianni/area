@@ -3,8 +3,8 @@
     import type { PageServerData, ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
     import { serviceName } from "@common/area/services.js";
     import { Button } from "$lib/components/ui/button/index.js";
-    import type { Choice } from "$lib/components/dashboard/area/Combobox/Combobox";
-    import Combobox from "$lib/components/dashboard/area/Combobox/Combobox.svelte";
+    import type { Choice } from "$lib/components/Combobox/Combobox";
+    import Combobox from "$lib/components/Combobox/Combobox.svelte";
     import LL from "$i18n/i18n-svelte";
 
     export let title: "Action" | "REAction";
@@ -16,9 +16,7 @@
 
     export let service: string;
 
-    export let oauthCredentialChoices: Choice[];
     export let oauthId: string;
-    export let setOAuthId: (value: string) => unknown;
 
     export let oauthScopes: string[] | undefined;
 
@@ -42,21 +40,7 @@
     {#if description}
         <p class="text-sm text-muted-foreground">{description}</p>
     {/if}
-    {#if id}
-        <!-- TODO: fix width/décalage -->
-        {#if oauthCredentialChoices.length}
-            <Combobox
-                title="OAuth"
-                choices={oauthCredentialChoices}
-                value={oauthId}
-                setValue={(value) => {
-                    setOAuthId(value);
-                    setLastUpdated();
-                }}
-                clearOption
-            />
-            <p class="text-center">ou</p>
-        {/if}
+    {#if id && !oauthId}
         <form
             method="POST"
             action="?/oauth"
@@ -68,7 +52,7 @@
             }}
             class="space-y-2"
         >
-            <Button type="submit" disabled={!!oauthId} class="w-full">
+            <Button type="submit" class="w-full">
                 <img src="/icons/services/{service}.png" alt="{service} service" class="mr-2 h-4" />
                 {$LL.area.oauth.action({ service: serviceName(service) })}
             </Button>
@@ -85,4 +69,5 @@
             {/if}
         </form>
     {/if}
+    <!-- TODO: add revoke form -->
 </div>

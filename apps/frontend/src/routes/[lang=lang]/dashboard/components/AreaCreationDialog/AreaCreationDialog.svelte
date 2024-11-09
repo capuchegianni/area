@@ -1,5 +1,3 @@
-<!-- TODO: i18n -->
-
 <script lang="ts">
     import type { PageServerData, ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
     import type { Services } from "@common/area/types/area";
@@ -21,7 +19,7 @@
     <Dialog.Trigger class={buttonVariants({ variant: "outline" })}>
         {$LL.area.createArea()}
     </Dialog.Trigger>
-    <Dialog.Content class="sm:max-w-[425px]">
+    <Dialog.Content class="min-h-[500px] sm:max-w-[425px]">
         <Dialog.Header>
             <Dialog.Title>{$LL.area.createArea()}</Dialog.Title>
             <Dialog.Description>

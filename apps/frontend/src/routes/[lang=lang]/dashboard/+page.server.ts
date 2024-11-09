@@ -2,12 +2,13 @@ import type { PageServerLoad, Actions } from "./$types";
 import api from "@common/api/api";
 import { env } from "$env/dynamic/private";
 import { error, fail, redirect } from "@sveltejs/kit";
-import { isOauthService, OAUTH_SERVICES } from "area-common/src/api/types/OAuthService";
+import { isOauthService, OAUTH_SERVICES } from "@common/api/types/OAuthService";
 import type { TranslationFunctions } from "$i18n/i18n-types";
+import { reactionFields } from "@common/area/reactions";
 
-export const load: PageServerLoad = async ({ parent, url: { searchParams } }) => {
-    const { locale, services, client } = await parent();
+const METADATA_PREFIX = "metadata-";
 
+export const load: PageServerLoad = async ({ url: { searchParams }, locals: { locale, services, client } }) => {
     if (!client)
         return error(401, "Unauthorized");
 
@@ -17,11 +18,11 @@ export const load: PageServerLoad = async ({ parent, url: { searchParams } }) =>
     if (!areas.success)
         return error(500, "Internal Server Error");
 
-    const oauthCredentials: Record<string, string[]> = {};
+    const oauthCredentials: Record<string, string> = {};
     for (const service of OAUTH_SERVICES) {
         const credentials = await api.oauth.credentials(env.API_URL, service, client.accessToken);
         if (credentials.success)
-            oauthCredentials[service] = credentials.body.filter(credential => credential.id !== undefined).map(credential => credential.id.toString());
+            oauthCredentials[service] = credentials.body.find(credential => credential.id !== undefined)?.id.toString() || "";
     }
 
     const oauthResult = {
@@ -33,14 +34,90 @@ export const load: PageServerLoad = async ({ parent, url: { searchParams } }) =>
     return { locale, services, areas: areas.body, oauthCredentials, oauthResult };
 };
 
-function badRequestFail(status: number, LL: TranslationFunctions) {
-    return fail(
-        status,
-        { oauthErrorMessage: LL.error.api.unknown() }
-    );
+function badRequestFail(LL: TranslationFunctions, field: string) {
+    return fail(400, { errorMessage: LL.error.incorrectField({ field }) });
+}
+
+function oauthBadRequestFail(LL: TranslationFunctions) {
+    return fail(400, { oauthErrorMessage: LL.error.api.unknown() });
+}
+
+function getOrThrow(data: FormData, key: string) {
+    const value = data.get(key);
+
+    if (!value || typeof value !== "string")
+        throw new Error(key);
+    return value;
+}
+
+function getPayload(data: FormData) {
+    const payload = {
+        name: getOrThrow(data, "name"),
+        description: getOrThrow(data, "description"),
+        action_id: getOrThrow(data, "action-id"),
+        action_metadata: {} as Record<string, string>,
+        action_oauth_id: Number(getOrThrow(data, "action-oauth-id")),
+        reaction_id: getOrThrow(data, "reaction-id"),
+        reaction_body: {} as Record<string, string>,
+        reaction_oauth_id: Number(getOrThrow(data, "reaction-oauth-id")),
+        delay: Number(getOrThrow(data, "delay"))
+    };
+
+    data.forEach((value, key) => {
+        if (!key.startsWith(METADATA_PREFIX))
+            return;
+        key = key.slice(METADATA_PREFIX.length);
+        if (!value || typeof value !== "string")
+            throw new Error(key);
+        payload.action_metadata[key] = value;
+    });
+    reactionFields(payload.reaction_id).forEach(({ name, optional }) => {
+        if (optional) {
+            const value = data.get(name);
+
+            if (!value)
+                return;
+            if (typeof value !== "string")
+                throw new Error(name);
+            payload.reaction_body[name] = value;
+            return;
+        }
+        payload.reaction_body[name] = getOrThrow(data, name);
+    });
+    if (isNaN(payload.action_oauth_id))
+        throw new Error("Action OAuth ID");
+    if (isNaN(payload.reaction_oauth_id))
+        throw new Error("REAction OAuth ID");
+    if (isNaN(payload.delay))
+        throw new Error("delay");
+    return payload;
 }
 
 export const actions: Actions = {
+    area: async ({ request, locals: { client, LL } }) => {
+        if (!client)
+            return error(401, "Unauthorized");
+
+        const data = await request.formData();
+
+        try {
+            const response = await api.area.createArea(env.API_URL, client.accessToken, getPayload(data));
+
+            if (!response.success)
+                return error(401, "Unauthorized");
+
+            if (data.get("enabled") === "on")
+                await api.area.patchById(env.API_URL, client.accessToken, response.body.id, {
+                    status: "RUNNING"
+                });
+            // TODO: display area with status (depending on the responses)
+        } catch (error) {
+            if (error instanceof Error)
+                return badRequestFail(LL, error.message);
+            return badRequestFail(LL, "unknown");
+        }
+    },
+
     oauth: async ({ request, locals: { client, LL } }) => {
         if (!client)
             return error(401, "Unauthorized");
@@ -50,11 +127,11 @@ export const actions: Actions = {
         const scope = data.get("scope");
 
         if (!service || !scope)
-            return badRequestFail(400, LL);
+            return oauthBadRequestFail(LL);
         if (typeof service !== "string" || typeof scope !== "string")
-            return badRequestFail(400, LL);
+            return oauthBadRequestFail(LL);
         if (!isOauthService(service))
-            return badRequestFail(400, LL);
+            return oauthBadRequestFail(LL);
 
         return redirect(303, `/oauth/${service}?scope=${scope}`);
     }

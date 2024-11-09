@@ -10,6 +10,15 @@ const en = {
             emailAlreadyTaken: "The email is already taken",
             termsDenied: "You must accept the terms and conditions",
             invalidCredentials: "Invalid credentials"
+        },
+        incorrectField: "Missing or invalid field: {field}"
+    },
+    components: {
+        combobox: {
+            select: "Select a {element}",
+            search: "Search a {element}",
+            no: "No {element} found",
+            clear: "Clear selection"
         }
     },
     header: {
@@ -68,12 +77,6 @@ const en = {
     area: {
         createArea: "Create an AREA",
         createAreaDescription: "Link an Action and a REAction to create an AREA",
-        combobox: {
-            select: "Select a {element}",
-            search: "Search a {element}",
-            no: "No {element} found",
-            clear: "Clear selection"
-        },
         oauth: {
             action: "Sign in with {service}"
         }

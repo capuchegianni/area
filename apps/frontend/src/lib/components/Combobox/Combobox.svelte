@@ -18,7 +18,7 @@
     let open = false;
 
     $: selectedGroup = choices.find(f => f.value === value)?.group ?? null;
-    $: selectedValue = choices.find(f => f.value === value)?.label ?? $LL.area.combobox.select({ element: title });
+    $: selectedValue = choices.find(f => f.value === value)?.label ?? $LL.components.combobox.select({ element: title });
 
     const closeAndFocusTrigger = (triggerId: string) => {
         open = false;
@@ -41,10 +41,10 @@
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
         </Popover.Trigger>
-        <Popover.Content>
+        <Popover.Content class="max-h-52 overflow-y-auto">
             <Command.Root>
-                <Command.Input placeholder={$LL.area.combobox.search({ element: title })} />
-                <Command.Empty>{$LL.area.combobox.no({ element: title })}</Command.Empty>
+                <Command.Input placeholder={$LL.components.combobox.search({ element: title })} />
+                <Command.Empty>{$LL.components.combobox.no({ element: title })}</Command.Empty>
                 <Command.Group>
                     {#if clearOption && value}
                         <Command.Item
@@ -53,26 +53,26 @@
                                 closeAndFocusTrigger(ids.trigger);
                             }}
                         >
-                            {$LL.area.combobox.clear()}
+                            {$LL.components.combobox.clear()}
                         </Command.Item>
                     {/if}
-                    {#each choices as action}
+                    {#each choices as choice}
                         <Command.Item
-                            value={action.value}
+                            value={choice.value}
                             onSelect={(currentValue) => {
                                 setValue(currentValue);
                                 closeAndFocusTrigger(ids.trigger);
                             }}
-                            disabled={action.disabled || action.isGroup}
-                            class={cn(action.isGroup && "font-bold")}
+                            disabled={choice.disabled || choice.isGroup}
+                            class={cn(choice.isGroup && "font-bold")}
                         >
                             <Check
                                 class={cn(
                                     "mr-2 h-4 w-4",
-                                    value !== action.value && "text-transparent"
+                                    value !== choice.value && "text-transparent"
                                 )}
                             />
-                            {action.label}
+                            {choice.label}
                         </Command.Item>
                     {/each}
                 </Command.Group>
