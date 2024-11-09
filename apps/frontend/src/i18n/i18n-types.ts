@@ -14,6 +14,11 @@ export type Translation = RootTranslation
 export type Translations = RootTranslation
 
 type RootTranslation = {
+	/**
+	 * H​e​l​l​o​,​ ​{​n​a​m​e​}​!​ ​W​h​a​t​ ​d​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​a​u​t​o​m​a​t​e​ ​t​o​d​a​y​?
+	 * @param {unknown} name
+	 */
+	welcome: RequiredParams<'name'>
 	error: {
 		/**
 		 * G​o​ ​t​o​ ​h​o​m​e​p​a​g​e
@@ -237,6 +242,14 @@ type RootTranslation = {
 		 * L​i​n​k​ ​a​n​ ​A​c​t​i​o​n​ ​a​n​d​ ​a​ ​R​E​A​c​t​i​o​n​ ​t​o​ ​c​r​e​a​t​e​ ​a​n​ ​A​R​E​A
 		 */
 		createAreaDescription: string
+		/**
+		 * U​p​d​a​t​e​ ​t​h​e​ ​A​R​E​A
+		 */
+		updateArea: string
+		/**
+		 * U​p​d​a​t​e​ ​t​h​e​ ​A​c​t​i​o​n​ ​a​n​d​ ​R​E​A​c​t​i​o​n​ ​o​f​ ​t​h​e​ ​A​R​E​A
+		 */
+		updateAreaDescription: string
 		oauth: {
 			/**
 			 * S​i​g​n​ ​i​n​ ​w​i​t​h​ ​{​s​e​r​v​i​c​e​}
@@ -248,6 +261,10 @@ type RootTranslation = {
 }
 
 export type TranslationFunctions = {
+	/**
+	 * Hello, {name}! What do you want to automate today?
+	 */
+	welcome: (arg: { name: unknown }) => LocalizedString
 	error: {
 		/**
 		 * Go to homepage
@@ -467,6 +484,14 @@ export type TranslationFunctions = {
 		 * Link an Action and a REAction to create an AREA
 		 */
 		createAreaDescription: () => LocalizedString
+		/**
+		 * Update the AREA
+		 */
+		updateArea: () => LocalizedString
+		/**
+		 * Update the Action and REAction of the AREA
+		 */
+		updateAreaDescription: () => LocalizedString
 		oauth: {
 			/**
 			 * Sign in with {service}

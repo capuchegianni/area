@@ -34,10 +34,11 @@ function onLikedVideo(
                 const youtubeVideo = data.items[0];
                 return resolve({
                     data: transformYouTubeVideoToArea(youtubeVideo),
-                    cacheValue: youtubeVideo.id
+                    cacheValue: JSON.stringify({ id: youtubeVideo.id })
                 });
             })
             .catch((e) => {
+                console.error(e);
                 if (403 === e.status)
                     return reject(
                         new ForbiddenException("Access token expired.")
@@ -68,13 +69,57 @@ function onNewSubscription(
             .get<YouTubeSubcriptionsResponse>(url, config)
             .then(({ data }) => {
                 if (1 !== data.items.length)
-                    return resolve({ data: null, cacheValue: "" });
+                    return resolve({
+                        data: null,
+                        cacheValue: JSON.stringify({ id: "" })
+                    });
                 const youtubeSubscription = data.items[0];
                 return resolve({
                     data: transformYoutubeSubscriptionToArea(
                         youtubeSubscription
                     ),
-                    cacheValue: youtubeSubscription.id
+                    cacheValue: JSON.stringify({ id: youtubeSubscription.id })
+                });
+            })
+            .catch((e) => {
+                if (403 === e.status)
+                    return reject(
+                        new ForbiddenException("Access token expired.")
+                    );
+                return reject(e);
+            });
+    });
+}
+
+function onNewUploadedVideo(
+    accessToken: string,
+    _metadata: object // eslint-disable-line
+): Promise<ActionResource> {
+    const url = "https://www.googleapis.com/youtube/v3/activities";
+    const config: AxiosRequestConfig = {
+        params: {
+            part: "contentDetails,snippet",
+            mine: true,
+            maxResults: 1
+        },
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        axios
+            .get<YouTubeVideoListResponse>(url, config)
+            .then(({ data }) => {
+                if (1 !== data.items.length)
+                    return resolve({
+                        data: null,
+                        cacheValue: JSON.stringify({ id: "" })
+                    });
+                const youtubeVideo = data.items[0];
+                return resolve({
+                    data: transformYouTubeVideoToArea(youtubeVideo),
+                    cacheValue: JSON.stringify({ id: youtubeVideo.id })
                 });
             })
             .catch((e) => {

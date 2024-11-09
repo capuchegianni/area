@@ -74,6 +74,7 @@ export default function RootLayout() {
                 setIsColorSchemeLoaded(true);
                 return;
             }
+
             setIsColorSchemeLoaded(true);
         })().finally(() => {
             SplashScreen.hideAsync();
@@ -86,23 +87,13 @@ export default function RootLayout() {
 
     const logout = async () => {
         const token = await getToken();
-        if (!token)
-            return;
-
-        const res = await api.auth.signOut(process.env.EXPO_PUBLIC_API_URL, token);
-
-        if (!res.success) {
-            switch (res.status) {
-            case 401:
-                AsyncStorage.removeItem("@access_token");
-                router.navigate("/(auth)/login");
-                break;
-            case 500:
-                console.error("An internal error happened.");
-                break;
-            }
+        if (!token) {
+            router.navigate("/(auth)/login");
             return;
         }
+
+        await api.auth.signOut(process.env.EXPO_PUBLIC_API_URL, token);
+
         AsyncStorage.removeItem("@access_token");
         router.navigate("/(auth)/login");
     };

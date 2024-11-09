@@ -14,6 +14,7 @@
     export let value: string;
     export let setValue: (value: string) => unknown;
     export let clearOption: boolean = false;
+    export let disabled: boolean = false;
 
     let open = false;
 
@@ -34,6 +35,7 @@
                 builders={[builder]}
                 variant="outline"
                 role="combobox"
+                disabled={disabled}
                 aria-expanded={open}
                 class="justify-between"
             >

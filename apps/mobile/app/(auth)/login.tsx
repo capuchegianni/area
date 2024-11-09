@@ -45,7 +45,7 @@ export default function LoginPage() {
             return;
         }
         setDisplayLoginError(false);
-        AsyncStorage.setItem("@access_token", res.body.access_token);
+        await AsyncStorage.setItem("@access_token", res.body.access_token);
         router.navigate("/(tabs)/dashboard");
     };
 
