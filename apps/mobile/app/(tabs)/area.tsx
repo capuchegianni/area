@@ -144,7 +144,7 @@ export default function AreaScreen() {
         getArea();
     });
 
-    const updateAreaProperty = (property: string, value: string | number | boolean | object, type?: "metadata" | "body") => {
+    const updateAreaProperty = (property: string, value: string | number | object, type?: "metadata" | "body") => {
         setArea(prevArea => {
             if (!prevArea)
                 return {
@@ -442,8 +442,8 @@ export default function AreaScreen() {
                                 <View>
                                     <Text>Enable AREA</Text>
                                     <Switch
-                                        checked={!area?.status}
-                                        onCheckedChange={(checked) => updateAreaProperty("status", !checked)}
+                                        checked={area?.status === "RUNNING"}
+                                        onCheckedChange={(checked) => updateAreaProperty("status", !checked ? "STOPPED" : "RUNNING")}
                                     />
                                 </View>
                                 <Text className="text-sm">Enable or disable the AREA.</Text>
