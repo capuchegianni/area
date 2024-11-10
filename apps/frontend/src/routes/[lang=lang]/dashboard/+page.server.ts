@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ url: { searchParams }, locals: { lo
         id: searchParams.get("id")
     };
 
-    return { locale, services, areas: areas.body, oauthCredentials, oauthResult };
+    return { locale, clientName: `${client.firstname} ${client.lastname}`, services, areas: areas.body, oauthCredentials, oauthResult };
 };
 
 function badRequestFail(LL: TranslationFunctions, field: string) {
