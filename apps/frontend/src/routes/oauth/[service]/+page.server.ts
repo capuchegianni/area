@@ -10,9 +10,9 @@ export const load: PageServerLoad = async ({ url: { origin, searchParams }, para
 
     accessToken ||= client?.accessToken;
     // Redirect to the frontend instead of the requester if it's the mobile (origin is the URL of the requester, so the mobile in this case).
-    // ORIGIN is not meant to be set in dev mode, only in prod with the root Docker compose.
-    if (isMobile && env.ORIGIN)
-        origin = env.ORIGIN;
+    // FRONTEND_URL is not meant to be set in dev mode, only in prod with the root Docker compose.
+    if (isMobile && env.FRONTEND_URL)
+        origin = env.FRONTEND_URL;
 
     if (!accessToken)
         return error(401, "Unauthorized");

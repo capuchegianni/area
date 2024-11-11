@@ -51,6 +51,8 @@ type Field<T = string> = {
     optional?: boolean;
 };
 
+type ServiceNames = "google" | "twitch" | "discord"
+
 export default function AreaScreen() {
     const { t } = useTranslation();
     const { id } = useLocalSearchParams() as QuerySearchParams;
@@ -200,21 +202,31 @@ export default function AreaScreen() {
     };
 
     const handleSubmit = async () => {
-        if (!action || !reaction)
+        const token = await AsyncStorage.getItem("@access_token");
+        if (!action || !reaction || !token)
             return;
         const actionService = services.find(service => service.actions.includes(action));
         const reactionService = services.find(service => service.reactions.includes(reaction));
+        const actionCredentials = await api.oauth.credentials(process.env.EXPO_PUBLIC_API_URL, action.oauthProvider as ServiceNames, token);
+        const reactionCredentials = await api.oauth.credentials(process.env.EXPO_PUBLIC_API_URL, reaction.oauthProvider as ServiceNames, token);
 
-        updateAreaProperty("action_id", (actionService ? actionService.name : action.oauthProvider) + "." + action.name);
-        updateAreaProperty("action_oauth_id", 0);
-        updateAreaProperty("reaction_id", (reactionService ? reactionService.name : reaction.oauthProvider) + "." + reaction.name);
-        updateAreaProperty("reaction_oauth_id", 0);
-        console.log(area);
-
-        const token = await AsyncStorage.getItem("@access_token");
-        if (!token || !area)
+        if (!actionCredentials.success || !reactionCredentials.success)
+            return;
+        if (!actionCredentials.body.length || !reactionCredentials.body.length)
             return;
 
+        const actionCreds = actionCredentials.body.find(cred => cred.scope === action.oauthScopes[0]);
+        const reactionCreds = reactionCredentials.body.find(cred => cred.scope === reaction.oauthScopes[0]);
+        if (!actionCreds || !reactionCreds)
+            return;
+
+        updateAreaProperty("action_id", (actionService ? actionService.name : action.oauthProvider) + "." + action.name);
+        updateAreaProperty("action_oauth_id", actionCreds);
+        updateAreaProperty("reaction_id", (reactionService ? reactionService.name : reaction.oauthProvider) + "." + reaction.name);
+        updateAreaProperty("reaction_oauth_id", reactionCreds);
+
+        if (!area)
+            return;
         if (id) {
             const res = await api.area.patchById(process.env.EXPO_PUBLIC_API_URL, token, id, area);
 

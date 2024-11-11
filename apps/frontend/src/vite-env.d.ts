@@ -2,7 +2,7 @@
 
 interface ImportMetaEnv {
     readonly API_URL: string;
-    readonly ORIGIN?: string;
+    readonly FRONTEND_URL?: string;
 }
 
 interface ImportMeta {
