@@ -55,6 +55,7 @@ services:
       - EXPO_PUBLIC_API_URL=${MOBILE_API_URL}
       - EXPO_USE_METRO_WORKSPACE_ROOT=1
       - EXPO_PUBLIC_NODE_ENV=production
+      - EXPO_PUBLIC_FRONTED_URL=${FRONTEND_URL}
     env_file:
       - .env
     volumes:
