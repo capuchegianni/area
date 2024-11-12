@@ -1,6 +1,7 @@
 import type { BaseTranslation } from "../i18n-types";
 
 const en = {
+    welcome: "Hello, {name}! What do you want to automate today?",
     error: {
         goHome: "Go to homepage",
         api: {
@@ -10,6 +11,15 @@ const en = {
             emailAlreadyTaken: "The email is already taken",
             termsDenied: "You must accept the terms and conditions",
             invalidCredentials: "Invalid credentials"
+        },
+        incorrectField: "Missing or invalid field: {field}"
+    },
+    components: {
+        combobox: {
+            select: "Select a {element}",
+            search: "Search a {element}",
+            no: "No {element} found",
+            clear: "Clear selection"
         }
     },
     header: {
@@ -68,12 +78,8 @@ const en = {
     area: {
         createArea: "Create an AREA",
         createAreaDescription: "Link an Action and a REAction to create an AREA",
-        combobox: {
-            select: "Select a {element}",
-            search: "Search a {element}",
-            no: "No {element} found",
-            clear: "Clear selection"
-        },
+        updateArea: "Update the AREA",
+        updateAreaDescription: "Update the Action and REAction of the AREA",
         oauth: {
             action: "Sign in with {service}"
         }

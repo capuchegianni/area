@@ -14,6 +14,11 @@ export type Translation = RootTranslation
 export type Translations = RootTranslation
 
 type RootTranslation = {
+	/**
+	 * H​e​l​l​o​,​ ​{​n​a​m​e​}​!​ ​W​h​a​t​ ​d​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​a​u​t​o​m​a​t​e​ ​t​o​d​a​y​?
+	 * @param {unknown} name
+	 */
+	welcome: RequiredParams<'name'>
 	error: {
 		/**
 		 * G​o​ ​t​o​ ​h​o​m​e​p​a​g​e
@@ -44,6 +49,34 @@ type RootTranslation = {
 			 * I​n​v​a​l​i​d​ ​c​r​e​d​e​n​t​i​a​l​s
 			 */
 			invalidCredentials: string
+		}
+		/**
+		 * M​i​s​s​i​n​g​ ​o​r​ ​i​n​v​a​l​i​d​ ​f​i​e​l​d​:​ ​{​f​i​e​l​d​}
+		 * @param {unknown} field
+		 */
+		incorrectField: RequiredParams<'field'>
+	}
+	components: {
+		combobox: {
+			/**
+			 * S​e​l​e​c​t​ ​a​ ​{​e​l​e​m​e​n​t​}
+			 * @param {unknown} element
+			 */
+			select: RequiredParams<'element'>
+			/**
+			 * S​e​a​r​c​h​ ​a​ ​{​e​l​e​m​e​n​t​}
+			 * @param {unknown} element
+			 */
+			search: RequiredParams<'element'>
+			/**
+			 * N​o​ ​{​e​l​e​m​e​n​t​}​ ​f​o​u​n​d
+			 * @param {unknown} element
+			 */
+			no: RequiredParams<'element'>
+			/**
+			 * C​l​e​a​r​ ​s​e​l​e​c​t​i​o​n
+			 */
+			clear: string
 		}
 	}
 	header: {
@@ -209,27 +242,14 @@ type RootTranslation = {
 		 * L​i​n​k​ ​a​n​ ​A​c​t​i​o​n​ ​a​n​d​ ​a​ ​R​E​A​c​t​i​o​n​ ​t​o​ ​c​r​e​a​t​e​ ​a​n​ ​A​R​E​A
 		 */
 		createAreaDescription: string
-		combobox: {
-			/**
-			 * S​e​l​e​c​t​ ​a​ ​{​e​l​e​m​e​n​t​}
-			 * @param {unknown} element
-			 */
-			select: RequiredParams<'element'>
-			/**
-			 * S​e​a​r​c​h​ ​a​ ​{​e​l​e​m​e​n​t​}
-			 * @param {unknown} element
-			 */
-			search: RequiredParams<'element'>
-			/**
-			 * N​o​ ​{​e​l​e​m​e​n​t​}​ ​f​o​u​n​d
-			 * @param {unknown} element
-			 */
-			no: RequiredParams<'element'>
-			/**
-			 * C​l​e​a​r​ ​s​e​l​e​c​t​i​o​n
-			 */
-			clear: string
-		}
+		/**
+		 * U​p​d​a​t​e​ ​t​h​e​ ​A​R​E​A
+		 */
+		updateArea: string
+		/**
+		 * U​p​d​a​t​e​ ​t​h​e​ ​A​c​t​i​o​n​ ​a​n​d​ ​R​E​A​c​t​i​o​n​ ​o​f​ ​t​h​e​ ​A​R​E​A
+		 */
+		updateAreaDescription: string
 		oauth: {
 			/**
 			 * S​i​g​n​ ​i​n​ ​w​i​t​h​ ​{​s​e​r​v​i​c​e​}
@@ -241,6 +261,10 @@ type RootTranslation = {
 }
 
 export type TranslationFunctions = {
+	/**
+	 * Hello, {name}! What do you want to automate today?
+	 */
+	welcome: (arg: { name: unknown }) => LocalizedString
 	error: {
 		/**
 		 * Go to homepage
@@ -271,6 +295,30 @@ export type TranslationFunctions = {
 			 * Invalid credentials
 			 */
 			invalidCredentials: () => LocalizedString
+		}
+		/**
+		 * Missing or invalid field: {field}
+		 */
+		incorrectField: (arg: { field: unknown }) => LocalizedString
+	}
+	components: {
+		combobox: {
+			/**
+			 * Select a {element}
+			 */
+			select: (arg: { element: unknown }) => LocalizedString
+			/**
+			 * Search a {element}
+			 */
+			search: (arg: { element: unknown }) => LocalizedString
+			/**
+			 * No {element} found
+			 */
+			no: (arg: { element: unknown }) => LocalizedString
+			/**
+			 * Clear selection
+			 */
+			clear: () => LocalizedString
 		}
 	}
 	header: {
@@ -436,24 +484,14 @@ export type TranslationFunctions = {
 		 * Link an Action and a REAction to create an AREA
 		 */
 		createAreaDescription: () => LocalizedString
-		combobox: {
-			/**
-			 * Select a {element}
-			 */
-			select: (arg: { element: unknown }) => LocalizedString
-			/**
-			 * Search a {element}
-			 */
-			search: (arg: { element: unknown }) => LocalizedString
-			/**
-			 * No {element} found
-			 */
-			no: (arg: { element: unknown }) => LocalizedString
-			/**
-			 * Clear selection
-			 */
-			clear: () => LocalizedString
-		}
+		/**
+		 * Update the AREA
+		 */
+		updateArea: () => LocalizedString
+		/**
+		 * Update the Action and REAction of the AREA
+		 */
+		updateAreaDescription: () => LocalizedString
 		oauth: {
 			/**
 			 * Sign in with {service}

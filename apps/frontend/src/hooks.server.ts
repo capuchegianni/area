@@ -41,9 +41,17 @@ function getPreferredLocale({ request, cookies }: RequestEvent): Locales {
  * @param resolve The resolve function to continue the request.
  */
 export const handle: Handle = async ({ event, resolve }) => {
-    const accessToken = event.cookies.get("accessToken");
+    event.locals.locale = "en";
+    event.locals.LL = L.en;
+    event.locals.client = null;
+    event.locals.services = null;
 
-    // TODO: avoid fetching client and services at each page change
+    // If the access token is in the URL, it means that it's a mobile request for OAuth.
+    // In this case, we don't need to get the client, the locale, or the services.
+    if (event.url.searchParams.get("access_token"))
+        return resolve(event);
+
+    const accessToken = event.cookies.get("accessToken");
 
     if (!event.locals.client) {
         event.locals.client = await getClient(accessToken);
