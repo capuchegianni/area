@@ -34,10 +34,11 @@ function onLikedVideo(
                 const youtubeVideo = data.items[0];
                 return resolve({
                     data: transformYouTubeVideoToArea(youtubeVideo),
-                    cacheValue: youtubeVideo.id
+                    cacheValue: JSON.stringify({ id: youtubeVideo.id })
                 });
             })
             .catch((e) => {
+                console.error(e);
                 if (403 === e.status)
                     return reject(
                         new ForbiddenException("Access token expired.")
@@ -68,13 +69,16 @@ function onNewSubscription(
             .get<YouTubeSubcriptionsResponse>(url, config)
             .then(({ data }) => {
                 if (1 !== data.items.length)
-                    return resolve({ data: null, cacheValue: "" });
+                    return resolve({
+                        data: null,
+                        cacheValue: JSON.stringify({ id: "" })
+                    });
                 const youtubeSubscription = data.items[0];
                 return resolve({
                     data: transformYoutubeSubscriptionToArea(
                         youtubeSubscription
                     ),
-                    cacheValue: youtubeSubscription.id
+                    cacheValue: JSON.stringify({ id: youtubeSubscription.id })
                 });
             })
             .catch((e) => {
@@ -108,11 +112,14 @@ function onNewUploadedVideo(
             .get<YouTubeVideoListResponse>(url, config)
             .then(({ data }) => {
                 if (1 !== data.items.length)
-                    return resolve({ data: null, cacheValue: "" });
+                    return resolve({
+                        data: null,
+                        cacheValue: JSON.stringify({ id: "" })
+                    });
                 const youtubeVideo = data.items[0];
                 return resolve({
                     data: transformYouTubeVideoToArea(youtubeVideo),
-                    cacheValue: youtubeVideo.id
+                    cacheValue: JSON.stringify({ id: youtubeVideo.id })
                 });
             })
             .catch((e) => {
