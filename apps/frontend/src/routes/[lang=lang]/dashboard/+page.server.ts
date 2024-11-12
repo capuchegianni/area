@@ -13,16 +13,20 @@ export const load: PageServerLoad = async ({ url: { searchParams }, locals: { lo
         return error(401, "Unauthorized");
 
     const areas = await api.area.getAll(env.API_URL, client.accessToken);
-    if (areas.status === 401)
-        return redirect(302, `/${locale}/auth/sign-in`);
     if (!areas.success)
-        return error(500, "Internal Server Error");
+        return error(401, "Unauthorized");
 
     const oauthCredentials: Record<string, string> = {};
     for (const service of OAUTH_SERVICES) {
         const credentials = await api.oauth.credentials(env.API_URL, service, client.accessToken);
-        if (credentials.success)
-            oauthCredentials[service] = credentials.body.find(credential => credential.id !== undefined)?.id.toString() || "";
+        if (credentials.success) {
+            credentials.body.forEach(credential => {
+                const key = `${service}.${credential.scope}`;
+
+                if (oauthCredentials[key] === undefined)
+                    oauthCredentials[key] = credential.id.toString();
+            });
+        }
     }
 
     const oauthResult = {
@@ -31,7 +35,7 @@ export const load: PageServerLoad = async ({ url: { searchParams }, locals: { lo
         id: searchParams.get("id")
     };
 
-    return { locale, services, areas: areas.body, oauthCredentials, oauthResult };
+    return { locale, clientName: `${client.firstname} ${client.lastname}`, services, areas: areas.body, oauthCredentials, oauthResult };
 };
 
 function badRequestFail(LL: TranslationFunctions, field: string) {
@@ -50,17 +54,25 @@ function getOrThrow(data: FormData, key: string) {
     return value;
 }
 
+function numberOrThrow(data: FormData, key: string) {
+    const value = Number(getOrThrow(data, key));
+
+    if (isNaN(value) || value < 0)
+        throw new Error(key);
+    return value;
+}
+
 function getPayload(data: FormData) {
     const payload = {
         name: getOrThrow(data, "name"),
         description: getOrThrow(data, "description"),
         action_id: getOrThrow(data, "action-id"),
         action_metadata: {} as Record<string, string>,
-        action_oauth_id: Number(getOrThrow(data, "action-oauth-id")),
+        action_oauth_id: numberOrThrow(data, "action-oauth-id"),
         reaction_id: getOrThrow(data, "reaction-id"),
         reaction_body: {} as Record<string, string>,
-        reaction_oauth_id: Number(getOrThrow(data, "reaction-oauth-id")),
-        delay: Number(getOrThrow(data, "delay"))
+        reaction_oauth_id: numberOrThrow(data, "reaction-oauth-id"),
+        delay: numberOrThrow(data, "delay")
     };
 
     data.forEach((value, key) => {
@@ -84,16 +96,13 @@ function getPayload(data: FormData) {
         }
         payload.reaction_body[name] = getOrThrow(data, name);
     });
-    if (isNaN(payload.action_oauth_id))
-        throw new Error("Action OAuth ID");
-    if (isNaN(payload.reaction_oauth_id))
-        throw new Error("REAction OAuth ID");
-    if (isNaN(payload.delay))
-        throw new Error("delay");
     return payload;
 }
 
 export const actions: Actions = {
+    /**
+     * Creates a new AREA.
+     */
     area: async ({ request, locals: { client, LL } }) => {
         if (!client)
             return error(401, "Unauthorized");
@@ -102,22 +111,65 @@ export const actions: Actions = {
 
         try {
             const response = await api.area.createArea(env.API_URL, client.accessToken, getPayload(data));
-
             if (!response.success)
                 return error(401, "Unauthorized");
 
-            if (data.get("enabled") === "on")
-                await api.area.patchById(env.API_URL, client.accessToken, response.body.id, {
+            if (data.get("enabled") === "on") {
+                const patchResponse = await api.area.patchById(env.API_URL, client.accessToken, response.body.id, {
                     status: "RUNNING"
                 });
-            // TODO: display area with status (depending on the responses)
+                if (!patchResponse.success)
+                    return error(401, "Unauthorized");
+            }
         } catch (error) {
             if (error instanceof Error)
                 return badRequestFail(LL, error.message);
             return badRequestFail(LL, "unknown");
         }
+        return redirect(303, "/dashboard");
     },
 
+    /**
+     * Edits the status of an AREA ("RUNNING" or "STOPPED").
+     */
+    status: async ({ request, locals: { client, LL } }) => {
+        if (!client)
+            return error(401, "Unauthorized");
+
+        const data = await request.formData();
+        const id = data.get("id");
+
+        if (!id || typeof id !== "string")
+            return fail(400, { errorMessage: LL.error.api.unknown() });
+
+        const response = await api.area.patchById(env.API_URL, client.accessToken, id, {
+            status: data.get("enabled") === "on" ? "RUNNING" : "STOPPED"
+        });
+        if (!response.success)
+            return error(401, "Unauthorized");
+    },
+
+    /**
+     * Deletes an AREA.
+     */
+    delete: async ({ request, locals: { client, LL } }) => {
+        if (!client)
+            return error(401, "Unauthorized");
+
+        const data = await request.formData();
+        const id = data.get("id");
+
+        if (!id || typeof id !== "string")
+            return fail(400, { errorMessage: LL.error.api.unknown() });
+
+        const response = await api.area.deleteArea(env.API_URL, client.accessToken, id);
+        if (!response.success)
+            return error(401, "Unauthorized");
+    },
+
+    /**
+     * Redirects to the OAuth connection page for the specified service.
+     */
     oauth: async ({ request, locals: { client, LL } }) => {
         if (!client)
             return error(401, "Unauthorized");

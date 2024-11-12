@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { PageServerData, ActionData } from "../../../../../routes/[lang=lang]/dashboard/$types";
+    import type { PageServerData, ActionData } from "../../$types";
     import { applyAction, enhance } from "$app/forms";
     import type { Services, Action, Reaction } from "@common/area/types/area";
     import { Label } from "$lib/components/ui/label";
@@ -32,14 +32,11 @@
     let reactionId: string = "";
     let lastUpdated: "action" | "reaction";
 
-    $: actionService = actions[actionId]?.oauthProvider;
-    $: reactionService = reactions[reactionId]?.oauthProvider;
-
     $: selectedActionFields = actionFields(actionId).join(", ");
 
     $: oauthIds = {
-        action: oauthCredentials[actionService] || "",
-        reaction: oauthCredentials[reactionService] || ""
+        action: oauthCredentials[`${actions[actionId]?.oauthProvider}.${actions[actionId]?.oauthScopes}`] || "",
+        reaction: oauthCredentials[`${reactions[reactionId]?.oauthProvider}.${reactions[reactionId]?.oauthScopes}`] || ""
     };
 
     let error = "";
@@ -72,29 +69,7 @@
 </script>
 
 <ScrollArea class="max-h-[500px]">
-    <form
-        method="POST"
-        action="?/area"
-        use:enhance={async ({ formData, cancel }) => {
-            const ids = [
-                ["action-id", actionId, "an Action"],
-                ["reaction-id", reactionId, "a REAction"],
-                ["action-oauth-id", oauthIds.action, "an OAuth credential for the Action"],
-                ["reaction-oauth-id", oauthIds.reaction, "an OAuth credential for the REAction"]
-            ];
-
-            for (const [name, value, displayName] of ids) {
-                if (!value) {
-                    cancel();
-                    error = `Please select ${displayName}.`;
-                    return;
-                }
-                formData.set(name, value);
-            }
-            return async ({ result }) => await applyAction(result);
-        }}
-        class="grid gap-4"
-    >
+    <div class="grid gap-4">
         <AREActionSelection
             title="Action"
             description={actions[actionId]?.description}
@@ -104,7 +79,7 @@
                 actionId = value;
                 sessionStorage.setItem("actionId", actionId);
             }}
-            service={actionService}
+            service={actions[actionId]?.oauthProvider}
             oauthId={oauthIds.action}
             oauthScopes={actions[actionId]?.oauthScopes}
             setLastUpdated={() => setLastUpdated("action")}
@@ -120,7 +95,7 @@
                 reactionId = value;
                 sessionStorage.setItem("reactionId", reactionId);
             }}
-            service={reactionService}
+            service={reactions[reactionId]?.oauthProvider}
             oauthId={oauthIds.reaction}
             oauthScopes={reactions[reactionId]?.oauthScopes}
             setLastUpdated={() => setLastUpdated("reaction")}
@@ -128,78 +103,102 @@
             form={lastUpdated === "reaction" ? form : undefined}
         />
         {#if actions[actionId] && reactions[reactionId]}
-            <div class="py-4">
-                <Separator />
-            </div>
-            <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
-                <Label for="name">Name</Label>
-                <Input type="text" id="name" name="name" placeholder="Name" required />
-            </div>
-            <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
-                <Label for="description">Description</Label>
-                <Input type="text" id="description" name="description" placeholder="Description" required />
-            </div>
-            {#if actions[actionId].metadata !== undefined}
-                <Separator />
-                {#each Object.keys(actions[actionId].metadata || {}) as field}
-                    <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
-                        <Label for="metadata-{field}">{field}</Label>
-                        <Input type="text" id="metadata-{field}" name="metadata-{field}" placeholder={field} required />
-                        <!-- TODO <p class="text-muted-foreground text-sm">{field.description}</p>-->
-                    </div>
-                {/each}
-            {/if}
-            <Separator />
-            <div class="space-y-4">
-                {#if selectedActionFields}
-                    <p class="text-xs">
-                        Here are the list of fields you can use for <strong>{actions[actionId].name}</strong>.<br />
-                        You can use them in the fields below to customize <strong>{reactions[reactionId].name}</strong>.<br />
-                        To use them, type <strong>{"{{<field_name>}}"}</strong> in the field.<br />
-                        For example, with a YouTube video, to set a combination of the video title and channel name in a field,
-                        type <strong>{"{{title}} by {{channelName}}"}</strong> in this field below.
-                    </p>
-                    <p class="px-2 text-muted-foreground text-xs text-justify">
-                        {selectedActionFields}
-                    </p>
+            <form
+                method="POST"
+                action="?/area"
+                use:enhance={async ({ formData, cancel }) => {
+                    const ids = [
+                        ["action-id", actionId, "an Action"],
+                        ["reaction-id", reactionId, "a REAction"],
+                        ["action-oauth-id", oauthIds.action, "an OAuth credential for the Action"],
+                        ["reaction-oauth-id", oauthIds.reaction, "an OAuth credential for the REAction"]
+                    ];
+
+                    for (const [name, value, displayName] of ids) {
+                        if (!value) {
+                            cancel();
+                            error = `Please select ${displayName}.`;
+                            return;
+                        }
+                        formData.set(name, value);
+                    }
+                    return async ({ result }) => await applyAction(result);
+                }}
+                class="grid gap-4"
+            >
+                <div class="py-4">
                     <Separator />
-                {/if}
-                {#each reactionFields(reactionId) as field}
-                    <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
-                        <Label for={field.name}>{field.name}</Label>
-                        {#if field.type === "textarea"}
-                            <Textarea id={field.name} name={field.name} placeholder={field.name} required={!field.optional} />
-                        {:else}
-                            <Input type={field.type} id={field.name} name={field.name} placeholder={field.name} required={!field.optional} />
-                        {/if}
-<!--                       TODO <p class="text-muted-foreground text-sm">{field.description}</p>-->
-                    </div>
-                {/each}
-            </div>
-            <Separator />
-            <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
-                <Label for="delay">Delay</Label>
-                <Input type="number" id="delay" name="delay" placeholder="Delay" required />
-                <p class="text-muted-foreground text-sm">The delay (in seconds) between each poll to the service.</p>
-            </div>
-            <Separator />
-            <div>
-                <div class="flex w-[95%] flex-row items-center justify-between">
-                    <Label for="enabled">Enable AREA</Label>
-                    <Switch id="enabled" name="enabled" />
                 </div>
-                <p class="text-muted-foreground text-sm">Enable or disable the AREA.</p>
-            </div>
-            <Separator />
-            {#if error}
-                <p class="text-center text-sm text-red-500">{error}</p>
-            {/if}
-            {#if form?.errorMessage}
-                <p class="text-center text-sm text-red-500">{form?.errorMessage}</p>
-            {/if}
-            <Button type="submit">
-                {$LL.area.createArea()}
-            </Button>
+                <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
+                    <Label for="name">Name</Label>
+                    <Input type="text" id="name" name="name" placeholder="Name" required />
+                </div>
+                <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
+                    <Label for="description">Description</Label>
+                    <Input type="text" id="description" name="description" placeholder="Description" required />
+                </div>
+                {#if actions[actionId].metadata !== undefined}
+                    <Separator />
+                    {#each Object.keys(actions[actionId].metadata || {}) as field}
+                        <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
+                            <Label for="metadata-{field}">{field}</Label>
+                            <Input type="text" id="metadata-{field}" name="metadata-{field}" placeholder={field} required />
+                            <!-- TODO <p class="text-muted-foreground text-sm">{field.description}</p>-->
+                        </div>
+                    {/each}
+                {/if}
+                <Separator />
+                <div class="space-y-4">
+                    {#if selectedActionFields}
+                        <p class="text-xs">
+                            Here are the list of fields you can use for <strong>{actions[actionId].name}</strong>.<br />
+                            You can use them in the fields below to customize <strong>{reactions[reactionId].name}</strong>.<br />
+                            To use them, type <strong>{"{{<field_name>}}"}</strong> in the field.<br />
+                            For example, with a YouTube video, to set a combination of the video title and channel name in a field,
+                            type <strong>{"{{title}} by {{channelName}}"}</strong> in this field below.
+                        </p>
+                        <p class="px-2 text-muted-foreground text-xs text-justify">
+                            {selectedActionFields}
+                        </p>
+                        <Separator />
+                    {/if}
+                    {#each reactionFields(reactionId) as field}
+                        <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
+                            <Label for={field.name}>{field.name}</Label>
+                            {#if field.type === "textarea"}
+                                <Textarea id={field.name} name={field.name} placeholder={field.name} required={!field.optional} />
+                            {:else}
+                                <Input type={field.type} id={field.name} name={field.name} placeholder={field.name} required={!field.optional} />
+                            {/if}
+    <!--                       TODO <p class="text-muted-foreground text-sm">{field.description}</p>-->
+                        </div>
+                    {/each}
+                </div>
+                <Separator />
+                <div class="flex w-[95%] max-w-sm flex-col gap-1.5">
+                    <Label for="delay">Delay</Label>
+                    <Input type="number" id="delay" name="delay" placeholder="Delay" required />
+                    <p class="text-muted-foreground text-sm">The delay (in seconds) between each poll to the service.</p>
+                </div>
+                <Separator />
+                <div>
+                    <div class="flex w-[95%] flex-row items-center justify-between">
+                        <Label for="enabled">Enable AREA</Label>
+                        <Switch id="enabled" name="enabled" />
+                    </div>
+                    <p class="text-muted-foreground text-sm">Enable or disable the AREA.</p>
+                </div>
+                <Separator />
+                {#if error}
+                    <p class="text-center text-sm text-red-500">{error}</p>
+                {/if}
+                {#if form?.errorMessage}
+                    <p class="text-center text-sm text-red-500">{form?.errorMessage}</p>
+                {/if}
+                <Button type="submit">
+                    {$LL.area.createArea()}
+                </Button>
+            </form>
         {/if}
-    </form>
+    </div>
 </ScrollArea>

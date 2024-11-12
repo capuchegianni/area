@@ -1,6 +1,7 @@
 import type { Translation } from "../i18n-types";
 
 const fr = {
+    welcome: "Bonjour, {name} ! Que souhaitez-vous automatiser aujourd'hui ?",
     error: {
         goHome: "Aller à la page d'accueil",
         api: {

@@ -14,6 +14,11 @@ export type Translation = RootTranslation
 export type Translations = RootTranslation
 
 type RootTranslation = {
+	/**
+	 * H​e​l​l​o​,​ ​{​n​a​m​e​}​!​ ​W​h​a​t​ ​d​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​a​u​t​o​m​a​t​e​ ​t​o​d​a​y​?
+	 * @param {unknown} name
+	 */
+	welcome: RequiredParams<'name'>
 	error: {
 		/**
 		 * G​o​ ​t​o​ ​h​o​m​e​p​a​g​e
@@ -248,6 +253,10 @@ type RootTranslation = {
 }
 
 export type TranslationFunctions = {
+	/**
+	 * Hello, {name}! What do you want to automate today?
+	 */
+	welcome: (arg: { name: unknown }) => LocalizedString
 	error: {
 		/**
 		 * Go to homepage

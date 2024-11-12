@@ -1,6 +1,7 @@
 import type { BaseTranslation } from "../i18n-types";
 
 const en = {
+    welcome: "Hello, {name}! What do you want to automate today?",
     error: {
         goHome: "Go to homepage",
         api: {
