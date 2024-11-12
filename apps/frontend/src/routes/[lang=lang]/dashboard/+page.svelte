@@ -23,12 +23,12 @@
             services={data.services}
             oauthCredentials={data.oauthCredentials}
             oauthResult={data.oauthResult}
-            {form}
+            form={form}
         />
     {/if}
     <div class="grid grid-cols-1 mobile:grid-cols-3">
-        {#each data.areas as area}
-            <AreaCard {area} {form} />
+        {#each data.areas as area, index}
+            <AreaCard area={area} index={index} form={form} />
         {/each}
     </div>
 </div>

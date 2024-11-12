@@ -3,14 +3,18 @@
     import { CircleX } from "lucide-svelte";
     import { invalidateAll } from "$app/navigation";
     import { applyAction, enhance } from "$app/forms";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import * as Card from "$lib/components/ui/card";
     import * as HoverCard from "$lib/components/ui/hover-card";
-    import { Button } from "$lib/components/ui/button";
+    import { Button, buttonVariants } from "$lib/components/ui/button";
     import { Label } from "$lib/components/ui/label";
     import { Switch } from "$lib/components/ui/switch";
+    import { cn } from "$lib/utils";
     import type { Area } from "@common/types/area/interfaces/area.interface";
 
     export let area: Area;
+    // eslint-disable-next-line svelte/valid-compile
+    export let index: number;
 
     export let form: ActionData;
 
@@ -53,7 +57,9 @@
                     <Label for="enabled" class="font-normal text-sm text-gray-500">Enabled</Label>
                     <div class="flex items-center space-x-2 rounded-lg border pl-3">
                         <Switch id="enabled" name="enabled" bind:checked={enabled} />
-                        <Button type="submit" variant="ghost" disabled={(area.status === "RUNNING") === enabled}>Save</Button>
+                        <Button type="submit" variant="ghost" disabled={(area.status === "RUNNING") === enabled}>
+                            Save
+                        </Button>
                     </div>
                 </form>
             {:else}
@@ -76,6 +82,36 @@
     </Card.Content>
     <Card.Footer class="flex justify-end space-x-4">
         <Button>Edit</Button>
-        <Button variant="destructive">Delete</Button>
+        <AlertDialog.Root>
+            <AlertDialog.Trigger class={cn(buttonVariants({ variant: "destructive" }))}>Delete</AlertDialog.Trigger>
+            <AlertDialog.Content>
+                <AlertDialog.Header>
+                    <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+                    <AlertDialog.Description>
+                        This action cannot be undone. This will permanently delete your AREA and remove its data from
+                        our servers.
+                    </AlertDialog.Description>
+                </AlertDialog.Header>
+                <AlertDialog.Footer>
+                    <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+                    <form
+                        method="POST"
+                        action="?/delete"
+                        use:enhance={async ({ formData }) => {
+                            formData.set("id", area.id);
+                            return async ({ result }) => {
+                                if (result.type === "success")
+                                    await invalidateAll();
+                                await applyAction(result);
+                            };
+                        }}
+                    >
+                        <AlertDialog.Action type="submit" class={cn(buttonVariants({ variant: "destructive" }))}>
+                            Continue
+                        </AlertDialog.Action>
+                    </form>
+                </AlertDialog.Footer>
+            </AlertDialog.Content>
+        </AlertDialog.Root>
     </Card.Footer>
 </Card.Root>
