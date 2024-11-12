@@ -1,45 +1,72 @@
-# AREA Mobile
+# AREA - Mobile 📱
+## Our tech stack 🧮
+- [Expo](https://expo.dev/) - The mobile framework
+- [React Native Reusables](https://rnr-docs.vercel.app/) - UI library
+- [TailwindCSS](https://tailwindcss.com/) - CSS framework
+- [i18next](https://www.i18next.com/) - Internationalization library
+- [Jest-Expo](https://docs.expo.dev/develop/unit-testing/) - Testing framework
 
-A starting point to help you set up your application quickly and use the common components provided by `react-native-reusables`. The idea is to make it easier for you to get started.
+## Project setup 🏗️
+**1.** To get started with the project, you need to met the following **requirements**:
+- **Node.js**(v20 or higher) & **npm**(v10.8 or higher) installed on your machine. (You can download it [here](https://nodejs.org/en/download/))
+- [**Git**](https://git-scm.com/downloads) & [**Docker**](https://docs.docker.com/get-started/) installed on your machine.
 
-This is an [Expo](ehttps://expo.dev) application.
+**2.** Then you can **clone the repository**:
+```bash
+git clone https://github.com/zowks/B-DEV-500-area.git
+cd B-DEV-500-area
+```
 
-## Features
+**3.** Install the **dependencies** and navigate to the project directory:
+```bash
+npm install
+cd apps/mobile
+```
 
-- NativeWind v4
-- Dark and light mode
-    - Android Navigation Bar matches mode
-    - Persistant mode
-- Common components
-    - ThemeToggle, Avatar, Button, Card, Progress, Text, Tooltip
+**4.** Create a `.env` file using the `.env.example` as a template:
+```bash
+cp .env.example .env
+```
+Customize the `.env` file to your needs. (If you're using our `docker-compose`, don't forget to also check the `README.md` in the root directory)
 
-<img src="https://github.com/mrzachnugent/react-native-reusables/assets/63797719/42c94108-38a7-498b-9c70-18640420f1bc" alt="starter-base-template" style="width:270px;" />
+## How to start in dev mode 🚀
+When everything is ready, you can start the app in development mode by running the following command:
+```bash
+npm run dev
+```
+You can optionnaly select a target platform by running:
+```bash
+npm run dev:<android|ios|web>
+```
 
-## Get started
+## How to run the tests 🧪
+```bash
+npm run test
+```
+Or in watch mode:
+```bash
+npm run test:watch
+```
 
-1. Install dependencies
+## How to use the Linter 🧹
+```bash
+npm run lint
+```
+You can also fix the linting errors using:
+```bash
+npm run lint:fix
+```
 
-   ```bash
-   npm install
-   ```
+## How to build the project 📦
+```bash
+npm run build
+```
+You can build locally (not using Expo Cloud services) by running:
+```bash
+npm run build:local
+```
 
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This application uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Add a UI component
-
+## Add a UI component 📥
 To add a UI component to the application, you can use the components provided by `react-native-reusables`.
 
 1. Go to [React Native Reusable docs](https://rnr-docs.vercel.app).
@@ -47,17 +74,11 @@ To add a UI component to the application, you can use the components provided by
 3. Follow the installation instructions (use CLI installation).
 4. Use the component in the application.
 
-### Add an icon
-
+## Add an icon 👱
 `lucide-react-native` provides a set of icons that you can use in the application.\
 In order to be able to use them, you need to follow the steps described in the [React Native Reusable/Adding Icons documentation](https://rnr-docs.vercel.app/getting-started/adding-icons).
 
-## Testing
-
-You can follow the [Expo/Unit testing documentation](https://docs.expo.dev/develop/unit-testing/#unit-test) to learn how to add tests to the application.
-
-## Learn more
-
+## Learn more about Expo 📚
 To learn more about developing your application with Expo, look at the following resources:
 
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
