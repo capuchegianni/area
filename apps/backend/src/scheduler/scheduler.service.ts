@@ -174,7 +174,7 @@ export class SchedulerService implements OnModuleInit, OnModuleDestroy {
 
         if (
             null === oldCache ||
-            data.cacheValue === parsedOldCache ||
+            data.cacheValue === oldCache ||
             null === transformedData
         )
             return true;
