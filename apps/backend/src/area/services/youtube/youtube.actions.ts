@@ -132,44 +132,6 @@ function onNewUploadedVideo(
     });
 }
 
-function onNewUploadedVideo(
-    accessToken: string,
-    _metadata: object // eslint-disable-line
-): Promise<ActionResource> {
-    const url = "https://www.googleapis.com/youtube/v3/activities";
-    const config: AxiosRequestConfig = {
-        params: {
-            part: "contentDetails,snippet",
-            mine: true,
-            maxResults: 1
-        },
-        headers: {
-            Authorization: `Bearer ${accessToken}`
-        }
-    };
-
-    return new Promise((resolve, reject) => {
-        axios
-            .get<YouTubeVideoListResponse>(url, config)
-            .then(({ data }) => {
-                if (1 !== data.items.length)
-                    return resolve({ data: null, cacheValue: "" });
-                const youtubeVideo = data.items[0];
-                return resolve({
-                    data: transformYouTubeVideoToArea(youtubeVideo),
-                    cacheValue: youtubeVideo.id
-                });
-            })
-            .catch((e) => {
-                if (403 === e.status)
-                    return reject(
-                        new ForbiddenException("Access token expired.")
-                    );
-                return reject(e);
-            });
-    });
-}
-
 export const YOUTUBE_ACTIONS: { [name: string]: ActionDescription } = {
     on_liked_video: {
         description: "This event is triggered once a video has been liked.",
