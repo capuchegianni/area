@@ -22,7 +22,7 @@ const englishTranslations = {
     },
     "home": "Home",
     "createArea": "Create a new AREA",
-    "servicesConnect": "Connect your account to multiple services!",
+    "services": "Create, edit and lookup your AREAs!",
     "areaDescription": "Link an Action and a REAction to create an AREA"
 };
 
@@ -59,7 +59,7 @@ const translations: Record<string, Translation> = {
             },
             "home": "Accueil",
             "createArea": "Créer une nouvelle AREA",
-            "servicesConnect": "Connectez votre compte avec plusieurs services !",
+            "services": "Créez, modifiez et retrouvez vos AREAs !",
             "areaDescription": "Liez une Action avec une REAction afin de créer une AREA"
         }
     }
