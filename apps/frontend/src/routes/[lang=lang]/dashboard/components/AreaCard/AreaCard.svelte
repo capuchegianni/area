@@ -65,14 +65,36 @@
             {:else}
                 <div class="flex flex-row items-center justify-between">
                     <span class="text-sm text-gray-500">Enabled</span>
+                    <div class="flex flex-row space-x-2 items-center justify-between">
                     <HoverCard.Root>
-                        <HoverCard.Trigger>
-                            <CircleX color="red" />
-                        </HoverCard.Trigger>
-                        <HoverCard.Content>
-                            The AREA is currently in an error state. Please contact the support for more information.
-                        </HoverCard.Content>
-                    </HoverCard.Root>
+                            <HoverCard.Trigger>
+                                <CircleX color="red" />
+                            </HoverCard.Trigger>
+                            <HoverCard.Content>
+                                The AREA is currently in an error state. Please contact the support for more information.
+                            </HoverCard.Content>
+                            <form
+                                method="POST"
+                                action="?/status"
+                                use:enhance={async ({ formData }) => {
+                                    formData.set("id", area.id);
+                                    formData.set("enabled", "on");
+                                    return async ({ result }) => {
+                                        if (result.type === "success") {
+                                            await invalidateAll();
+                                            enabled = true;
+                                        }
+                                        await applyAction(result);
+                                    };
+                                }}
+                                class="flex flex-row items-center justify-between"
+                            >
+                                <Button type="submit" variant="outline">
+                                    Re-enable
+                                </Button>
+                            </form>
+                        </HoverCard.Root>
+                    </div>
                 </div>
             {/if}
             {#if form?.errorMessage}
