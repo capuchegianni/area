@@ -115,12 +115,12 @@ export const actions: Actions = {
                 if (!patchResponse.success)
                     return error(401, "Unauthorized");
             }
-            // TODO: display area with status (depending on the responses)
         } catch (error) {
             if (error instanceof Error)
                 return badRequestFail(LL, error.message);
             return badRequestFail(LL, "unknown");
         }
+        return redirect(303, "/dashboard");
     },
 
     /**
