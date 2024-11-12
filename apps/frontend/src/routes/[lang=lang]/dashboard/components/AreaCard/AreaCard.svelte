@@ -13,8 +13,8 @@
     import type { Area } from "@common/types/area/interfaces/area.interface";
 
     export let area: Area;
-    // eslint-disable-next-line svelte/valid-compile
     export let index: number;
+    export let onEditButtonClick: (index: number) => unknown;
 
     export let form: ActionData;
 
@@ -103,7 +103,7 @@
         </div>
     </Card.Content>
     <Card.Footer class="flex justify-end space-x-4">
-        <Button>Edit</Button>
+        <Button on:click={() => onEditButtonClick(index)}>Edit</Button>
         <AlertDialog.Root>
             <AlertDialog.Trigger class={cn(buttonVariants({ variant: "destructive" }))}>Delete</AlertDialog.Trigger>
             <AlertDialog.Content>

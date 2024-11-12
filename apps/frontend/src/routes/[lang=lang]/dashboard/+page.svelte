@@ -6,6 +6,8 @@
 
     export let data: PageServerData;
     export let form: ActionData;
+
+    let editingIndex: number | undefined;
 </script>
 
 <div class="p-4 space-y-4">
@@ -13,22 +15,30 @@
     {#if data.services}
         <AreaCreationDialog
             onOpenChange={(open) => {
-                if (!open)
+                if (!open) {
                     data.oauthResult = {
                         success: null,
                         service: null,
                         id: null
                     };
+                    editingIndex = undefined;
+                }
             }}
             services={data.services}
             oauthCredentials={data.oauthCredentials}
             oauthResult={data.oauthResult}
+            editingArea={editingIndex !== undefined ? data.areas[editingIndex] : undefined}
             form={form}
         />
     {/if}
     <div class="grid grid-cols-1 mobile:grid-cols-3">
         {#each data.areas as area, index}
-            <AreaCard area={area} index={index} form={form} />
+            <AreaCard
+                area={area}
+                index={index}
+                onEditButtonClick={(index) => editingIndex = index}
+                form={form}
+            />
         {/each}
     </div>
 </div>

@@ -78,6 +78,8 @@ const en = {
     area: {
         createArea: "Create an AREA",
         createAreaDescription: "Link an Action and a REAction to create an AREA",
+        updateArea: "Update the AREA",
+        updateAreaDescription: "Update the Action and REAction of the AREA",
         oauth: {
             action: "Sign in with {service}"
         }

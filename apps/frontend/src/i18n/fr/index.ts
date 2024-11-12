@@ -77,6 +77,8 @@ const fr = {
     area: {
         createArea: "Créer une AREA",
         createAreaDescription: "Reliez une Action et une REAction pour créer une AREA",
+        updateArea: "Modifier l'AREA",
+        updateAreaDescription: "Modifiez les paramètres de votre AREA",
         oauth: {
             action: "Connexion avec {service}"
         }
