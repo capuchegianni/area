@@ -1,6 +1,7 @@
 import type { BaseTranslation } from "../i18n-types";
 
 const en = {
+    welcome: "Hello, {name}! What do you want to automate today?",
     error: {
         goHome: "Go to homepage",
         api: {
@@ -77,6 +78,8 @@ const en = {
     area: {
         createArea: "Create an AREA",
         createAreaDescription: "Link an Action and a REAction to create an AREA",
+        updateArea: "Update the AREA",
+        updateAreaDescription: "Update the Action and REAction of the AREA",
         oauth: {
             action: "Sign in with {service}"
         }
