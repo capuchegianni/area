@@ -32,14 +32,11 @@
     let reactionId: string = "";
     let lastUpdated: "action" | "reaction";
 
-    $: actionService = actions[actionId]?.oauthProvider;
-    $: reactionService = reactions[reactionId]?.oauthProvider;
-
     $: selectedActionFields = actionFields(actionId).join(", ");
 
     $: oauthIds = {
-        action: oauthCredentials[actionService] || "",
-        reaction: oauthCredentials[reactionService] || ""
+        action: oauthCredentials[`${actions[actionId]?.oauthProvider}.${actions[actionId]?.oauthScopes}`] || "",
+        reaction: oauthCredentials[`${reactions[reactionId]?.oauthProvider}.${reactions[reactionId]?.oauthScopes}`] || ""
     };
 
     let error = "";
@@ -82,7 +79,7 @@
                 actionId = value;
                 sessionStorage.setItem("actionId", actionId);
             }}
-            service={actionService}
+            service={actions[actionId]?.oauthProvider}
             oauthId={oauthIds.action}
             oauthScopes={actions[actionId]?.oauthScopes}
             setLastUpdated={() => setLastUpdated("action")}
@@ -98,7 +95,7 @@
                 reactionId = value;
                 sessionStorage.setItem("reactionId", reactionId);
             }}
-            service={reactionService}
+            service={reactions[reactionId]?.oauthProvider}
             oauthId={oauthIds.reaction}
             oauthScopes={reactions[reactionId]?.oauthScopes}
             setLastUpdated={() => setLastUpdated("reaction")}

@@ -14,7 +14,7 @@
     export let id: string;
     export let setId: (value: string) => unknown;
 
-    export let service: string;
+    export let service: string | undefined;
 
     export let oauthId: string;
 
@@ -40,7 +40,7 @@
     {#if description}
         <p class="text-sm text-muted-foreground">{description}</p>
     {/if}
-    {#if id && !oauthId}
+    {#if id && service && !oauthId}
         <form
             method="POST"
             action="?/oauth"

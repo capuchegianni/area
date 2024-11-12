@@ -19,8 +19,14 @@ export const load: PageServerLoad = async ({ url: { searchParams }, locals: { lo
     const oauthCredentials: Record<string, string> = {};
     for (const service of OAUTH_SERVICES) {
         const credentials = await api.oauth.credentials(env.API_URL, service, client.accessToken);
-        if (credentials.success)
-            oauthCredentials[service] = credentials.body.find(credential => credential.id !== undefined)?.id.toString() || "";
+        if (credentials.success) {
+            credentials.body.forEach(credential => {
+                const key = `${service}.${credential.scope}`;
+
+                if (oauthCredentials[key] === undefined)
+                    oauthCredentials[key] = credential.id.toString();
+            });
+        }
     }
 
     const oauthResult = {
