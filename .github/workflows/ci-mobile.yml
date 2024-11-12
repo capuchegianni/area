@@ -13,10 +13,15 @@ on:
         description: "The NODE_ENV"
         required: true
         type: string
+      FRONTEND_URL:
+        description: "The frontend URL"
+        required: true
+        type: string
 
 env:
   EXPO_PUBLIC_API_URL: "${{ inputs.API_URL }}"
   EXPO_PUBLIC_NODE_ENV: "${{ inputs.NODE_ENV }}"
+  EXPO_PUBLIC_FRONTEND_URL: "${{ inputs.FRONTEND_URL }}"
 
 jobs:
   run-tests:

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
@@ -21,18 +20,18 @@ import { Area } from "@common/types/area/interfaces/area.interface";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { X } from "~/lib/icons/X";
 import { TouchableOpacity } from "react-native";
-
-type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number];
+import { OAuthService } from "@common/api/types/OAuthService";
+import ServiceOauth from "~/components/serviceOauth";
 
 type Services = AboutJson["server"]["services"];
-type Service = ArrayElement<AboutJson["server"]["services"]>
+type Service = Services[number]
 
-type Action = ArrayElement<Service["actions"]>
+type Action = Service["actions"][number]
 type SelectAction = {
     value: string
     label: string
 }
-type Reaction = ArrayElement<Service["reactions"]>
+type Reaction = Service["reactions"][number]
 type SelectReaction = {
     value: string
     label: string
@@ -40,14 +39,6 @@ type SelectReaction = {
 
 type QuerySearchParams = {
     id: string | undefined
-}
-
-function CreateArea() {
-
-}
-
-function EditArea({ id }: { id: string }) {
-
 }
 
 export default function AreaScreen() {
@@ -149,7 +140,10 @@ export default function AreaScreen() {
                     <View className="flex-row mb-1">
                         <Text className="text-foreground text-sm native:text-lg">Action</Text>
                         {selectAction && (
-                            <TouchableOpacity onPress={() => setSelectAction(undefined)} className="ml-2">
+                            <TouchableOpacity onPress={() => {
+                                setSelectAction(undefined);
+                                setAction(undefined);
+                            }} className="ml-2">
                                 <X color="red" size={16} />
                             </TouchableOpacity>
                         )}
@@ -160,6 +154,7 @@ export default function AreaScreen() {
                             label: selectAction ? selectAction.label : ""
                         }}
                         onValueChange={storeAction}
+                        className="mb-2"
                     >
                         <SelectTrigger>
                             <SelectValue
@@ -182,12 +177,21 @@ export default function AreaScreen() {
                             ))}
                         </SelectContent>
                     </Select>
+                    {action && (
+                        <ServiceOauth
+                            name={action.oauthProvider as OAuthService}
+                            scope={action.oauthScopes.join(" ")}
+                        />
+                    )}
                 </View>
                 <View>
-                    <View className="flex-row mb-1">
+                    <View className="flex-row">
                         <Text className="text-foreground text-sm native:text-lg">REAction</Text>
                         {selectReaction && (
-                            <TouchableOpacity onPress={() => setSelectReaction(undefined)} className="ml-2">
+                            <TouchableOpacity onPress={() => {
+                                setSelectReaction(undefined);
+                                setReaction(undefined);
+                            }} className="ml-2">
                                 <X color="red" size={16} />
                             </TouchableOpacity>
                         )}
@@ -198,6 +202,7 @@ export default function AreaScreen() {
                             label: selectReaction ? selectReaction.label : ""
                         }}
                         onValueChange={storeReaction}
+                        className="mb-2"
                     >
                         <SelectTrigger>
                             <SelectValue
@@ -220,6 +225,12 @@ export default function AreaScreen() {
                             ))}
                         </SelectContent>
                     </Select>
+                    {reaction && (
+                        <ServiceOauth
+                            name={reaction.oauthProvider as OAuthService}
+                            scope={reaction.oauthScopes.join(" ")}
+                        />
+                    )}
                 </View>
             </View>
         </View>
