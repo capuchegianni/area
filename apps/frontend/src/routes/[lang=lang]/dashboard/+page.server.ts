@@ -149,10 +149,13 @@ export const actions: Actions = {
     delete: async ({ request, locals: { client, LL } }) => {
         if (!client)
             return error(401, "Unauthorized");
+
         const data = await request.formData();
         const id = data.get("id");
+
         if (!id || typeof id !== "string")
             return fail(400, { errorMessage: LL.error.api.unknown() });
+
         const response = await api.area.deleteArea(env.API_URL, client.accessToken, id);
         if (!response.success)
             return error(401, "Unauthorized");
