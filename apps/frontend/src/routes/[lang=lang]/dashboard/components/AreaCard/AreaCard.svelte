@@ -13,8 +13,8 @@
     import type { Area } from "@common/types/area/interfaces/area.interface";
 
     export let area: Area;
-    // eslint-disable-next-line svelte/valid-compile
     export let index: number;
+    export let onEditButtonClick: (index: number) => unknown;
 
     export let form: ActionData;
 
@@ -65,14 +65,36 @@
             {:else}
                 <div class="flex flex-row items-center justify-between">
                     <span class="text-sm text-gray-500">Enabled</span>
+                    <div class="flex flex-row space-x-2 items-center justify-between">
                     <HoverCard.Root>
-                        <HoverCard.Trigger>
-                            <CircleX color="red" />
-                        </HoverCard.Trigger>
-                        <HoverCard.Content>
-                            The AREA is currently in an error state. Please contact the support for more information.
-                        </HoverCard.Content>
-                    </HoverCard.Root>
+                            <HoverCard.Trigger>
+                                <CircleX color="red" />
+                            </HoverCard.Trigger>
+                            <HoverCard.Content>
+                                The AREA is currently in an error state. Please contact the support for more information.
+                            </HoverCard.Content>
+                            <form
+                                method="POST"
+                                action="?/status"
+                                use:enhance={async ({ formData }) => {
+                                    formData.set("id", area.id);
+                                    formData.set("enabled", "on");
+                                    return async ({ result }) => {
+                                        if (result.type === "success") {
+                                            await invalidateAll();
+                                            enabled = true;
+                                        }
+                                        await applyAction(result);
+                                    };
+                                }}
+                                class="flex flex-row items-center justify-between"
+                            >
+                                <Button type="submit" variant="outline">
+                                    Re-enable
+                                </Button>
+                            </form>
+                        </HoverCard.Root>
+                    </div>
                 </div>
             {/if}
             {#if form?.errorMessage}
@@ -81,7 +103,7 @@
         </div>
     </Card.Content>
     <Card.Footer class="flex justify-end space-x-4">
-        <Button>Edit</Button>
+        <Button on:click={() => onEditButtonClick(index)}>Edit</Button>
         <AlertDialog.Root>
             <AlertDialog.Trigger class={cn(buttonVariants({ variant: "destructive" }))}>Delete</AlertDialog.Trigger>
             <AlertDialog.Content>

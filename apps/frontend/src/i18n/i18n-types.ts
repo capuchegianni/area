@@ -242,6 +242,14 @@ type RootTranslation = {
 		 * L​i​n​k​ ​a​n​ ​A​c​t​i​o​n​ ​a​n​d​ ​a​ ​R​E​A​c​t​i​o​n​ ​t​o​ ​c​r​e​a​t​e​ ​a​n​ ​A​R​E​A
 		 */
 		createAreaDescription: string
+		/**
+		 * U​p​d​a​t​e​ ​t​h​e​ ​A​R​E​A
+		 */
+		updateArea: string
+		/**
+		 * U​p​d​a​t​e​ ​t​h​e​ ​A​c​t​i​o​n​ ​a​n​d​ ​R​E​A​c​t​i​o​n​ ​o​f​ ​t​h​e​ ​A​R​E​A
+		 */
+		updateAreaDescription: string
 		oauth: {
 			/**
 			 * S​i​g​n​ ​i​n​ ​w​i​t​h​ ​{​s​e​r​v​i​c​e​}
@@ -476,6 +484,14 @@ export type TranslationFunctions = {
 		 * Link an Action and a REAction to create an AREA
 		 */
 		createAreaDescription: () => LocalizedString
+		/**
+		 * Update the AREA
+		 */
+		updateArea: () => LocalizedString
+		/**
+		 * Update the Action and REAction of the AREA
+		 */
+		updateAreaDescription: () => LocalizedString
 		oauth: {
 			/**
 			 * Sign in with {service}

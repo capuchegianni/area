@@ -13,6 +13,7 @@
     export let choices: Choice[];
     export let id: string;
     export let setId: (value: string) => unknown;
+    export let disabled: boolean;
 
     export let service: string | undefined;
 
@@ -36,6 +37,7 @@
             setId(value);
             setLastUpdated();
         }}
+        disabled={disabled}
     />
     {#if description}
         <p class="text-sm text-muted-foreground">{description}</p>

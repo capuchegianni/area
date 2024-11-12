@@ -5,6 +5,7 @@ import { error, fail, redirect } from "@sveltejs/kit";
 import { isOauthService, OAUTH_SERVICES } from "@common/api/types/OAuthService";
 import type { TranslationFunctions } from "$i18n/i18n-types";
 import { reactionFields } from "@common/area/reactions";
+import type { UpdateAreaDto } from "area-common/src/types/area/dto/updateArea.dto";
 
 const METADATA_PREFIX = "metadata-";
 
@@ -99,6 +100,25 @@ function getPayload(data: FormData) {
     return payload;
 }
 
+type PatchPayload = UpdateAreaDto & {
+    action_id?: string;
+    reaction_id?: string;
+};
+
+function patchArea(apiUrl: string, accessToken: string, areaId: string, payload: PatchPayload, enabled: boolean) {
+    delete payload.action_id;
+    delete payload.reaction_id;
+    return api.area.patchById(apiUrl, accessToken, areaId, { ...payload, status: enabled ? "RUNNING" : "STOPPED" });
+}
+
+async function switchAreaStatus(accessToken: string, id: string, enabled: boolean) {
+    const response = await api.area.patchById(env.API_URL, accessToken, id, {
+        status: enabled ? "RUNNING" : "STOPPED"
+    });
+    if (!response.success)
+        return error(401, "Unauthorized");
+}
+
 export const actions: Actions = {
     /**
      * Creates a new AREA.
@@ -108,24 +128,26 @@ export const actions: Actions = {
             return error(401, "Unauthorized");
 
         const data = await request.formData();
+        const id = data.get("id");
 
+        if (id && typeof id !== "string")
+            return badRequestFail(LL, "unknown");
         try {
-            const response = await api.area.createArea(env.API_URL, client.accessToken, getPayload(data));
+            const payload = getPayload(data);
+            const response = id ?
+                await patchArea(env.API_URL, client.accessToken, id, payload, data.get("enabled") === "on") :
+                await api.area.createArea(env.API_URL, client.accessToken, payload);
             if (!response.success)
                 return error(401, "Unauthorized");
 
-            if (data.get("enabled") === "on") {
-                const patchResponse = await api.area.patchById(env.API_URL, client.accessToken, response.body.id, {
-                    status: "RUNNING"
-                });
-                if (!patchResponse.success)
-                    return error(401, "Unauthorized");
-            }
+            if (!id)
+                await switchAreaStatus(client.accessToken, response.body.id, data.get("enabled") === "on");
         } catch (error) {
             if (error instanceof Error)
                 return badRequestFail(LL, error.message);
             return badRequestFail(LL, "unknown");
         }
+        // TODO: fix Not found error
         return redirect(303, "/dashboard");
     },
 
@@ -142,11 +164,7 @@ export const actions: Actions = {
         if (!id || typeof id !== "string")
             return fail(400, { errorMessage: LL.error.api.unknown() });
 
-        const response = await api.area.patchById(env.API_URL, client.accessToken, id, {
-            status: data.get("enabled") === "on" ? "RUNNING" : "STOPPED"
-        });
-        if (!response.success)
-            return error(401, "Unauthorized");
+        await switchAreaStatus(client.accessToken, id, data.get("enabled") === "on");
     },
 
     /**
